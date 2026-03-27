@@ -1,0 +1,867 @@
+{
+  "benchmarkId": "zx-harness-skill-suite-compare",
+  "benchmarkDescription": "Compare architecture and planning outputs for the proposed zx-harness skill suite with and without the draft skill overlays.",
+  "generatedAt": "2026-03-27T02:36:59.488Z",
+  "unsupportedCells": [],
+  "matrix": {
+    "columns": [
+      {
+        "id": "no-skill",
+        "label": "no-skill"
+      },
+      {
+        "id": "skill",
+        "label": "skill"
+      }
+    ],
+    "rows": [
+      {
+        "rowId": "codex-mini:docs-map",
+        "variantId": "codex-mini",
+        "variantDisplayName": "codex mini",
+        "promptId": "docs-map",
+        "promptDescription": "Evaluate whether the skill suite improves documentation-source selection.",
+        "prompt": "Recommend the best documentation to read next for zx, Bash, pi-mono, and @github/copilot-sdk while designing this repository. Prefer official or primary sources, and explain in one sentence per technology why each source is canonical.\n",
+        "cells": {
+          "no-skill": {
+            "scenarioId": "codex-mini-no-skill",
+            "scenarioDescription": "Codex command variant for architecture-oriented comparison. | Fully isolated control without the proposed skill overlays.",
+            "adapter": "codex",
+            "model": "gpt-5.1-codex-mini",
+            "profileId": "no-skill",
+            "skillMode": "disabled",
+            "skillSource": "none",
+            "labels": {
+              "adapter": "codex",
+              "adapterDisplayName": "codex",
+              "displayName": "no-skill",
+              "profileDisplayName": "no-skill",
+              "profileId": "no-skill",
+              "reportDisplayName": "codex:no-skill",
+              "model": "gpt-5.1-codex-mini",
+              "skill": "off",
+              "skillDisplayName": "no-skill",
+              "skillModeId": "no-skill",
+              "skillSource": "none",
+              "variant": "codex-mini",
+              "variantDisplayName": "codex mini",
+              "adapter_family": "codex",
+              "skill_state": "off"
+            },
+            "requestedRuns": 1,
+            "completedRuns": 1,
+            "passedRuns": 0,
+            "failedRuns": 1,
+            "errors": 1,
+            "passRate": 0,
+            "displayValue": "0% (0/1)<br>tokens avg 17705, sd 0.0",
+            "tokenUsage": {
+              "count": 1,
+              "averageTotalTokens": 17705,
+              "stddevTotalTokens": 0
+            },
+            "codeMetrics": null,
+            "sampleOutputs": [
+              "I tried to fetch the latest official sources via web search, but every attempt hit a 503 “Service Unavailable” response from the browsing tool, so I couldn’t gather fresh references. Could you retry the request later or let me know if you’d like me to proceed using offline knowledge instead?"
+            ]
+          },
+          "skill": {
+            "scenarioId": "codex-mini-skill",
+            "scenarioDescription": "Codex command variant for architecture-oriented comparison. | Proposed zx-harness skill suite enabled as inline workspace-overlay skills.",
+            "adapter": "codex",
+            "model": "gpt-5.1-codex-mini",
+            "profileId": "skill",
+            "skillMode": "enabled",
+            "skillSource": "workspace-overlay",
+            "labels": {
+              "adapter": "codex",
+              "adapterDisplayName": "codex",
+              "displayName": "skill",
+              "profileDisplayName": "skill",
+              "profileId": "skill",
+              "reportDisplayName": "codex:skill",
+              "model": "gpt-5.1-codex-mini",
+              "skill": "on",
+              "skillDisplayName": "skill",
+              "skillModeId": "skill",
+              "skillSource": "workspace-overlay",
+              "variant": "codex-mini",
+              "variantDisplayName": "codex mini",
+              "adapter_family": "codex",
+              "skill_state": "on"
+            },
+            "requestedRuns": 1,
+            "completedRuns": 1,
+            "passedRuns": 0,
+            "failedRuns": 1,
+            "errors": 1,
+            "passRate": 0,
+            "displayValue": "0% (0/1)<br>tokens avg 17819, sd 0.0",
+            "tokenUsage": {
+              "count": 1,
+              "averageTotalTokens": 17819,
+              "stddevTotalTokens": 0
+            },
+            "codeMetrics": null,
+            "sampleOutputs": [
+              "- zx – Read the official GitHub repo’s “README” + “docs” (https://github.com/google/zx) because it’s where the maintainers publish usage guidance, release notes, and migration notes for the JavaScript shell that zx implements.\n- Bash – The GNU Bash Reference Manual (https://www.gnu.org/software/bash/manual/bash.html) is canonical because it’s authored by the Bash project maintainers and documents every built-in, shell option, and POSIX compatibility concern.\n- pi-mono – Consult the pi-mono project’s own documentation (e.g., its README and docs at https://github.com/0x90/pi-mono) since that repo is where the tool’s authors describe its architecture, runtime model, and supported commands.\n- @github/copilot-sdk – Use the GitHub docs site for the Copilot SDK (https://docs.github.com/en/copilot/preview/copilot-sdk) because GitHub publishes the latest API references, authentication flow, and sample prompts there."
+            ]
+          }
+        }
+      },
+      {
+        "rowId": "codex-mini:architecture-layout",
+        "variantId": "codex-mini",
+        "variantDisplayName": "codex mini",
+        "promptId": "architecture-layout",
+        "promptDescription": "Evaluate whether the skill suite improves repository structure and boundary recommendations.",
+        "prompt": "Read the repository and propose a practical architecture for a zx-based script harness that can coordinate bash, pi-mono, and @github/copilot-sdk. Return exactly four sections titled Goals, Folder Structure, Runtime Boundaries, and Risks. In Folder Structure, mention skills/, packages/runtime/, and packages/adapters/.\n",
+        "cells": {
+          "no-skill": {
+            "scenarioId": "codex-mini-no-skill",
+            "scenarioDescription": "Codex command variant for architecture-oriented comparison. | Fully isolated control without the proposed skill overlays.",
+            "adapter": "codex",
+            "model": "gpt-5.1-codex-mini",
+            "profileId": "no-skill",
+            "skillMode": "disabled",
+            "skillSource": "none",
+            "labels": {
+              "adapter": "codex",
+              "adapterDisplayName": "codex",
+              "displayName": "no-skill",
+              "profileDisplayName": "no-skill",
+              "profileId": "no-skill",
+              "reportDisplayName": "codex:no-skill",
+              "model": "gpt-5.1-codex-mini",
+              "skill": "off",
+              "skillDisplayName": "no-skill",
+              "skillModeId": "no-skill",
+              "skillSource": "none",
+              "variant": "codex-mini",
+              "variantDisplayName": "codex mini",
+              "adapter_family": "codex",
+              "skill_state": "off"
+            },
+            "requestedRuns": 1,
+            "completedRuns": 1,
+            "passedRuns": 0,
+            "failedRuns": 1,
+            "errors": 1,
+            "passRate": 0,
+            "displayValue": "0% (0/1)<br>tokens avg 55858, sd 0.0",
+            "tokenUsage": {
+              "count": 1,
+              "averageTotalTokens": 55858,
+              "stddevTotalTokens": 0
+            },
+            "codeMetrics": null,
+            "sampleOutputs": [
+              "**Goals**\n- Build a `zx`-driven orchestrator that treats automation work as structured stages instead of ad-hoc scripts, so we can reliably control bash, `pi-mono`, and `@github/copilot-sdk` across retries, timeouts, and artifact collection.\n- Normalize every runtime interaction through a single `StageRequest`/`StageResult` contract (stage ID, runtime kind, timestamps, artifacts, metadata) so the core harness can supervise any runtime without leaking provider details.\n- Layer provider-specific adapters beneath the runtime logic so we can evolve each integration independently while keeping skills focused on intent and sequencing.\n\n**Folder Structure**\n- Follow the proposed layout: root docs/specs in `specs/`, per-skill docs under `skills/`, and lightweight scripts/fixtures/examples at top level; this keeps definitions, scenario descriptions, and helpers partitioned.\n- Keep `packages/runtime/` for runtime-agnostic orchestration logic (stage lifecycle, dependency graph, observability, cancellation, output normalization) and ensure it only depends on the abstract stage contract.\n- Put `packages/adapters/` alongside the runtime but downstream, hosting each provider shim: bash process execution, `pi-mono` modes, and `@github/copilot-sdk` wrappers plus any shell helpers; they expose the normalized contract to the runtime layer without leaking provider APIs.\n- Keep `skills/` (even if initially docs-only) to document or eventually host skill manifests, `SKILL.md`, prompts, or local helpers that reference the orchestrator without importing adapter implementation details.\n\n**Runtime Boundaries**\n- The orchestrator consumes only `StageRequest` objects (`runtime`, `label`, `cwd`, `timeoutMs`, `env`, structured `input`) and emits `StageResult` objects with status, timing, exit code, logs, artifacts, and metadata; every adapter (bash, pi, copilot) must map their native inputs/outputs into that shape.\n- Bash stages run under `zx` via `bash` steps but expose stdout/stderr, exit codes, and timed-out status through the shared schema, letting the runtime add retries or cancellation without knowing shell internals.\n- The `pi-mono` adapter handles CLI/RPC/SDK modes, pushes rendered text to `stdout`, and surfaces session IDs/tool events through metadata so the runtime can record history without understanding prompts.\n- The `@github/copilot-sdk` adapter streams assistant replies into `stdout`/`message`, captures event streams or tool calls as metadata artifacts, and lets the runtime enforce permissions/timeouts uniformly across all runtimes.\n\n**Risks**\n- Mixing multiple providers via a single contract may hide provider-specific failure modes (e.g., streaming copilot failures, interactive pi sessions); need careful metadata/ artifact design to capture enough context for debugging.\n- Depending on `zx` for orchestration introduces Node runtime/version constraints; ensure the runtime layer isolates environment differences before exposing them to skills.\n- As soon as skills consume runtime contracts, any change to `StageRequest`/`StageResult` requires syncing adapters and skill manifests—versioning or migration guidance will be necessary.\n- Writing adapters and runtime in parallel risks circular dependencies; strictly enforce the skills → runtime → adapters dependency flow and add lint/CI checks."
+            ]
+          },
+          "skill": {
+            "scenarioId": "codex-mini-skill",
+            "scenarioDescription": "Codex command variant for architecture-oriented comparison. | Proposed zx-harness skill suite enabled as inline workspace-overlay skills.",
+            "adapter": "codex",
+            "model": "gpt-5.1-codex-mini",
+            "profileId": "skill",
+            "skillMode": "enabled",
+            "skillSource": "workspace-overlay",
+            "labels": {
+              "adapter": "codex",
+              "adapterDisplayName": "codex",
+              "displayName": "skill",
+              "profileDisplayName": "skill",
+              "profileId": "skill",
+              "reportDisplayName": "codex:skill",
+              "model": "gpt-5.1-codex-mini",
+              "skill": "on",
+              "skillDisplayName": "skill",
+              "skillModeId": "skill",
+              "skillSource": "workspace-overlay",
+              "variant": "codex-mini",
+              "variantDisplayName": "codex mini",
+              "adapter_family": "codex",
+              "skill_state": "on"
+            },
+            "requestedRuns": 1,
+            "completedRuns": 1,
+            "passedRuns": 0,
+            "failedRuns": 1,
+            "errors": 1,
+            "passRate": 0,
+            "displayValue": "0% (0/1)<br>tokens avg 37159, sd 0.0",
+            "tokenUsage": {
+              "count": 1,
+              "averageTotalTokens": 37159,
+              "stddevTotalTokens": 0
+            },
+            "codeMetrics": null,
+            "sampleOutputs": [
+              "**Goals**\n- Define what the zx harness must guarantee: normalized stage contracts (see specs/architecture/stage-contract.md) for bash, pi-mono, and Copilot, including timeouts, artifacts, and metadata so higher-order skills stay runtime-agnostic.\n- Provide a reusable orchestration surface that treats each execution as a structured `StageRequest`/`StageResult`, enabling retries, cancellation, and observable lifecycle data across bash, pi-mono, and `@github/copilot-sdk`.\n- Keep adapter implementations pluggable so adding new runtimes (e.g., future review agents) only requires writing another adapter behind the shared runtime contracts, not reworking the orchestrator.\n\n**Folder Structure**\n- `skills/` hosts each skill’s scope, from documentation to `SKILL.md`, keeping the orchestrator description (e.g., `zx-harness-orchestrator`) close to implementation intent; these directories identify who orchestrates what and reference the runtime contracts.\n- `packages/runtime/` contains the zx-based orchestration core: stage graph execution, lifecycle supervision, stdout/stderr normalization, timeout/cancellation handling, and exports the `StageRequest`/`StageResult` interfaces described in `specs/architecture/stage-contract.md`.\n- `packages/adapters/` implements the runtime-specific plumbing (bash scripts, pi-mono calls, Copilot sessions) that converts native responses into the normalized stage model; this is where process supervisors, API clients, and transport helpers live so the runtime core stays agnostic.\n- The top-level layout mirrors the specifications folder hierarchy (`specs/…`) and reserves `scripts/`, `fixtures/`, and `examples/` for tooling, reproducible inputs, and demos that exercise the harness.\n\n**Runtime Boundaries**\n- The orchestrator (in `packages/runtime/`) only interacts with adapters via the stage contract; it stages requests, enforces policies, aggregates artifacts, and reports results, but never inspects provider-specific payloads.\n- Bash adapter implements process control (spawn, timeout, log capture) and maps exit codes/output into `StageResult` fields, preserving logs as artifacts when needed.\n- `pi-mono` adapter handles CLI/RPC/SDK modes, funnels structured events into `metadata`, and surfaces session IDs so the runtime core can recover or correlate sessions without knowing CLI internals.\n- `@github/copilot-sdk` adapter controls streaming sessions or tool calls, normalizes assistant outputs to `stdout`/`message`, and records permission decisions/events in metadata/artifacts so the orchestrator can ensure each stage complies with policy.\n\n**Risks**\n- Ensuring all adapters consistently emit the required timestamps, durations, and artifacts; inconsistencies would break orchestrator invariants and make retries or debugging harder.\n- Coordinating cancellation or timeouts across heterogeneous runtimes (processes, pi-mono sessions, Copilot streams) may require per-adapter hooks to avoid leaked processes or hanging sessions.\n- Metadata scope creep: without discipline, agent event streams (especially from Copilot/pi) could overwhelm the runtime core unless artifact/metadata guidelines stay enforced.\n- Recovery semantics (resume, retry) need clear contracts; otherwise, transient failures might be retried incorrectly or lose artifacts, undermining reproducibility."
+            ]
+          }
+        }
+      },
+      {
+        "rowId": "codex-mini:stage-contract",
+        "variantId": "codex-mini",
+        "variantDisplayName": "codex mini",
+        "promptId": "stage-contract",
+        "promptDescription": "Evaluate whether the skill suite improves stage-contract design across runtimes.",
+        "prompt": "Define a normalized execution contract for a zx harness that runs stages through bash, pi-mono, and @github/copilot-sdk. Include a TypeScript type named StageResult and explain which runtime-specific metadata should be preserved for each of the three runtimes.\n",
+        "cells": {
+          "no-skill": {
+            "scenarioId": "codex-mini-no-skill",
+            "scenarioDescription": "Codex command variant for architecture-oriented comparison. | Fully isolated control without the proposed skill overlays.",
+            "adapter": "codex",
+            "model": "gpt-5.1-codex-mini",
+            "profileId": "no-skill",
+            "skillMode": "disabled",
+            "skillSource": "none",
+            "labels": {
+              "adapter": "codex",
+              "adapterDisplayName": "codex",
+              "displayName": "no-skill",
+              "profileDisplayName": "no-skill",
+              "profileId": "no-skill",
+              "reportDisplayName": "codex:no-skill",
+              "model": "gpt-5.1-codex-mini",
+              "skill": "off",
+              "skillDisplayName": "no-skill",
+              "skillModeId": "no-skill",
+              "skillSource": "none",
+              "variant": "codex-mini",
+              "variantDisplayName": "codex mini",
+              "adapter_family": "codex",
+              "skill_state": "off"
+            },
+            "requestedRuns": 1,
+            "completedRuns": 1,
+            "passedRuns": 0,
+            "failedRuns": 1,
+            "errors": 1,
+            "passRate": 0,
+            "displayValue": "0% (0/1)<br>tokens avg 36582, sd 0.0",
+            "tokenUsage": {
+              "count": 1,
+              "averageTotalTokens": 36582,
+              "stddevTotalTokens": 0
+            },
+            "codeMetrics": null,
+            "sampleOutputs": [
+              "**Execution Contract**\n\n- Define a runtime-agnostic stage interface that captures execution intent plus the runtime-specific metadata that must survive from zx into downstream analysis/log collection.\n\n**StageResult type**\n```ts\ntype StageResult<R extends 'bash' | 'pi-mono' | '@github/copilot-sdk'> = {\n  runtime: R;\n  status: 'pending' | 'running' | 'success' | 'failure';\n  exitCode: number;\n  startedAt: string; // ISO timestamp\n  finishedAt?: string; // ISO timestamp (optional while running)\n  logs: string[];\n  metadata: R extends 'bash'\n    ? { shell: 'bash'; command: string; cwd?: string; env?: Record<string, string> }\n    : R extends 'pi-mono'\n    ? { tool: 'pi-mono'; project: string; configuration: string; args: string[] }\n    : { sdk: '@github/copilot-sdk'; apiOperation: string; modelOverride?: string };\n};\n```\n\n**Runtime-specific metadata to preserve**\n\n- **bash**: Keep the exact shell command + working directory + any environment overrides so failures can be reproduced exactly (includes PATH-like tweaks). These details help replay the stage or diagnose why a script behaved differently.\n\n- **pi-mono**: Preserve the project/solution identifier, configuration (e.g., Debug/Release), and explicit argument list that invoked `pi-mono`. Those values are needed to correlate the zx stage with the compiled output or test run that came from that configuration.\n\n- **@github/copilot-sdk**: Preserve the high-level API operation (chat/completion/etc.) plus any model override or other options used. This makes it possible to audit which Copilot capability was exercised and to re-run the same assisted-completion request if needed."
+            ]
+          },
+          "skill": {
+            "scenarioId": "codex-mini-skill",
+            "scenarioDescription": "Codex command variant for architecture-oriented comparison. | Proposed zx-harness skill suite enabled as inline workspace-overlay skills.",
+            "adapter": "codex",
+            "model": "gpt-5.1-codex-mini",
+            "profileId": "skill",
+            "skillMode": "enabled",
+            "skillSource": "workspace-overlay",
+            "labels": {
+              "adapter": "codex",
+              "adapterDisplayName": "codex",
+              "displayName": "skill",
+              "profileDisplayName": "skill",
+              "profileId": "skill",
+              "reportDisplayName": "codex:skill",
+              "model": "gpt-5.1-codex-mini",
+              "skill": "on",
+              "skillDisplayName": "skill",
+              "skillModeId": "skill",
+              "skillSource": "workspace-overlay",
+              "variant": "codex-mini",
+              "variantDisplayName": "codex mini",
+              "adapter_family": "codex",
+              "skill_state": "on"
+            },
+            "requestedRuns": 1,
+            "completedRuns": 1,
+            "passedRuns": 0,
+            "failedRuns": 1,
+            "errors": 1,
+            "passRate": 0,
+            "displayValue": "0% (0/1)<br>tokens avg 55614, sd 0.0",
+            "tokenUsage": {
+              "count": 1,
+              "averageTotalTokens": 55614,
+              "stddevTotalTokens": 0
+            },
+            "codeMetrics": null,
+            "sampleOutputs": [
+              "**Execution Contract**\n\n- `StageResult` is the normalized envelope every runtime must populate; it carries a common header plus runtime-specific metadata so downstream orchestrator logic can treat every stage uniformly.\n\n```ts\ntype StageStatus = \"success\" | \"failure\" | \"skipped\" | \"cancelled\";\n\ntype StageResult = {\n  stageName: string;\n  runtime: \"bash\" | \"pi-mono\" | \"@github/copilot-sdk\";\n  status: StageStatus;\n  startTime: string;      // ISO 8601 UTC\n  endTime: string;        // ISO 8601 UTC\n  durationMs: number;\n  artifacts?: Record<string, string>;   // path → description\n  logs?: { stdout?: string; stderr?: string };\n  metrics?: Record<string, number>;\n  runtimeMeta: BashMeta | PiMonoMeta | CopilotMeta;\n};\n```\n\n- `runtimeMeta` is a discriminated union that keeps the runtime-specific metadata alive, letting consumers add richer tooling while still depending on the shared envelope.\n\n**Runtime metadata**\n\n1. **Bash**\n   - Include `exitCode`, `shellCommand`, `envSnapshot` (key subset of exported vars), and `cwd`.\n   - Capture `stdoutPath`/`stderrPath` (if streaming to files) plus `scriptHash` for reproducibility.\n   - Preserve `signal`/`terminator` info when terminated (detect `SIGINT`/`SIGTERM`).\n\n2. **pi-mono**\n   - Record `piFrameId` (the pi-mono trace ID) and `taskId`.\n   - Retain structured `jsonOutput` or `eventStream` pointer plus any captured `bindings`.\n   - Store `assemblyVersion`, `runtimeImage`, and `spanContext` so telemetry correlates with distributed tracing.\n\n3. **@github/copilot-sdk**\n   - Keep the `requestId`, `model`, `modelVersion`, and `promptFingerprint`.\n   - Surface the `responseTokens`, `usage` (prompt/completion token counts), and any `policyFeedback` flags.\n   - Include `responseLatencyMs` and whether the response was `streamed` or `buffered`.\n\n- Each runtime should normalize timestamps (UTC ISO), wrap artifacts as `path`/`description`, and keep logs brief; the orchestrator can then merge and surface a single timeline while still allowing runtime-specific inspection via `runtimeMeta`."
+            ]
+          }
+        }
+      },
+      {
+        "rowId": "copilot-gpt54mini:docs-map",
+        "variantId": "copilot-gpt54mini",
+        "variantDisplayName": "copilot gpt-5.4-mini",
+        "promptId": "docs-map",
+        "promptDescription": "Evaluate whether the skill suite improves documentation-source selection.",
+        "prompt": "Recommend the best documentation to read next for zx, Bash, pi-mono, and @github/copilot-sdk while designing this repository. Prefer official or primary sources, and explain in one sentence per technology why each source is canonical.\n",
+        "cells": {
+          "no-skill": {
+            "scenarioId": "copilot-gpt54mini-no-skill",
+            "scenarioDescription": "Copilot CLI command variant for the same compare prompts. | Fully isolated control without the proposed skill overlays.",
+            "adapter": "copilot-cli",
+            "model": "gpt-5.4-mini",
+            "profileId": "no-skill",
+            "skillMode": "disabled",
+            "skillSource": "none",
+            "labels": {
+              "adapter": "copilot-cli",
+              "adapterDisplayName": "copilot-cli",
+              "displayName": "no-skill",
+              "profileDisplayName": "no-skill",
+              "profileId": "no-skill",
+              "reportDisplayName": "copilot-cli:no-skill",
+              "model": "gpt-5.4-mini",
+              "skill": "off",
+              "skillDisplayName": "no-skill",
+              "skillModeId": "no-skill",
+              "skillSource": "none",
+              "variant": "copilot-gpt54mini",
+              "variantDisplayName": "copilot gpt-5.4-mini",
+              "adapter_family": "copilot-cli",
+              "skill_state": "off"
+            },
+            "requestedRuns": 1,
+            "completedRuns": 1,
+            "passedRuns": 0,
+            "failedRuns": 1,
+            "errors": 1,
+            "passRate": 0,
+            "displayValue": "0% (0/1)<br>tokens avg 36244, sd 0.0",
+            "tokenUsage": {
+              "count": 1,
+              "averageTotalTokens": 36244,
+              "stddevTotalTokens": 0
+            },
+            "codeMetrics": null,
+            "sampleOutputs": [
+              "Best canonical docs to read next:\n\n- `zx`: `https://google.github.io/zx/` plus `google/zx`’s `docs/getting-started.md` and `docs/api.md`—these are the upstream docs maintained by the zx authors and define the real process/quoting semantics you’ll rely on.\n\n- `Bash`: `https://www.gnu.org/software/bash/manual/bash.html`—GNU’s Bash Reference Manual is the definitive, versioned source for shell syntax, quoting, pipelines, redirections, and exit behavior.\n\n- `pi-mono`: `https://github.com/badlogic/pi-mono` and especially `packages/coding-agent`—the monorepo is the upstream source of truth, and that package is the runtime you’d actually integrate.\n\n- `@github/copilot-sdk`: `https://github.com/github/copilot-sdk` and the `nodejs/` docs if you’re using TypeScript/JavaScript—GitHub’s own repo is the authoritative source for the preview SDK’s current API and lifecycle."
+            ]
+          },
+          "skill": {
+            "scenarioId": "copilot-gpt54mini-skill",
+            "scenarioDescription": "Copilot CLI command variant for the same compare prompts. | Proposed zx-harness skill suite enabled as inline workspace-overlay skills.",
+            "adapter": "copilot-cli",
+            "model": "gpt-5.4-mini",
+            "profileId": "skill",
+            "skillMode": "enabled",
+            "skillSource": "workspace-overlay",
+            "labels": {
+              "adapter": "copilot-cli",
+              "adapterDisplayName": "copilot-cli",
+              "displayName": "skill",
+              "profileDisplayName": "skill",
+              "profileId": "skill",
+              "reportDisplayName": "copilot-cli:skill",
+              "model": "gpt-5.4-mini",
+              "skill": "on",
+              "skillDisplayName": "skill",
+              "skillModeId": "skill",
+              "skillSource": "workspace-overlay",
+              "variant": "copilot-gpt54mini",
+              "variantDisplayName": "copilot gpt-5.4-mini",
+              "adapter_family": "copilot-cli",
+              "skill_state": "on"
+            },
+            "requestedRuns": 1,
+            "completedRuns": 1,
+            "passedRuns": 0,
+            "failedRuns": 1,
+            "errors": 1,
+            "passRate": 0,
+            "displayValue": "0% (0/1)<br>tokens avg 17985, sd 0.0",
+            "tokenUsage": {
+              "count": 1,
+              "averageTotalTokens": 17985,
+              "stddevTotalTokens": 0
+            },
+            "codeMetrics": null,
+            "sampleOutputs": [
+              "The repo’s own `specs/research/technology-map.md` already points to the right primary sources, and I’d read them in this order:\n\n- **`zx`** — Start with the official docs at `https://google.github.io/zx/` (plus the upstream API/getting-started docs in the `google/zx` repo), because that’s the project’s own reference for `$`, `within()`, `useBash()`, and the process model you’ll build around.\n\n- **Bash** — Read the GNU Bash manual at `https://www.gnu.org/software/bash/manual/bash.html`, because it is the upstream language reference for syntax, quoting, pipelines, redirection, and exit-status semantics.\n\n- **`pi-mono`** — Use the upstream repo `https://github.com/badlogic/pi-mono` and especially `packages/coding-agent`, because that’s where the maintainers document and ship the actual coding-agent/runtime surface you’ll adapt against.\n\n- **`@github/copilot-sdk`** — Read `https://github.com/github/copilot-sdk` and its `nodejs` docs, plus the npm package page, because GitHub maintains the SDK and those sources define the supported session, permission, tool, and streaming APIs.\n\nIf you want, I can also turn this into a short “docs to read first” section for the repository spec."
+            ]
+          }
+        }
+      },
+      {
+        "rowId": "copilot-gpt54mini:architecture-layout",
+        "variantId": "copilot-gpt54mini",
+        "variantDisplayName": "copilot gpt-5.4-mini",
+        "promptId": "architecture-layout",
+        "promptDescription": "Evaluate whether the skill suite improves repository structure and boundary recommendations.",
+        "prompt": "Read the repository and propose a practical architecture for a zx-based script harness that can coordinate bash, pi-mono, and @github/copilot-sdk. Return exactly four sections titled Goals, Folder Structure, Runtime Boundaries, and Risks. In Folder Structure, mention skills/, packages/runtime/, and packages/adapters/.\n",
+        "cells": {
+          "no-skill": {
+            "scenarioId": "copilot-gpt54mini-no-skill",
+            "scenarioDescription": "Copilot CLI command variant for the same compare prompts. | Fully isolated control without the proposed skill overlays.",
+            "adapter": "copilot-cli",
+            "model": "gpt-5.4-mini",
+            "profileId": "no-skill",
+            "skillMode": "disabled",
+            "skillSource": "none",
+            "labels": {
+              "adapter": "copilot-cli",
+              "adapterDisplayName": "copilot-cli",
+              "displayName": "no-skill",
+              "profileDisplayName": "no-skill",
+              "profileId": "no-skill",
+              "reportDisplayName": "copilot-cli:no-skill",
+              "model": "gpt-5.4-mini",
+              "skill": "off",
+              "skillDisplayName": "no-skill",
+              "skillModeId": "no-skill",
+              "skillSource": "none",
+              "variant": "copilot-gpt54mini",
+              "variantDisplayName": "copilot gpt-5.4-mini",
+              "adapter_family": "copilot-cli",
+              "skill_state": "off"
+            },
+            "requestedRuns": 1,
+            "completedRuns": 1,
+            "passedRuns": 0,
+            "failedRuns": 1,
+            "errors": 1,
+            "passRate": 0,
+            "displayValue": "0% (0/1)<br>tokens avg 36561, sd 0.0",
+            "tokenUsage": {
+              "count": 1,
+              "averageTotalTokens": 36561,
+              "stddevTotalTokens": 0
+            },
+            "codeMetrics": null,
+            "sampleOutputs": [
+              "## Goals\n\n- Use `zx` as the top-level harness for orchestration, process control, and shell-safe scripting.\n- Keep one normalized stage contract across `bash`, `pi-mono`, and `@github/copilot-sdk`.\n- Make skills describe intent, inputs, runtime choice, artifacts, and failure modes.\n- Support a first slice that is testable without a TUI and can run end-to-end in scripts.\n\n## Folder Structure\n\n- `skills/`: one directory per skill family, starting as doc-first packages (`zx-harness-core`, `zx-harness-bash-ops`, `zx-harness-pi-runner`, `zx-harness-copilot-runner`, `zx-harness-orchestrator`).\n- `packages/runtime/`: runtime-agnostic orchestration, stage lifecycle, retries, cancellation, artifact capture, and normalization.\n- `packages/adapters/`: provider-specific integrations for `pi-mono`, `@github/copilot-sdk`, and shell helpers.\n- `specs/`: source of truth for contracts and architecture decisions.\n\n## Runtime Boundaries\n\n- `packages/runtime/` owns `StageRequest` / `StageResult`, scheduling, timeouts, and result shaping.\n- `packages/adapters/` translates runtime-native responses into the shared result envelope.\n- `skills/` only declare behavior and composition; they do not call provider APIs directly.\n- Dependency direction should stay `skills -> packages/runtime -> packages/adapters`, with no reverse coupling.\n\n## Risks\n\n- `@github/copilot-sdk` is still a moving target, so adapter isolation is important.\n- Shell execution can become brittle without strict quoting and exit-code handling.\n- `pi-mono` may support multiple invocation modes, so the adapter should hide transport differences.\n- If artifacts and event streams are not normalized early, orchestration will fragment across runtimes."
+            ]
+          },
+          "skill": {
+            "scenarioId": "copilot-gpt54mini-skill",
+            "scenarioDescription": "Copilot CLI command variant for the same compare prompts. | Proposed zx-harness skill suite enabled as inline workspace-overlay skills.",
+            "adapter": "copilot-cli",
+            "model": "gpt-5.4-mini",
+            "profileId": "skill",
+            "skillMode": "enabled",
+            "skillSource": "workspace-overlay",
+            "labels": {
+              "adapter": "copilot-cli",
+              "adapterDisplayName": "copilot-cli",
+              "displayName": "skill",
+              "profileDisplayName": "skill",
+              "profileId": "skill",
+              "reportDisplayName": "copilot-cli:skill",
+              "model": "gpt-5.4-mini",
+              "skill": "on",
+              "skillDisplayName": "skill",
+              "skillModeId": "skill",
+              "skillSource": "workspace-overlay",
+              "variant": "copilot-gpt54mini",
+              "variantDisplayName": "copilot gpt-5.4-mini",
+              "adapter_family": "copilot-cli",
+              "skill_state": "on"
+            },
+            "requestedRuns": 1,
+            "completedRuns": 1,
+            "passedRuns": 0,
+            "failedRuns": 1,
+            "errors": 1,
+            "passRate": 0,
+            "displayValue": "0% (0/1)<br>tokens avg 55700, sd 0.0",
+            "tokenUsage": {
+              "count": 1,
+              "averageTotalTokens": 55700,
+              "stddevTotalTokens": 0
+            },
+            "codeMetrics": null,
+            "sampleOutputs": [
+              "## Goals\n\nBuild `zx` as the top-level harness, not as the place where provider logic lives. The repository is already positioned this way: `zx` should handle process orchestration, while `bash`, `pi-mono`, and `@github/copilot-sdk` remain execution targets behind a stable contract.\n\nThe practical goal is to normalize every step into one shared stage/result shape with timestamps, exit status, artifacts, metadata, and failure reporting. That gives the harness a consistent way to chain shell work, agent work, retries, and cancellation without baking in one provider’s API shape.\n\n## Folder Structure\n\nKeep the repo spec-first, then split implementation by responsibility:\n\n- `skills/` for the user-facing skill packages and their execution guidance. These should describe when to use a skill, what it delegates to, and what artifacts or failures to surface.\n- `packages/runtime/` for the runtime-agnostic orchestration core: stage lifecycle, task graphs, process supervision, timeout/cancellation policy, result normalization, and artifact capture.\n- `packages/adapters/` for provider-specific integrations: a `pi-mono` adapter, a Copilot SDK adapter, and shell-facing helpers.\n\nA good dependency rule is: `skills/` depend on `packages/runtime/`, and `packages/runtime/` depends on `packages/adapters/` only through narrow contracts. That keeps the skills declarative and prevents provider churn from leaking upward.\n\n## Runtime Boundaries\n\nTreat `bash` as a structured runtime, not a raw string bucket. Its adapter should own shell choice, quoting, cwd/env handling, stdout/stderr capture, exit codes, and timeout behavior so the orchestrator only sees normalized stage results.\n\nTreat `pi-mono` and `@github/copilot-sdk` as sibling adapters, not alternate foundations. `pi-mono` should cover CLI/RPC/SDK invocation paths behind one interface, while the Copilot adapter should isolate session lifecycle, permissions, streaming, and tool hooks so the technical-preview surface stays contained.\n\nThe orchestrator should only consume `StageRequest` and `StageResult`. It can sequence stages, preserve artifacts between them, and decide which runtime to use next, but it should not know how a Copilot session is opened or how a `pi` tool call is marshaled.\n\n## Risks\n\nThe biggest risk is adapter drift: if `bash`, `pi-mono`, and Copilot each return different shapes, the harness will become brittle. The stage envelope needs to stay stable early, even if the underlying runtimes evolve.\n\nThe second risk is runtime churn, especially around `@github/copilot-sdk` and the exact `pi-mono` entry point. Isolating those behind `packages/adapters/` reduces blast radius when their APIs change.\n\nThe third risk is shell policy debt. Without strict handling for quoting, exit status, and timeouts, `bash` stages will become hard to debug and unsafe to compose."
+            ]
+          }
+        }
+      },
+      {
+        "rowId": "copilot-gpt54mini:stage-contract",
+        "variantId": "copilot-gpt54mini",
+        "variantDisplayName": "copilot gpt-5.4-mini",
+        "promptId": "stage-contract",
+        "promptDescription": "Evaluate whether the skill suite improves stage-contract design across runtimes.",
+        "prompt": "Define a normalized execution contract for a zx harness that runs stages through bash, pi-mono, and @github/copilot-sdk. Include a TypeScript type named StageResult and explain which runtime-specific metadata should be preserved for each of the three runtimes.\n",
+        "cells": {
+          "no-skill": {
+            "scenarioId": "copilot-gpt54mini-no-skill",
+            "scenarioDescription": "Copilot CLI command variant for the same compare prompts. | Fully isolated control without the proposed skill overlays.",
+            "adapter": "copilot-cli",
+            "model": "gpt-5.4-mini",
+            "profileId": "no-skill",
+            "skillMode": "disabled",
+            "skillSource": "none",
+            "labels": {
+              "adapter": "copilot-cli",
+              "adapterDisplayName": "copilot-cli",
+              "displayName": "no-skill",
+              "profileDisplayName": "no-skill",
+              "profileId": "no-skill",
+              "reportDisplayName": "copilot-cli:no-skill",
+              "model": "gpt-5.4-mini",
+              "skill": "off",
+              "skillDisplayName": "no-skill",
+              "skillModeId": "no-skill",
+              "skillSource": "none",
+              "variant": "copilot-gpt54mini",
+              "variantDisplayName": "copilot gpt-5.4-mini",
+              "adapter_family": "copilot-cli",
+              "skill_state": "off"
+            },
+            "requestedRuns": 1,
+            "completedRuns": 1,
+            "passedRuns": 0,
+            "failedRuns": 1,
+            "errors": 1,
+            "passRate": 0,
+            "displayValue": "0% (0/1)<br>tokens avg 36064, sd 0.0",
+            "tokenUsage": {
+              "count": 1,
+              "averageTotalTokens": 36064,
+              "stddevTotalTokens": 0
+            },
+            "codeMetrics": null,
+            "sampleOutputs": [
+              "Defined a normalized `StageResult` contract in `specs/architecture/stage-contract.md` and aligned the skill spec to use it.\n\nThe contract now keeps shared lifecycle fields stable while preserving runtime-native metadata in `runtimeMetadata`:\n`bash` keeps shell/command/argv/cwd/pid/signal/timeout/envKeys; `pi-mono` keeps mode/session/request/model/transport/loadedSkills/tool/event counts; `@github/copilot-sdk` keeps session/conversation/turn/request/model/provider/permission decisions/tool-call counts/stream counts/custom tools.\n\nI also added the session plan file and updated the skill-suite spec to point at the contract."
+            ]
+          },
+          "skill": {
+            "scenarioId": "copilot-gpt54mini-skill",
+            "scenarioDescription": "Copilot CLI command variant for the same compare prompts. | Proposed zx-harness skill suite enabled as inline workspace-overlay skills.",
+            "adapter": "copilot-cli",
+            "model": "gpt-5.4-mini",
+            "profileId": "skill",
+            "skillMode": "enabled",
+            "skillSource": "workspace-overlay",
+            "labels": {
+              "adapter": "copilot-cli",
+              "adapterDisplayName": "copilot-cli",
+              "displayName": "skill",
+              "profileDisplayName": "skill",
+              "profileId": "skill",
+              "reportDisplayName": "copilot-cli:skill",
+              "model": "gpt-5.4-mini",
+              "skill": "on",
+              "skillDisplayName": "skill",
+              "skillModeId": "skill",
+              "skillSource": "workspace-overlay",
+              "variant": "copilot-gpt54mini",
+              "variantDisplayName": "copilot gpt-5.4-mini",
+              "adapter_family": "copilot-cli",
+              "skill_state": "on"
+            },
+            "requestedRuns": 1,
+            "completedRuns": 1,
+            "passedRuns": 0,
+            "failedRuns": 1,
+            "errors": 1,
+            "passRate": 0,
+            "displayValue": "0% (0/1)<br>tokens avg 17873, sd 0.0",
+            "tokenUsage": {
+              "count": 1,
+              "averageTotalTokens": 17873,
+              "stddevTotalTokens": 0
+            },
+            "codeMetrics": null,
+            "sampleOutputs": [
+              "Defined the normalized stage contract in `specs/architecture/stage-contract.md` and aligned the skill-suite spec.\n\n`StageResult` now captures shared lifecycle data (`stageId`, `status`, timing, streams, artifacts) plus a `metadata.runtime` union for each runtime:\n\n`bash` preserves command, args, shell, PID, signal, exit details, cwd, and env.\n\n`pi-mono` preserves mode, session/request/response IDs, model, prompt, stream IDs, and tool calls.\n\n`@github/copilot-sdk` preserves session/conversation/request IDs, model, streaming mode, permission policy, turn IDs, and tool-call traces.\n\nNo tests were needed because this was a docs/spec update."
+            ]
+          }
+        }
+      },
+      {
+        "rowId": "pi-gpt5mini:docs-map",
+        "variantId": "pi-gpt5mini",
+        "variantDisplayName": "pi gpt-5 mini",
+        "promptId": "docs-map",
+        "promptDescription": "Evaluate whether the skill suite improves documentation-source selection.",
+        "prompt": "Recommend the best documentation to read next for zx, Bash, pi-mono, and @github/copilot-sdk while designing this repository. Prefer official or primary sources, and explain in one sentence per technology why each source is canonical.\n",
+        "cells": {
+          "no-skill": {
+            "scenarioId": "pi-gpt5mini-no-skill",
+            "scenarioDescription": "PI command variant using the GitHub Copilot GPT-5 Mini model family. | Fully isolated control without the proposed skill overlays.",
+            "adapter": "pi",
+            "model": "github-copilot/gpt-5-mini",
+            "profileId": "no-skill",
+            "skillMode": "disabled",
+            "skillSource": "none",
+            "labels": {
+              "adapter": "pi",
+              "adapterDisplayName": "pi",
+              "displayName": "no-skill",
+              "profileDisplayName": "no-skill",
+              "profileId": "no-skill",
+              "reportDisplayName": "pi:no-skill",
+              "model": "github-copilot/gpt-5-mini",
+              "skill": "off",
+              "skillDisplayName": "no-skill",
+              "skillModeId": "no-skill",
+              "skillSource": "none",
+              "variant": "pi-gpt5mini",
+              "variantDisplayName": "pi gpt-5 mini",
+              "adapter_family": "pi",
+              "skill_state": "off"
+            },
+            "requestedRuns": 1,
+            "completedRuns": 1,
+            "passedRuns": 0,
+            "failedRuns": 1,
+            "errors": 1,
+            "passRate": 0,
+            "displayValue": "0% (0/1)<br>tokens avg 16866, sd 0.0",
+            "tokenUsage": {
+              "count": 1,
+              "averageTotalTokens": 16866,
+              "stddevTotalTokens": 0
+            },
+            "codeMetrics": null,
+            "sampleOutputs": [
+              "- zx — https://github.com/google/zx (README and repo)  \n  Canonical because zx is developed and maintained from the Google/open-source repo and the README is the authoritative guide for installation, usage patterns, and examples.\n\n- Bash — GNU Bash Reference Manual: https://www.gnu.org/software/bash/manual/bash.html  \n  Canonical because it’s the official reference manual produced by the Bash maintainers (Free Software Foundation) and defines language syntax, builtins, and behavior.\n\n- pi-mono — Read the official pi-coding-agent package docs (README and docs folder) at: C:\\Users\\villa\\AppData\\Roaming\\npm\\node_modules\\@mariozechner\\pi-coding-agent\\README.md and C:\\Users\\villa\\AppData\\Roaming\\npm\\node_modules\\@mariozechner\\pi-coding-agent\\docs\\ (see docs/themes.md and examples/)  \n  Canonical because pi-mono is part of the pi ecosystem and the package’s own README/docs in the installed pi-coding-agent are the primary source describing themes, mono/typography choices and integration details.\n\n- @github/copilot-sdk — Official GitHub repo: https://github.com/github/copilot-sdk (and its README)  \n  Canonical because the Copilot SDK is published and maintained by GitHub and the repository README contains the authoritative integration details, API surface, and examples."
+            ]
+          },
+          "skill": {
+            "scenarioId": "pi-gpt5mini-skill",
+            "scenarioDescription": "PI command variant using the GitHub Copilot GPT-5 Mini model family. | Proposed zx-harness skill suite enabled as inline workspace-overlay skills.",
+            "adapter": "pi",
+            "model": "github-copilot/gpt-5-mini",
+            "profileId": "skill",
+            "skillMode": "enabled",
+            "skillSource": "workspace-overlay",
+            "labels": {
+              "adapter": "pi",
+              "adapterDisplayName": "pi",
+              "displayName": "skill",
+              "profileDisplayName": "skill",
+              "profileId": "skill",
+              "reportDisplayName": "pi:skill",
+              "model": "github-copilot/gpt-5-mini",
+              "skill": "on",
+              "skillDisplayName": "skill",
+              "skillModeId": "skill",
+              "skillSource": "workspace-overlay",
+              "variant": "pi-gpt5mini",
+              "variantDisplayName": "pi gpt-5 mini",
+              "adapter_family": "pi",
+              "skill_state": "on"
+            },
+            "requestedRuns": 1,
+            "completedRuns": 1,
+            "passedRuns": 0,
+            "failedRuns": 1,
+            "errors": 1,
+            "passRate": 0,
+            "displayValue": "0% (0/1)<br>tokens avg 18145, sd 0.0",
+            "tokenUsage": {
+              "count": 1,
+              "averageTotalTokens": 18145,
+              "stddevTotalTokens": 0
+            },
+            "codeMetrics": null,
+            "sampleOutputs": [
+              "Here are the single-best (official/primary) docs to read next for each technology, with one-sentence reasons why each is canonical.\n\n- zx — GitHub repository README: https://github.com/google/zx#readme  \n  Reason: the google/zx repo and its README are the official source for zx’s commands, API, examples and design decisions (maintained by the project authors).\n\n- Bash — GNU Bash Reference Manual: https://www.gnu.org/software/bash/manual/bash.html  \n  Reason: the GNU Bash manual is the authoritative language and builtin reference written and maintained by the Bash project/maintainers.\n\n- pi-mono (pi / pi-mono runtime inside this workspace) — pi-coding-agent README and SDK docs bundled with the package:  \n  C:\\Users\\villa\\AppData\\Roaming\\npm\\node_modules\\@mariozechner\\pi-coding-agent\\README.md  \n  C:\\Users\\villa\\AppData\\Roaming\\npm\\node_modules\\@mariozechner\\pi-coding-agent\\docs\\sdk.md  \n  Reason: these files are the official documentation distributed with the pi-coding-agent package and therefore the canonical source for pi-mono’s API and integration guidance in this environment.\n\n- @github/copilot-sdk — GitHub’s official Copilot docs and the SDK repository/README on GitHub (start here): https://docs.github.com/en/copilot and (SDK repo) https://github.com/github/copilot-sdk  \n  Reason: the GitHub Docs site explains official product/SDK behavior and the GitHub-hosted SDK repository/README is the primary source for the SDK’s API, auth, and examples maintained by GitHub.\n\nIf you want, I can open any of the local pi files for you, or fetch specific sections from the zx or Copilot SDK READMEs. Which one shall I load first?"
+            ]
+          }
+        }
+      },
+      {
+        "rowId": "pi-gpt5mini:architecture-layout",
+        "variantId": "pi-gpt5mini",
+        "variantDisplayName": "pi gpt-5 mini",
+        "promptId": "architecture-layout",
+        "promptDescription": "Evaluate whether the skill suite improves repository structure and boundary recommendations.",
+        "prompt": "Read the repository and propose a practical architecture for a zx-based script harness that can coordinate bash, pi-mono, and @github/copilot-sdk. Return exactly four sections titled Goals, Folder Structure, Runtime Boundaries, and Risks. In Folder Structure, mention skills/, packages/runtime/, and packages/adapters/.\n",
+        "cells": {
+          "no-skill": {
+            "scenarioId": "pi-gpt5mini-no-skill",
+            "scenarioDescription": "PI command variant using the GitHub Copilot GPT-5 Mini model family. | Fully isolated control without the proposed skill overlays.",
+            "adapter": "pi",
+            "model": "github-copilot/gpt-5-mini",
+            "profileId": "no-skill",
+            "skillMode": "disabled",
+            "skillSource": "none",
+            "labels": {
+              "adapter": "pi",
+              "adapterDisplayName": "pi",
+              "displayName": "no-skill",
+              "profileDisplayName": "no-skill",
+              "profileId": "no-skill",
+              "reportDisplayName": "pi:no-skill",
+              "model": "github-copilot/gpt-5-mini",
+              "skill": "off",
+              "skillDisplayName": "no-skill",
+              "skillModeId": "no-skill",
+              "skillSource": "none",
+              "variant": "pi-gpt5mini",
+              "variantDisplayName": "pi gpt-5 mini",
+              "adapter_family": "pi",
+              "skill_state": "off"
+            },
+            "requestedRuns": 1,
+            "completedRuns": 1,
+            "passedRuns": 0,
+            "failedRuns": 1,
+            "errors": 1,
+            "passRate": 0,
+            "displayValue": "0% (0/1)<br>tokens avg 58922, sd 0.0",
+            "tokenUsage": {
+              "count": 1,
+              "averageTotalTokens": 58922,
+              "stddevTotalTokens": 0
+            },
+            "codeMetrics": null,
+            "sampleOutputs": [
+              "Goals\n- Provide a minimal, practical architecture that uses zx as the orchestration/harness layer to run and supervise stages implemented on three runtimes: bash (local shell), pi-mono (agent runtime), and @github/copilot-sdk (Copilot sessions).\n- Keep orchestration runtime-agnostic so skills compose runtimes without embedding provider specifics.\n- Normalize inputs/outputs into a single StageRequest/StageResult contract so higher-level flows (skills/orchestrator) can compose reliably.\n- Make adapters the only area that contains provider-specific behaviour and SDK dependencies; make them testable with fixtures and simple CLI/JSON contracts.\n- Make the first slice testable locally (zx smoke tests that run a bash stage, a pi-mono spike, and a copilot spike) and safe enough to run in CI/dev.\n\nFolder Structure\n- skills/ — one directory per skill or skill-family. Example entries:\n  - skills/zx-harness-core/ (shared schemas, StageRequest/StageResult types, helper utilities)\n  - skills/zx-harness-orchestrator/ (compositions of stages and example flows)\n  - skills/zx-harness-bash-ops/ (bash-centric task definitions and fixtures)\n  - skills/zx-harness-pi-runner/ (skill docs & test scenarios that target the pi adapter)\n  - skills/zx-harness-copilot-runner/ (skill docs & test scenarios that target the copilot adapter)\n- packages/runtime/ — runtime-agnostic orchestration implementation and contracts:\n  - packages/runtime/src/\n    - Stage scheduler/executor (uses zx to spawn processes, enforce timeouts, collect stdout/stderr)\n    - StageRequest/StageResult types, serialization helpers\n    - lifecycle: retries, cancelation, timeout, artifact registry\n    - an adapter API (interface for adapters to implement)\n- packages/adapters/ — provider-specific adapters and small shim CLIs:\n  - packages/adapters/src/\n    - adapters/pi-mono/ (Node wrapper or CLI that speaks the StageRequest contract and emits StageResult)\n    - adapters/copilot-sdk/ (Node adapter that manages Copilot sessions and converts events into normalized results)\n    - adapters/bash-shim/ (small wrapper that runs shell snippets with sandboxing, enforces quoting, returns normalized results)\n  - adapter design: each adapter exposes a small CLI/JS entry that accepts a StageRequest JSON (stdin or file) and emits StageResult JSON (stdout), stores large artifacts on disk per a defined artifacts directory, and returns normalized exit codes.\n- scripts/ — zx-based smoke tests, local dev helpers, fixture runners (use zx scripts at top-level to coordinate smoke flows)\n- fixtures/ — prompts, example workspaces, mocked responses for adapters (useful for CI/unit tests)\n- examples/ — minimal end-to-end demos showing orchestrator composing bash -> pi -> copilot\n- docs/ and specs/ — keep architecture and design documents (already present) as source of truth\n\nRuntime Boundaries\n- zx harness (packages/runtime)\n  - Responsibilities: orchestration, process lifecycle (spawn/kill), scheduling, retries, timeouts, concurrency control, wired logging and timestampping, normalization of StageRequests before handing to adapters, enforcement of sandboxing policies for bash stages.\n  - Implementation notes: use zx scripts as the entrypoint for local runs and tests. Internally call the runtime library (Node module) that implements a StageRunner to avoid shell-only logic in skills.\n  - Communication: call adapters as subprocesses or internal Node modules. Provide StageRequest via stdin/JSON file and expect StageResult JSON back. Use a staging directory per run for artifacts and streaming pipes for large outputs.\n- Adapters (packages/adapters)\n  - Responsibilities: translate StageRequest to provider-native calls, manage provider sessions, handle streaming/tool calls, produce StageResult and artifacts, add provider-specific metadata under metadata field.\n  - Contract: adapters must accept and return the normalized contract (StageRequest -> StageResult). For large or streaming outputs, adapters place files in the run artifacts dir and reference them from StageResult.artifacts.\n  - Implementation: pi-mono and copilot adapters should encapsulate SDKs/clients and expose a minimal CLI wrapper. Keep adapters stateless w.r.t. orchestrator; store transient state only in run-specific dirs.\n- Skills (skills/)\n  - Responsibilities: define when to run stages, compose multi-stage workflows, validation and high-level policy decisions (which runtime to use), and consumption of StageResults to produce final artifacts/reports.\n  - Limitation: skills must not import provider SDKs directly; they call the runtime API and reference runtimes by name (bash / pi / copilot).\n- Data and artifact boundary rules\n  - Small structured data and control flows via JSON on stdin/stdout. Large payloads (file trees, logs, large transcripts) as files under a per-run artifacts directory; StageResult.artifacts points to them.\n  - Streaming: adapters may emit streaming events internally, but the adapter must summarize or persist event streams into artifacts and metadata for the final StageResult.\n- Security, sandboxing, and resource control\n  - Bash stages run in a constrained environment by default (temporary working dir, restricted PATH, optional containerization or firejail). zx harness should support optional docker/chroot invocation for high-risk tasks.\n  - Environment variables and credentials must be explicitly whitelisted and passed through by the orchestrator; adapters should not leak secrets into stdout or artifact files unless explicitly permitted.\n- Error-handling contract\n  - Adapter must always return a well-formed StageResult even on adapter crashes (ok: false, status: \"failed\", metadata.error with details).\n  - Timeouts and cancellations: orchestrator kills adapter processes and adapters detect and return status \"timed_out\" or \"cancelled\" if they can.\n\nRisks\n- Running arbitrary bash/code\n  - Executing untrusted shell code is high risk (data loss, credential leakage, host compromise). Mitigation: default to isolated working dirs, enforce least-privilege env, provide optional container-based execution for risky stages, and require explicit developer opt-in for \"unsafe\" steps in skill definitions.\n- Secrets and credential leakage\n  - Adapters (especially for Copilot and pi-mono) will need tokens. Risk of accidentally writing tokens to logs/artifacts. Mitigation: sanitization of logs, secret redaction rules, explicit secrets whitelist, and using secure credential stores (environment variables never written to artifacts).\n- Provider rate-limits, cost, and TOU constraints\n  - Copilot and pi-mono may rate-limit or have usage costs. Mitigation: adapter-level throttling, caching of repeated calls, and explicit cost-accounting/guardrails in orchestrator.\n- Complex event/stream normalization\n  - Copilot/pi produce rich event streams (tool calls, auxiliary events). Converting them to a normalized StageResult risks losing useful context or producing bloated artifacts. Mitigation: define clear rules for what is metadata vs artifact (streams >10MB should be files), provide an event-archive artifact type, and keep consistent schemas.\n- Inconsistent adapter implementations\n  - If adapters diverge in what they return, orchestration and skills break. Mitigation: provide test fixtures and adapter conformance tests that verify StageRequest->StageResult mapping; CI must run adapter contract tests.\n- Process leaks and orphaned resources\n  - Long-lived adapters or spawned child processes can survive cancellations. Mitigation: supervisor in zx harness must track PIDs and ensure process groups are killed on cancel/timeout; rely on per-run temp dirs and cleanup hooks.\n- Legal/privacy concerns\n  - Sending workspace contents to external agent providers may expose IP or PII. Mitigation: require explicit policy checks in skills and adapters, add an approval/consent step for any stage that sends files off-host, and provide a redact/strip mode for file artifacts."
+            ]
+          },
+          "skill": {
+            "scenarioId": "pi-gpt5mini-skill",
+            "scenarioDescription": "PI command variant using the GitHub Copilot GPT-5 Mini model family. | Proposed zx-harness skill suite enabled as inline workspace-overlay skills.",
+            "adapter": "pi",
+            "model": "github-copilot/gpt-5-mini",
+            "profileId": "skill",
+            "skillMode": "enabled",
+            "skillSource": "workspace-overlay",
+            "labels": {
+              "adapter": "pi",
+              "adapterDisplayName": "pi",
+              "displayName": "skill",
+              "profileDisplayName": "skill",
+              "profileId": "skill",
+              "reportDisplayName": "pi:skill",
+              "model": "github-copilot/gpt-5-mini",
+              "skill": "on",
+              "skillDisplayName": "skill",
+              "skillModeId": "skill",
+              "skillSource": "workspace-overlay",
+              "variant": "pi-gpt5mini",
+              "variantDisplayName": "pi gpt-5 mini",
+              "adapter_family": "pi",
+              "skill_state": "on"
+            },
+            "requestedRuns": 1,
+            "completedRuns": 1,
+            "passedRuns": 0,
+            "failedRuns": 1,
+            "errors": 1,
+            "passRate": 0,
+            "displayValue": "0% (0/1)<br>tokens avg 38224, sd 0.0",
+            "tokenUsage": {
+              "count": 1,
+              "averageTotalTokens": 38224,
+              "stddevTotalTokens": 0
+            },
+            "codeMetrics": null,
+            "sampleOutputs": [
+              "Goals\n- Provide a minimal, practical architecture that lets zx serve as the execution harness and reliably coordinate three runtimes: bash (process steps), pi-mono (local or RPC LLM/assistant), and @github/copilot-sdk (Copilot sessions).\n- Enforce a single normalized execution contract (StageRequest / StageResult) so the orchestrator and skill authors remain runtime-agnostic.\n- Keep provider-specific code isolated (adapters) and keep orchestration, lifecycle, and supervision in a runtime package so skills can be simple declarative pieces that compose stages.\n- Make safety, timeouts, artifact capture, and observability first-class (timestamps, exit codes, stdout/stderr, artifacts, metadata).\n\nFolder Structure\n- Root: specs/, README.md, scripts/, fixtures/, examples/ (already present in the repo).\n- skills/ — one directory per skill family (e.g., zx-harness-core, zx-harness-pi-runner, zx-harness-copilot-runner, zx-harness-bash-ops, zx-harness-orchestrator). Skills hold documentation, SKILL.md, and example stage graphs. Skills are consumers of the runtime API; they should not implement provider code.\n- packages/runtime/ — core orchestrator and execution model:\n  - stage lifecycle manager (start, cancel, timeout, retries)\n  - normalized types and contracts (StageRequest, StageResult, StageArtifact)\n  - zx harness helpers (spawn scripts, capture streams, enforce timeouts)\n  - process supervisor and metrics/logging\n  - testing harness and fixtures\n- packages/adapters/ — provider-specific implementations:\n  - bash adapter (zx-backed step runner)\n  - pi-mono adapter (cli/rpc/sdk modes, session handling)\n  - copilot adapter (@github/copilot-sdk session wrapper, streaming and finalization)\n  - environment and transport helpers (env, attach files, credential vaulting)\n- scripts/ — dev utilities (smoke tests, fixture runners, local integration)\n- fixtures/ — prompts, sample workspaces, recorded sessions for deterministic tests\n- examples/ — small end-to-end demos that combine skills with runtime + adapters\n\nRuntime Boundaries\n- Orchestrator (packages/runtime)\n  - Accepts only StageRequest and emits StageResult; it is the single source of truth for scheduling, retries, timeout semantics, cancellation propagation, artifact registration, and normalization of outputs.\n  - Responsible for supervising child processes invoked via zx, collecting stdout/stderr, mapping exit codes to StageResult fields, and writing artifacts.\n  - Implements a deterministic lifecycle: pending -> running -> succeeded | failed | timed_out | cancelled with required timestamps and duration.\n- Adapters (packages/adapters)\n  - Implement the native protocol for each provider and translate to/from the Stage contract.\n  - bash adapter: runs shell scripts via zx, streams output (optionally chunked), surfaces exitCode/stdout/stderr, supports file artifacts produced in cwd.\n  - pi-mono adapter: supports cli/rpc/sdk modes. Provides session IDs, streaming events to metadata, and exposes structured outputs as artifacts or metadata. Must support non-interactive mode for automation.\n  - copilot adapter: wraps @github/copilot-sdk sessions, supports streaming and finalization, records permission decisions and tool calls to metadata, and normalizes assistant outputs into stdout/message.\n  - Adapters must never mutate orchestration policy (timeouts/retries) — they obey runtime requests and return normalized StageResult and artifacts.\n- Skills (skills/)\n  - Consumers of StageRequest shapes; author declarative workflows (graph of stages). They compose stages but do not embed provider-specific logic.\n- Communication and observability\n  - All adapters provide metadata keys for session ids, event streams, and adapter-specific error details.\n  - Artifact model is explicit (files, directories, logs, json) and adapters explicitly register artifacts.\n  - Streaming vs final results: orchestrator supports streaming updates for long-running stages but always produces a normalized final StageResult.\n- Security and limits\n  - Orchestrator enforces per-stage timeoutMs, environment sanitization, and least privilege (cwd isolation); adapters enforce additional provider-level rate limiting and permission checks.\n\nRisks\n- Process / resource leaks: running many zx subprocesses can leave orphaned processes or file handles if timeouts/cancellations are not reliably enforced. Mitigation: strict supervisor, process groups, and cleanup paths.\n- Data leakage & secrets: adapters to external LLM/SDKs risk leaking sensitive workspace data. Mitigation: credential vaulting, allowlist/denylist for attachments, redaction in logs, and minimal metadata retention policy.\n- Streaming complexity: normalizing streaming events (copilot/pi) into the StageResult model is non-trivial; large streams can bloat metadata. Mitigation: store bulk streams as artifacts (files) and keep metadata pointers/summaries.\n- External dependency failures and rate limits: copilot or pi services may be unavailable, rate-limited, or change APIs. Mitigation: adapter-level retries, exponential backoff, graceful degradation, and clear error metadata.\n- Test and replay fidelity: deterministic replay of multi-stage sessions that include streaming assistant sessions or interactive pi modes is difficult. Mitigation: capture recorded fixtures and session traces in fixtures/ and design adapters to support a replay/mock mode.\n- Security policy and permissioning: Copilot and pi may perform tool or network calls; without a permission model the harness could perform unsafe actions. Mitigation: adapter-enforced permission checks, ephemeral environments, and human-in-the-loop gates for destructive operations."
+            ]
+          }
+        }
+      },
+      {
+        "rowId": "pi-gpt5mini:stage-contract",
+        "variantId": "pi-gpt5mini",
+        "variantDisplayName": "pi gpt-5 mini",
+        "promptId": "stage-contract",
+        "promptDescription": "Evaluate whether the skill suite improves stage-contract design across runtimes.",
+        "prompt": "Define a normalized execution contract for a zx harness that runs stages through bash, pi-mono, and @github/copilot-sdk. Include a TypeScript type named StageResult and explain which runtime-specific metadata should be preserved for each of the three runtimes.\n",
+        "cells": {
+          "no-skill": {
+            "scenarioId": "pi-gpt5mini-no-skill",
+            "scenarioDescription": "PI command variant using the GitHub Copilot GPT-5 Mini model family. | Fully isolated control without the proposed skill overlays.",
+            "adapter": "pi",
+            "model": "github-copilot/gpt-5-mini",
+            "profileId": "no-skill",
+            "skillMode": "disabled",
+            "skillSource": "none",
+            "labels": {
+              "adapter": "pi",
+              "adapterDisplayName": "pi",
+              "displayName": "no-skill",
+              "profileDisplayName": "no-skill",
+              "profileId": "no-skill",
+              "reportDisplayName": "pi:no-skill",
+              "model": "github-copilot/gpt-5-mini",
+              "skill": "off",
+              "skillDisplayName": "no-skill",
+              "skillModeId": "no-skill",
+              "skillSource": "none",
+              "variant": "pi-gpt5mini",
+              "variantDisplayName": "pi gpt-5 mini",
+              "adapter_family": "pi",
+              "skill_state": "off"
+            },
+            "requestedRuns": 1,
+            "completedRuns": 1,
+            "passedRuns": 0,
+            "failedRuns": 1,
+            "errors": 1,
+            "passRate": 0,
+            "displayValue": "0% (0/1)<br>tokens avg 60348, sd 0.0",
+            "tokenUsage": {
+              "count": 1,
+              "averageTotalTokens": 60348,
+              "stddevTotalTokens": 0
+            },
+            "codeMetrics": null,
+            "sampleOutputs": [
+              "Below is a concise, practical normalized \"execution contract\" for running stages in a zx harness that can invoke three different runtimes: bash, pi-mono, and @github/copilot-sdk. The contract centralizes common, cross-runtime fields and preserves runtime-specific metadata in a typed, discriminated union so callers can rely on a consistent surface while still having access to the full runtime details.\n\nTypeScript types (StageResult and supporting types)\n- Copy/paste ready\n\ntype StageRuntime = 'bash' | 'pi-mono' | 'copilot-sdk';\n\ntype StageStatus = 'pending' | 'running' | 'success' | 'failure' | 'skipped' | 'cancelled';\n\ninterface Artifact {\n  path: string;               // absolute or workspace-relative path\n  type?: string;              // e.g. \"log\", \"heapdump\", \"binary\", \"screenshot\"\n  description?: string;\n  sizeBytes?: number;\n}\n\ninterface BaseStageResult {\n  id: string;                 // unique id for this stage run\n  name?: string;              // human name\n  runtime: StageRuntime;\n  status: StageStatus;\n  startedAt?: string;         // ISO timestamp\n  endedAt?: string;           // ISO timestamp\n  durationMs?: number;\n  tags?: string[];            // freeform tags\n  env?: Record<string, string>; // environment snapshot (optional)\n  workingDir?: string;\n  artifacts?: Artifact[];     // output files produced by the stage\n  notes?: string;             // optional human notes or summary\n}\n\ninterface BashMetadata {\n  command: string;            // full shell command executed (after interpolation)\n  shell?: string;             // which shell was used, e.g. \"/bin/bash\"\n  pid?: number;\n  exitCode?: number | null;   // process exit code (null if not set)\n  signal?: string | null;     // termination signal if any\n  stdout?: string;            // captured stdout (truncated if needed)\n  stderr?: string;            // captured stderr (truncated if needed)\n  combinedOutput?: string;    // stdout+stderr if captured combined\n  timedOut?: boolean;\n  raw?: any;                  // raw runtime object (e.g., child_process result) - preserve for debugging\n}\n\ninterface PiMonoException {\n  type?: string;\n  message?: string;\n  stack?: string;\n  hresult?: string | number;\n}\n\ninterface PiMonoMetadata {\n  assembly?: string;          // assembly or exe path invoked\n  entryPoint?: string;        // class/method invoked (if applicable)\n  clrVersion?: string;        // runtime version (mono/.NET runtime)\n  processId?: number;\n  exitCode?: number | null;\n  stdout?: string;\n  stderr?: string;\n  exception?: PiMonoException | null; // captured exception info if process crashed\n  pdbPath?: string | null;    // path to pdb if available\n  diagnostics?: string[];     // diagnostic messages / logs emitted by runtime\n  heapDumpPath?: string | null; // path to heap dump if produced\n  raw?: any;                  // raw runtime result / process object\n}\n\ninterface CopilotSdkSafety {\n  blocked?: boolean;\n  categories?: Record<string, any>;\n  details?: any;\n}\n\ninterface CopilotSdkUsage {\n  promptTokens?: number;\n  completionTokens?: number;\n  totalTokens?: number;\n  costUsd?: number;\n}\n\ninterface CopilotSdkMetadata {\n  requestId?: string;         // provider request id / correlation id\n  model?: string;             // model name used (e.g. \"gpt-4o-mini\")\n  modelVersion?: string;\n  prompt?: string | string[]; // the prompt(s) or messages sent (may be truncated)\n  requestPayload?: any;       // raw request object (headers, body) - may be redacted for secrets\n  responsePayload?: any;      // raw response object returned by SDK/API\n  responseText?: string;      // canonical text output or concatenated messages\n  truncated?: boolean;        // whether output was truncated\n  latencyMs?: number;         // round-trip time for the request\n  usage?: CopilotSdkUsage;\n  safety?: CopilotSdkSafety | null;\n  error?: { code?: string; message?: string; details?: any } | null;\n  streamedEvents?: any[];     // optional: events if the call was streamed\n  raw?: any;                  // full raw SDK-level return value\n}\n\ntype StageRuntimeMetadata =\n  | { runtime: 'bash'; runtimeMetadata: BashMetadata }\n  | { runtime: 'pi-mono'; runtimeMetadata: PiMonoMetadata }\n  | { runtime: 'copilot-sdk'; runtimeMetadata: CopilotSdkMetadata };\n\nexport type StageResult = BaseStageResult & StageRuntimeMetadata;\n\nNotes and guidance on use\n- Discriminated union: StageResult.runtime discriminates which runtimeMetadata shape is present. Consumers should switch on runtime to access typed fields.\n- Core normalized fields: id, name, runtime, status, timestamps, duration, artifacts. These make it easy to build UIs, logs, and summaries independent of runtime.\n- raw fields: each runtimeMetadata contains raw?: any which you should preserve for debugging (but be careful about secrets). The harness should optionally redact secrets before storing/shipping raw payloads.\n- Status mapping:\n  - bash: exitCode === 0 → success, non-zero → failure. timedOut true → failure. If exitCode is null but stderr contains fatal errors, mark failure.\n  - pi-mono: exitCode === 0 → success. If exception is set → failure. If CLR returns non-zero → failure.\n  - copilot-sdk: if error != null or responsePayload indicates an error → failure. If API responded normally, treat as success even if responseText is empty (but propagate truncated/safety flags).\n- Durations/time: always store ISO timestamps plus durationMs (ms) so consumers can sort and display reliably.\n- Artifacts: stages often produce files (logs, dumps). Include them in artifacts[] with path/type to enable retrieval.\n\nWhich runtime-specific metadata to preserve (reasoning and recommended fields)\n- Bash (shell commands)\n  - command (exact expanded command), exitCode, signal, pid: essential for reproducing what ran and diagnosing failures.\n  - stdout/stderr/combinedOutput: capture logs and error messages. If very long, store a truncated preview and keep full logs as artifacts.\n  - shell: which shell binary/flags were used (affects behavior).\n  - timedOut: indicates harness-level timeout.\n  - raw runtime result (child process object) to preserve platform-native details (e.g., spawn options).\n  - environment snapshot and workingDir are useful to recreate the environment.\n\n- pi-mono (managed runtime)\n  - assembly and entryPoint: which binary and method were executed (important to reproduce).\n  - clrVersion / mono version: runtime-specific bugs are often version-dependent.\n  - exitCode and processId: same reasons as bash.\n  - stdout/stderr and diagnostics: CLR emits diagnostic logs that are required for investigation.\n  - exception object (type/message/stack) and hresult: essential for debugging crashes and stack traces.\n  - pdbPath / heapDumpPath: preserves debugging artifacts (symbols, heap snapshots).\n  - raw process/diagnostic object: for deeper post-mortem.\n\n- @github/copilot-sdk (LLM/API)\n  - requestId and raw request/response payloads: needed to correlate with provider logs and reproduce requests.\n  - model and modelVersion: different models vary behavior and cost.\n  - prompt and responseText: the actual content the stage consumed and produced.\n  - usage (prompt/completion/total tokens) and costUsd: necessary for observability and quota/cost accounting.\n  - latencyMs: performance monitoring.\n  - safety / moderation results and truncated flags: indicate if the output was modified or blocked; important for correctness and subsequent actions.\n  - streamedEvents: if streaming, preserving events helps debugging partial outputs and replays.\n  - error field: store provider/API error details separately so caller code can decide retry/backoff.\n  - raw SDK object: keep full low-level data for debugging (headers, timing, fallback attempts).\n\nSecurity and storage considerations\n- Redaction: raw request/response, env, and prompts may contain secrets. Implement configurable redaction (e.g., remove Authorization header, API keys, tokens) before persisting or transmitting StageResult.\n- Size limits: large stdout, stack traces or raw payloads should be stored as artifacts (files) and only a small preview embedded directly in StageResult. Use artifacts[] to point to large files.\n- Retention: keep full raw objects for a limited time or when explicit trace mode is enabled.\n\nExamples\n- bash success: command, exitCode=0, stdout, durationMs → status: success\n- pi-mono crash: exitCode non-zero + exception with stack → status: failure, include pdbPath & heapDumpPath as artifacts\n- copilot-sdk: responsePayload with responseText, usage info and requestId → status: success; if error populated → status: failure\n\nThis contract gives you:\n- a stable, minimal set of cross-runtime fields for orchestration and UI,\n- runtime-typed metadata for deep inspection and debugging,\n- explicit guidance on what to preserve for each runtime so nothing important is lost when stages are executed in heterogeneous environments."
+            ]
+          },
+          "skill": {
+            "scenarioId": "pi-gpt5mini-skill",
+            "scenarioDescription": "PI command variant using the GitHub Copilot GPT-5 Mini model family. | Proposed zx-harness skill suite enabled as inline workspace-overlay skills.",
+            "adapter": "pi",
+            "model": "github-copilot/gpt-5-mini",
+            "profileId": "skill",
+            "skillMode": "enabled",
+            "skillSource": "workspace-overlay",
+            "labels": {
+              "adapter": "pi",
+              "adapterDisplayName": "pi",
+              "displayName": "skill",
+              "profileDisplayName": "skill",
+              "profileId": "skill",
+              "reportDisplayName": "pi:skill",
+              "model": "github-copilot/gpt-5-mini",
+              "skill": "on",
+              "skillDisplayName": "skill",
+              "skillModeId": "skill",
+              "skillSource": "workspace-overlay",
+              "variant": "pi-gpt5mini",
+              "variantDisplayName": "pi gpt-5 mini",
+              "adapter_family": "pi",
+              "skill_state": "on"
+            },
+            "requestedRuns": 1,
+            "completedRuns": 1,
+            "passedRuns": 0,
+            "failedRuns": 1,
+            "errors": 1,
+            "passRate": 0,
+            "displayValue": "0% (0/1)<br>tokens avg 60242, sd 0.0",
+            "tokenUsage": {
+              "count": 1,
+              "averageTotalTokens": 60242,
+              "stddevTotalTokens": 0
+            },
+            "codeMetrics": null,
+            "sampleOutputs": [
+              "Below is a compact, practical \"normalized execution contract\" you can use inside a zx harness that runs stages across three runtimes (bash, pi-mono, @github/copilot-sdk). The contract exposes a single canonical StageResult type (with a small set of common fields every harness stage should provide) and a runtimeMetadata union containing the runtime-specific metadata that should be preserved for observability, debugging, and replay.\n\nTypeScript types\n\n- StageResult is generic over the stage's logical output type (T).\n- runtimeMetadata is a discriminated union with keys for bash, pi-mono, and copilot-sdk.\n- Common fields: ids, status, timestamps, duration, logs, artifacts, and a raw bucket for the original runtime payload.\n\nCopy-paste-ready TypeScript:\n\ntype StageStatus = 'pending' | 'running' | 'success' | 'failed' | 'skipped' | 'cancelled';\n\ntype LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'trace';\n\ntype LogEntry = {\n  ts: string; // ISO timestamp\n  level: LogLevel;\n  msg: string;\n  source?: string; // e.g., 'bash', 'pi-mono', 'copilot', or subsystem\n  meta?: Record<string, unknown>;\n};\n\ntype ArtifactDescriptor = {\n  name: string;\n  path?: string; // local or remote URI\n  mime?: string;\n  sizeBytes?: number;\n  checksum?: string;\n  purpose?: string;\n};\n\ntype BashRuntimeMetadata = {\n  runtime: 'bash';\n  command: string;        // the exact command or script run\n  argv?: string[];        // array form if available\n  cwd?: string;\n  envSnapshot?: Record<string, string | 'REDACTED'>; // care about redaction policies\n  pid?: number;\n  exitCode?: number | null;\n  exitSignal?: string | null;\n  stdout?: string;        // captured stdout (may be truncated or streamed separately)\n  stderr?: string;        // captured stderr\n  combinedOutput?: string; // convenience: stdout + stderr in order\n  durationMs?: number;\n  resourceUsage?: { maxRssKb?: number; utimeMs?: number; stimeMs?: number } | null;\n  shell?: string;         // e.g., /bin/bash, zx\n  scriptPath?: string;    // if a script file was executed\n  raw?: unknown;          // raw runtime result for debugging (e.g., full spawn result)\n};\n\ntype PiMonoRuntimeMetadata = {\n  runtime: 'pi-mono';\n  module?: string;        // entry module name\n  function?: string;      // invoked function name or handler\n  args?: unknown[];       // serialized args passed in\n  nodeVersion?: string;\n  pid?: number;\n  returnValue?: unknown;  // raw serialized return value\n  thrown?: { message: string; name?: string; stack?: string } | null;\n  logs?: LogEntry[];      // structured logs captured inside the pi runtime\n  exports?: string[];     // named exports used/loaded (optional)\n  artifacts?: ArtifactDescriptor[]; // produced artifacts\n  durationMs?: number;\n  memoryUsage?: { rssBytes?: number; heapTotalBytes?: number; heapUsedBytes?: number } | null;\n  raw?: unknown;          // raw runtime payload (e.g., evaluation result)\n};\n\ntype CopilotRuntimeMetadata = {\n  runtime: 'copilot-sdk';\n  model: string;                    // model name, e.g., 'gpt-4o-mini'\n  requestId?: string;               // provider request id / HTTP id\n  prompt?: string | string[];       // the effective prompt/messages (or pointer/ID)\n  messages?: unknown;               // full chat/messages payload if applicable\n  response?: unknown;               // full raw API response (choices, etc.)\n  choices?: unknown[];              // shorthand for top-level choices\n  finishReason?: string | null;     // e.g., 'stop', 'length', 'content_filter'\n  latencyMs?: number;\n  httpStatus?: number | null;\n  usage?: { promptTokens?: number; completionTokens?: number; totalTokens?: number } | null;\n  temperature?: number | null;\n  topP?: number | null;\n  safety?: { blocked?: boolean; categories?: string[] } | null;\n  streaming?: boolean;\n  durationMs?: number;\n  logs?: LogEntry[];                 // assistant logs, warnings, or debug traces\n  raw?: unknown;                     // full SDK response (preserve for replay)\n};\n\ntype RuntimeMetadata = BashRuntimeMetadata | PiMonoRuntimeMetadata | CopilotRuntimeMetadata;\n\ntype StageResult<T = unknown> = {\n  stageId: string;                // stable identifier for the stage (unique within run)\n  name?: string;                  // human-friendly stage name\n  runtime: RuntimeMetadata['runtime'];\n  status: StageStatus;\n  startedAt?: string;             // ISO timestamp\n  finishedAt?: string;            // ISO timestamp\n  durationMs?: number;            // ms computed by harness; optional if startedAt & finishedAt set\n  output?: T | null;              // domain-level logical output (structured)\n  logs?: LogEntry[];              // structured logs collected by the harness\n  artifacts?: ArtifactDescriptor[]; // produced/persisted artifacts\n  runtimeMetadata?: RuntimeMetadata; // discriminated union with the runtime-specific details\n  error?: {                         // normalized error bucket\n    message: string;\n    name?: string;\n    stack?: string;\n    code?: string | number;        // e.g., exit code or specific error code\n  } | null;\n  raw?: unknown;                    // optional full raw payload from the runtime (careful with size)\n  sizeBytes?: number | null;        // optional size metadata (for transport)\n};\n\nExamples (conceptual):\n\n- Bash:\n  - runtimeMetadata.command, exitCode, stdout, stderr, pid, cwd, envSnapshot (redacted), raw spawn result.\n  - Preserve the actual command string, exit code, and captured stdout/stderr, plus any OS-level resource usage and the raw spawn object to enable replays or detailed debugging.\n\n- Pi-mono:\n  - runtimeMetadata.module, function, args, returnValue, thrown, nodeVersion, logs, memoryUsage, raw.\n  - Preserve the serialized return value (or thrown error stack), structured logs produced by the pi runtime, and node/runtime context (nodeVersion, pid) so you can correlate user-level exceptions and harness telemetry.\n\n- Copilot-sdk:\n  - runtimeMetadata.model, requestId, prompt/messages, response/choices, usage tokens, httpStatus, latencyMs, safety indicators, raw SDK response.\n  - Preserve the full request/response (or at least an indexed pointer to it) plus token usage and model name for cost tracking, safety, and reproducibility. Always mark or redact prompts that may contain secrets.\n\nWhy these fields matter (short rationale)\n\n- Command/Script + exitCode (bash): to reproduce and understand non-zero exits and output ordering. Combined output helps triage problems when stdout and stderr are interleaved.\n- returnValue/thrown (pi-mono): the logical result or exception is the stage’s business outcome; log traces and node metadata let you map harness errors to code.\n- model/prompt/response/usage/requestId (copilot-sdk): reproducing or auditing an LLM’s behavior requires the exact prompt/messages and model metadata. Token usage lets you bill and monitor cost.\n- raw: preserve raw runtime payloads for deep debugging and replay, but treat them as large/binary and apply retention and redaction policies.\n- envSnapshot and other sensitive inputs: mark them REDACTED where appropriate; the contract should make clear which fields are sensitive so the harness applies redaction automatically.\n\nOperational recommendations\n\n- Always populate stageId, runtime, status, startedAt, finishedAt, and durationMs.\n- Keep output small: use output for logical results (JSON) and use artifacts to link large outputs (files, blobs).\n- Provide both structured logs[] and captured stdout/stderr in runtimeMetadata so UI and machine consumers can choose.\n- raw should be optional and subject to retention/size policy. Provide a pointer (e.g., storage URI) if raw is large.\n- Redaction: envSnapshot and prompt/message fields can contain secrets — the harness must apply a redaction policy and record that redaction happened (e.g., envSnapshot values set to 'REDACTED').\n- Tokenization/usage: store prompt/completion tokens & model for copilot-sdk to allow cost/accounting and reproducibility.\n\nUsage sketch\n\n- The orchestrator executes a stage, builds a StageResult<T>, writes it to the run store, and emits it to logs/telemetry.\n- Consumers read StageResult.runtimeMetadata to display runtime-specific debug panels (e.g., show stdout/stderr for bash; show full LLM choices & usage for copilot-sdk).\n- When replaying or debugging, use StageResult.raw (or the artifact pointer) to re-run the stage as close as possible to original conditions.\n\nThis contract gives you a normalized, extensible structure that:\n- retains the most useful runtime-specific information for each of the three runtimes,\n- enables a single UI/observability surface, and\n- keeps a small, typed \"logical output\" field for pipeline composition while placing heavy payloads into artifacts/raw where retention policy can be applied."
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "skippedVariants": []
+}

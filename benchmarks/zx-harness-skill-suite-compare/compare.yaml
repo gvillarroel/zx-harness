@@ -1,0 +1,270 @@
+schemaVersion: 1
+benchmark:
+  id: zx-harness-skill-suite-compare
+  description: Compare architecture and planning outputs for the proposed zx-harness skill suite with and without the draft skill overlays.
+  tags:
+    - compare
+    - zx
+    - harness
+    - skills
+task:
+  prompts:
+    - id: architecture-layout
+      description: Evaluate whether the skill suite improves repository structure and boundary recommendations.
+      prompt: >
+        Read the repository and propose a practical architecture for a zx-based script harness that can coordinate bash, pi-mono, and @github/copilot-sdk. Return exactly four sections titled Goals, Folder Structure, Runtime Boundaries, and Risks. In Folder Structure, mention skills/, packages/runtime/, and packages/adapters/.
+      evaluation:
+        assertions:
+          - type: regex
+            value: '(?s)Goals.*Folder Structure.*Runtime Boundaries.*Risks'
+          - type: regex
+            value: '(?i)skills/'
+          - type: regex
+            value: '(?i)packages/runtime/'
+          - type: regex
+            value: '(?i)packages/adapters/'
+    - id: stage-contract
+      description: Evaluate whether the skill suite improves stage-contract design across runtimes.
+      prompt: >
+        Define a normalized execution contract for a zx harness that runs stages through bash, pi-mono, and @github/copilot-sdk. Include a TypeScript type named StageResult and explain which runtime-specific metadata should be preserved for each of the three runtimes.
+      evaluation:
+        assertions:
+          - type: contains
+            value: StageResult
+          - type: regex
+            value: '(?i)\bbash\b'
+          - type: regex
+            value: '(?i)\bpi(-mono)?\b'
+          - type: regex
+            value: '(?i)copilot'
+    - id: docs-map
+      description: Evaluate whether the skill suite improves documentation-source selection.
+      prompt: >
+        Recommend the best documentation to read next for zx, Bash, pi-mono, and @github/copilot-sdk while designing this repository. Prefer official or primary sources, and explain in one sentence per technology why each source is canonical.
+      evaluation:
+        assertions:
+          - type: regex
+            value: '(?i)google(\.github\.io|/zx| zx)'
+          - type: regex
+            value: '(?i)gnu bash|bash reference manual'
+          - type: regex
+            value: '(?i)badlogic/pi-mono|pi-coding-agent'
+          - type: regex
+            value: '(?i)github/copilot-sdk|@github/copilot-sdk'
+workspace:
+  sources:
+    - id: repo
+      type: local-path
+      path: .
+      target: /
+  setup:
+    initializeGit: true
+evaluation:
+  assertions:
+    - type: llm-rubric
+      provider: skill-arena:judge:codex
+      value: Score 1.0 only if the answer is grounded in the repository, correctly distinguishes zx, bash, pi-mono, and @github/copilot-sdk, and gives concrete recommendations that are immediately useful for implementation planning.
+  requests: 2
+  timeoutMs: 600000
+  tracing: false
+  maxConcurrency: 1
+  noCache: true
+comparison:
+  profiles:
+    - id: no-skill
+      description: Fully isolated control without the proposed skill overlays.
+      isolation:
+        inheritSystem: false
+      capabilities: {}
+      output:
+        tags:
+          - baseline
+        labels:
+          skill_state: off
+    - id: skill
+      description: Proposed zx-harness skill suite enabled as inline workspace-overlay skills.
+      isolation:
+        inheritSystem: false
+      capabilities:
+        skills:
+          - source:
+              type: inline-files
+              skillId: zx-harness-core
+              files:
+                - path: skills/zx-harness-core/SKILL.md
+                  content: |
+                    ---
+                    name: zx-harness-core
+                    description: Use when the task is to define or refine the shared execution model, task vocabulary, or repository architecture for the zx harness.
+                    ---
+
+                    # zx-harness-core
+
+                    Use this skill when the task is about shared architecture for a zx-based harness that coordinates bash, pi-mono, and @github/copilot-sdk.
+
+                    ## Focus
+                    - Separate shared orchestration from runtime-specific adapters.
+                    - Prefer repository-grounded recommendations over generic agent-framework advice.
+                    - Normalize outputs around stages, artifacts, timeouts, and errors.
+                    - Keep the skill suite cohesive: core, bash ops, pi runner, copilot runner, orchestrator.
+              install:
+                strategy: workspace-overlay
+          - source:
+              type: inline-files
+              skillId: zx-harness-bash-ops
+              files:
+                - path: skills/zx-harness-bash-ops/SKILL.md
+                  content: |
+                    ---
+                    name: zx-harness-bash-ops
+                    description: Use when the task depends on shell-native execution, pipelines, quoting, redirection, or exit-handling policy.
+                    ---
+
+                    # zx-harness-bash-ops
+
+                    Use this skill for bash-heavy stages inside the zx harness.
+
+                    ## Focus
+                    - Treat bash as a structured runtime, not just raw command strings.
+                    - Call out quoting, shell selection, cwd, env, timeout, stdout, stderr, and exit status.
+                    - Prefer GNU Bash manual concepts when recommending semantics.
+                    - Highlight when zx should use useBash() and when shell logic should remain isolated.
+              install:
+                strategy: workspace-overlay
+          - source:
+              type: inline-files
+              skillId: zx-harness-pi-runner
+              files:
+                - path: skills/zx-harness-pi-runner/SKILL.md
+                  content: |
+                    ---
+                    name: zx-harness-pi-runner
+                    description: Use when the task should evaluate or design how pi-mono participates as one runtime inside the zx harness.
+                    ---
+
+                    # zx-harness-pi-runner
+
+                    Use this skill when the answer should cover pi-mono integration.
+
+                    ## Focus
+                    - Distinguish pi-mono monorepo concepts from the pi coding agent package.
+                    - Discuss CLI, RPC, and SDK integration options when relevant.
+                    - Mention session, tool, and customization implications only when they matter to the repository design.
+                    - Keep pi as one adapter path, not the whole foundation.
+              install:
+                strategy: workspace-overlay
+          - source:
+              type: inline-files
+              skillId: zx-harness-copilot-runner
+              files:
+                - path: skills/zx-harness-copilot-runner/SKILL.md
+                  content: |
+                    ---
+                    name: zx-harness-copilot-runner
+                    description: Use when the task should evaluate or design how @github/copilot-sdk participates as one runtime inside the zx harness.
+                    ---
+
+                    # zx-harness-copilot-runner
+
+                    Use this skill when the answer should cover the GitHub Copilot SDK path.
+
+                    ## Focus
+                    - Treat @github/copilot-sdk as a JSON-RPC session adapter around Copilot CLI.
+                    - Mention permission handling, session lifecycle, streaming, and custom tools when they affect architecture.
+                    - Keep the adapter boundary explicit so technical-preview churn stays isolated.
+              install:
+                strategy: workspace-overlay
+          - source:
+              type: inline-files
+              skillId: zx-harness-orchestrator
+              files:
+                - path: skills/zx-harness-orchestrator/SKILL.md
+                  content: |
+                    ---
+                    name: zx-harness-orchestrator
+                    description: Use when the task needs a multi-stage plan that coordinates bash, pi-mono, and @github/copilot-sdk in one higher-order workflow.
+                    ---
+
+                    # zx-harness-orchestrator
+
+                    Use this skill when the answer should compose multiple runtimes into one task flow.
+
+                    ## Focus
+                    - Choose a runtime per stage instead of forcing one runtime for the whole task.
+                    - Recommend a normalized stage result envelope.
+                    - Preserve artifacts and failure surfaces between stages.
+                    - Explain sequencing and boundaries clearly enough that implementation can follow the design.
+              install:
+                strategy: workspace-overlay
+      output:
+        tags:
+          - skill
+        labels:
+          skill_state: on
+  variants:
+    - id: codex-mini
+      description: Codex command variant for architecture-oriented comparison.
+      agent:
+        adapter: codex
+        model: gpt-5.1-codex-mini
+        executionMethod: command
+        commandPath: codex
+        sandboxMode: read-only
+        approvalPolicy: never
+        webSearchEnabled: false
+        networkAccessEnabled: false
+        reasoningEffort: low
+        additionalDirectories: []
+        cliEnv: {}
+        config: {}
+      output:
+        tags:
+          - codex
+          - mini
+        labels:
+          variantDisplayName: codex mini
+          adapter_family: codex
+    - id: pi-gpt5mini
+      description: PI command variant using the GitHub Copilot GPT-5 Mini model family.
+      agent:
+        adapter: pi
+        model: github-copilot/gpt-5-mini
+        executionMethod: command
+        commandPath: pi
+        sandboxMode: read-only
+        approvalPolicy: never
+        webSearchEnabled: false
+        networkAccessEnabled: false
+        reasoningEffort: low
+        additionalDirectories: []
+        cliEnv: {}
+        config: {}
+      output:
+        tags:
+          - pi
+          - gpt-5-mini
+        labels:
+          variantDisplayName: pi gpt-5 mini
+          adapter_family: pi
+    - id: copilot-gpt54mini
+      description: Copilot CLI command variant for the same compare prompts.
+      agent:
+        adapter: copilot-cli
+        model: gpt-5.4-mini
+        executionMethod: command
+        commandPath: copilot
+        sandboxMode: read-only
+        approvalPolicy: never
+        webSearchEnabled: false
+        networkAccessEnabled: false
+        reasoningEffort: low
+        additionalDirectories: []
+        cliEnv: {}
+        config: {}
+      output:
+        tags:
+          - copilot
+          - gpt-5.4-mini
+        labels:
+          variantDisplayName: copilot gpt-5.4-mini
+          adapter_family: copilot-cli
