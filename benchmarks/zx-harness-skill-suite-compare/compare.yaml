@@ -16,13 +16,13 @@ task:
       evaluation:
         assertions:
           - type: regex
-            value: '(?s)Goals.*Folder Structure.*Runtime Boundaries.*Risks'
-          - type: regex
-            value: '(?i)skills/'
-          - type: regex
-            value: '(?i)packages/runtime/'
-          - type: regex
-            value: '(?i)packages/adapters/'
+            value: 'Goals[\s\S]*Folder Structure[\s\S]*Runtime Boundaries[\s\S]*Risks'
+          - type: contains
+            value: skills/
+          - type: contains
+            value: packages/runtime/
+          - type: contains
+            value: packages/adapters/
     - id: stage-contract
       description: Evaluate whether the skill suite improves stage-contract design across runtimes.
       prompt: >
@@ -32,11 +32,11 @@ task:
           - type: contains
             value: StageResult
           - type: regex
-            value: '(?i)\bbash\b'
+            value: '\b(?:bash|Bash)\b'
           - type: regex
-            value: '(?i)\bpi(-mono)?\b'
+            value: '\b(?:pi|Pi)(?:-mono)?\b'
           - type: regex
-            value: '(?i)copilot'
+            value: '(?:copilot|Copilot|@github/copilot-sdk)'
     - id: docs-map
       description: Evaluate whether the skill suite improves documentation-source selection.
       prompt: >
@@ -44,13 +44,13 @@ task:
       evaluation:
         assertions:
           - type: regex
-            value: '(?i)google(\.github\.io|/zx| zx)'
+            value: '(?:[Gg]oogle(?:\.github\.io|/zx| zx))'
           - type: regex
-            value: '(?i)gnu bash|bash reference manual'
+            value: '(?:GNU Bash|Bash Reference Manual|bash reference manual)'
           - type: regex
-            value: '(?i)badlogic/pi-mono|pi-coding-agent'
+            value: '(?:badlogic/pi-mono|pi-coding-agent)'
           - type: regex
-            value: '(?i)github/copilot-sdk|@github/copilot-sdk'
+            value: '(?:github/copilot-sdk|@github/copilot-sdk)'
 workspace:
   sources:
     - id: repo

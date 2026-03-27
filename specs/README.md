@@ -5,6 +5,7 @@ This repository starts from specs, not implementation.
 ## Current Documents
 
 - [architecture/folder-structure.md](architecture/folder-structure.md): proposed repository layout and ownership boundaries
+- [architecture/hardening.md](architecture/hardening.md): valid hardening configurations and runtime-specific examples
 - [architecture/stage-contract.md](architecture/stage-contract.md): draft normalized execution contract for all runtimes
 - [research/technology-map.md](research/technology-map.md): validated technology map and official documentation sources
 - [skills/skill-suite.md](skills/skill-suite.md): initial spec for the skill group and execution model
