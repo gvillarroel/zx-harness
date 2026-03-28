@@ -1,0 +1,169 @@
+schemaVersion: 1
+benchmark:
+  id: zx-example-author-compare
+  description: Compare Codex variants on short zx-harness example prompts with and without the local zx-example-author skill.
+  tags:
+    - compare
+    - zx
+    - harness
+    - skill
+    - examples
+task:
+  prompts:
+    - id: hello-name
+      description: Create the hello-name example from a short prompt.
+      prompt: >-
+        Create a zx script at `deliverables/hello-name/index.mjs` that asks for
+        a name when none is passed, prints `hello <name>`, uses
+        zx, and returns only a brief completion note after the
+        file is written.
+      evaluation:
+        assertions:
+          - type: file-contains
+            path: deliverables/hello-name/index.mjs
+            value: "#!/usr/bin/env zx"
+          - type: file-contains
+            path: deliverables/hello-name/index.mjs
+            value: "question("
+          - type: file-contains
+            path: deliverables/hello-name/index.mjs
+            value: "hello ${"
+          - type: file-contains
+            path: deliverables/hello-name/index.mjs
+            value: "process.argv"
+          - type: file-contains
+            path: deliverables/hello-name/index.mjs
+            value: "trim("
+          - type: file-contains
+            path: deliverables/hello-name/index.mjs
+            value: "Error"
+    - id: hello-cop
+      description: Create the hello-cop example from a short prompt.
+      prompt: >-
+        Create a zx script at `deliverables/hello-cop/index.mjs` that runs a
+        tiny Copilot CLI prompt, uses zx, and returns only a
+        brief completion note after the file is written.
+      evaluation:
+        assertions:
+          - type: file-contains
+            path: deliverables/hello-cop/index.mjs
+            value: "#!/usr/bin/env zx"
+          - type: file-contains
+            path: deliverables/hello-cop/index.mjs
+            value: "$.quote = quote;"
+          - type: file-contains
+            path: deliverables/hello-cop/index.mjs
+            value: "copilot -p 'ping' --model gpt-5-mini"
+    - id: gh-involved-repos
+      description: Create the gh-involved-repos example from a short prompt.
+      prompt: >-
+        Create a zx script at `deliverables/gh-involved-repos/index.mjs` plus
+        `deliverables/gh-involved-repos/repo.ts` that lists repos the current
+        GitHub user is involved in, prints one `name: owner/repo` per line, and
+        returns only a brief completion note after the files are written.
+      evaluation:
+        assertions:
+          - type: file-contains
+            path: deliverables/gh-involved-repos/index.mjs
+            value: "import { printRepo } from \"./repo.ts\";"
+          - type: file-contains
+            path: deliverables/gh-involved-repos/index.mjs
+            value: "gh api user --jq .login"
+          - type: file-contains
+            path: deliverables/gh-involved-repos/index.mjs
+            value: "--limit 1000 --json repository"
+          - type: file-contains
+            path: deliverables/gh-involved-repos/index.mjs
+            value: "printRepo(repo);"
+          - type: file-contains
+            path: deliverables/gh-involved-repos/repo.ts
+            value: "console.log(`name: ${name}`);"
+workspace:
+  sources:
+    - id: base
+      type: local-path
+      path: C:/Users/villa/dev/zx-harness/evaluations/zx-example-author/fixtures/base
+      target: /
+  setup:
+    initializeGit: true
+evaluation:
+  assertions:
+    - type: javascript
+      value: 'typeof output === "string" && output.trim().length > 0'
+  requests: 1
+  timeoutMs: 600000
+  tracing: false
+  maxConcurrency: 1
+  noCache: true
+comparison:
+  profiles:
+    - id: no-skill
+      description: Fully isolated baseline without the zx-example-author skill.
+      isolation:
+        inheritSystem: false
+      capabilities: {}
+      output:
+        tags:
+          - baseline
+        labels:
+          skill_state: off
+    - id: skill
+      description: Workspace overlay with the local zx-example-author skill enabled.
+      isolation:
+        inheritSystem: false
+      capabilities:
+        skills:
+          - source:
+              type: local-path
+              path: C:/Users/villa/dev/zx-harness/skills/zx-example-author
+              skillId: zx-example-author
+            install:
+              strategy: workspace-overlay
+      output:
+        tags:
+          - skill
+        labels:
+          skill_state: on
+  variants:
+    - id: codex-mini
+      description: Codex mini authoring variant.
+      agent:
+        adapter: codex
+        model: gpt-5.1-codex-mini
+        executionMethod: command
+        commandPath: codex
+        sandboxMode: danger-full-access
+        approvalPolicy: never
+        webSearchEnabled: false
+        networkAccessEnabled: true
+        reasoningEffort: low
+        additionalDirectories: []
+        cliEnv: {}
+        config: {}
+      output:
+        tags:
+          - codex
+          - mini
+        labels:
+          variantDisplayName: codex mini
+    - id: gpt-5-4
+      description: GPT-5.4 authoring variant.
+      agent:
+        adapter: codex
+        model: gpt-5.4
+        executionMethod: command
+        commandPath: codex
+        sandboxMode: danger-full-access
+        approvalPolicy: never
+        webSearchEnabled: false
+        networkAccessEnabled: true
+        reasoningEffort: low
+        additionalDirectories: []
+        cliEnv: {}
+        config: {}
+      output:
+        tags:
+          - gpt
+          - "5.4"
+        labels:
+          variantDisplayName: GPT-5.4
