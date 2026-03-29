@@ -14,6 +14,12 @@ pnpm install zx
 zx examples/hello-world/index.mjs
 ```
 
+Copilot SDK repository summary example:
+```bash
+cd examples/copilot-sdk-repo-summary && npm install
+zx examples/copilot-sdk-repo-summary/index.mjs https://github.com/github/copilot-sdk/tree/main/nodejs
+```
+
 Issue knowledge example:
 ```bash
 zx examples/gh-issue-knowledge/index.mjs owner/repo 123

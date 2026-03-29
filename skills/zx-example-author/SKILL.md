@@ -118,6 +118,87 @@ export function printItem(name) {
 }
 ```
 
+### SDK repo-summary example
+
+Use this shape when the example is a small folder with a zx wrapper, package files, and a TypeScript summarizer that maps a repository and reduces summaries in pairs.
+
+- Create only the requested files, usually `index.mjs`, `summarize-repo.ts`, `package.json`, `tsconfig.json`, and `README.md`.
+- Keep `index.mjs` as a thin zx wrapper around the local TypeScript entrypoint.
+- In the wrapper, set `$.quote = quote;`, trim CLI args from `process.argv.slice(3)`, verify required commands with `for (const command of ["node", "npm", "git"])`, require local `node_modules`, then run `npm exec -- tsx summarize-repo.ts`.
+- Keep `package.json` minimal with `tsx`, `typescript`, and `zx` plus only the SDK dependency needed for that provider.
+- Use `NodeNext` in `tsconfig.json`.
+- In `summarize-repo.ts`, accept a local repo path or GitHub tree URL from `process.argv[2]` and an optional output path from `process.argv[3]`.
+- Create a local `run/` directory and write the final markdown summary there plus JSON artifacts for the mapped files and tree.
+- Map files first, filter low-signal and binary files, then summarize file entries in pairs and merge summary nodes in pairs until one summary remains.
+- Keep the traversal and reduction logic sequential and readable rather than heavily abstracted.
+- Use explicit env vars for tuning model, concurrency, byte limits, and timeout when the provider family supports them.
+
+Typical wrapper structure:
+
+```js
+#!/usr/bin/env zx
+
+import { existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
+
+$.quote = quote;
+
+const exampleDir = fileURLToPath(new URL(".", import.meta.url));
+const dependenciesDir = resolve(exampleDir, "node_modules");
+const args = process.argv.slice(3).map((value) => value.trim()).filter(Boolean);
+
+for (const command of ["node", "npm", "git"]) {
+  try {
+    await $`${command} --version`;
+  } catch {
+    throw new Error(`Required CLI not found: ${command}`);
+  }
+}
+
+if (!existsSync(dependenciesDir)) {
+  throw new Error(`Install example dependencies first: cd ${exampleDir.replaceAll("\\", "/")} && npm install`);
+}
+
+await $({ cwd: exampleDir, stdio: "inherit" })`npm exec -- tsx summarize-repo.ts ${args}`;
+```
+
+Typical TypeScript structure:
+
+```ts
+import { mkdir, mkdtemp, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
+import { spawn } from "node:child_process";
+import { tmpdir } from "node:os";
+import { basename, extname, join, relative, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const exampleDir = fileURLToPath(new URL(".", import.meta.url));
+const runDir = resolve(exampleDir, "run");
+const repoInput = (process.argv[2] ?? "").trim();
+const requestedOutput = (process.argv[3] ?? "").trim();
+const mappedFiles: string[] = [];
+const summaryNodes: Array<{ level: number; paths: string[]; summary: string }> = [];
+
+await mkdir(runDir, { recursive: true });
+
+// Map files first, then summarize them in pairs, then merge summaries in pairs.
+```
+
+Copilot SDK variant:
+
+- Import `CopilotClient` and `approveAll` from `@github/copilot-sdk`.
+- Keep one client instance and use it for file-pair summaries and merge rounds.
+- Include `mapped_files:` and `merge_level:` markers in the prompts or generated text blocks so intermediate artifacts stay inspectable.
+- Prefer env vars such as `COPILOT_REPO_SUMMARY_MODEL`, `COPILOT_REPO_SUMMARY_REASONING`, `COPILOT_REPO_SUMMARY_MAX_BYTES`, `COPILOT_REPO_SUMMARY_CONCURRENCY`, and `COPILOT_REPO_SUMMARY_TIMEOUT_MS`.
+
+pi-mono variant:
+
+- Import `completeSimple` and `getModel` from `@mariozechner/pi-ai`.
+- Import `getOAuthApiKey` from `@mariozechner/pi-ai/oauth`.
+- Read provider and model overrides from `PI_MONO_REPO_SUMMARY_PROVIDER` and `PI_MONO_REPO_SUMMARY_MODEL`.
+- Reuse local pi OAuth state when available before falling back to a direct API key.
+- Keep the same pairwise map, summarize, and merge flow as the Copilot SDK variant.
+
 ## Domain Hints
 
 - For greeting-style examples, favor a tiny interactive script with argument fallback.
@@ -125,3 +206,6 @@ export function printItem(name) {
 - For Copilot or similar assistant CLIs, keep the example as a minimal wrapper around one prompt command, usually `tool -p <short prompt> --model <model>`.
 - For GitHub involvement-style examples, resolve the viewer with `gh api user --jq .login`, query involved issues and PRs, deduplicate `nameWithOwner`, and print one repository per line.
 - For GitHub formatter helpers, keep the helper tiny and focused on printing the final line shape.
+- For repo-summary examples, prefer a zx wrapper plus one TypeScript summarizer over multiple entrypoints or extra helpers.
+- For repo-summary examples, keep the wrapper literal: verify `node`, `npm`, and `git`, require installed local dependencies, then delegate with `npm exec -- tsx summarize-repo.ts`.
+- For repo-summary examples, keep `run/` outputs explicit: final markdown plus JSON files for the map and tree.
