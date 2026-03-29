@@ -22,9 +22,10 @@ description: Author small zx examples from short implementation requests. Use wh
 ## Workflow
 
 1. Infer the example intent from the request.
-2. Pick the smallest script shape that satisfies that intent.
-3. Write the files directly with minimal ceremony.
-4. Keep the final response short and factual.
+2. If the request matches a supported scaffold, prefer generating the files from the local script and then making only the smallest needed edits.
+3. Pick the smallest script shape that satisfies that intent.
+4. Write the files directly with minimal ceremony.
+5. Keep the final response short and factual.
 
 ## Intent Patterns
 
@@ -122,6 +123,8 @@ export function printItem(name) {
 
 Use this shape when the example is a small folder with a zx wrapper, package files, and a TypeScript summarizer that maps a repository and reduces summaries in pairs.
 
+- Prefer the local scaffold at `scripts/scaffold-example.mjs` for supported variants because it removes repetitive file creation and keeps the shape stable across runs.
+- Run it as `node scripts/scaffold-example.mjs <variant> <target-directory>`.
 - Create only the requested files, usually `index.mjs`, `summarize-repo.ts`, `package.json`, `tsconfig.json`, and `README.md`.
 - Keep `index.mjs` as a thin zx wrapper around the local TypeScript entrypoint.
 - In the wrapper, set `$.quote = quote;`, trim CLI args from `process.argv.slice(3)`, verify required commands with `for (const command of ["node", "npm", "git"])`, require local `node_modules`, then run `npm exec -- tsx summarize-repo.ts`.
@@ -186,6 +189,7 @@ await mkdir(runDir, { recursive: true });
 
 Copilot SDK variant:
 
+- Scaffold variant: `copilot-sdk-repo-summary`
 - Import `CopilotClient` and `approveAll` from `@github/copilot-sdk`.
 - Keep one client instance and use it for file-pair summaries and merge rounds.
 - Include `mapped_files:` and `merge_level:` markers in the prompts or generated text blocks so intermediate artifacts stay inspectable.
@@ -193,6 +197,7 @@ Copilot SDK variant:
 
 pi-mono variant:
 
+- Scaffold variant: `pi-mono-repo-summary`
 - Import `completeSimple` and `getModel` from `@mariozechner/pi-ai`.
 - Import `getOAuthApiKey` from `@mariozechner/pi-ai/oauth`.
 - Read provider and model overrides from `PI_MONO_REPO_SUMMARY_PROVIDER` and `PI_MONO_REPO_SUMMARY_MODEL`.
