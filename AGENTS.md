@@ -1,21 +1,9 @@
-# Repository Instructions
-
-## Language
-
-All repository-facing content must be written in English.
-
-This rule applies to:
-- Source code comments
-- Specs and design docs
-- READMEs
-- Skill definitions
-- Commit and changelog text created for this repository
-
-If a discussion happens in another language, convert the resulting repository content to English before writing files.
-
-## Working Style
-
-- Start with specs before implementation when a feature is still being designed.
-- Prefer official documentation and primary sources when defining behavior or interfaces.
-- Keep orchestration logic separated from provider-specific adapters.
-- Treat shell execution as a first-class interface with explicit input, output, timeout, and error handling rules.
+Constrains:
+- follow SPEC.md
+- everything in this repository should be in english
+- Less is better, use the min words possible to explain in documentation and comments, high information density is better than long documents
+- Add comments to scripts explaining reasoning and every step
+- Prefer sequential, async and looping than a lot of functions to decompose on scripts
+- Prefer tmux when terminal multiplexing helps
+- Before say that something is done, test it manually if is possible
+- never change examples\hello-world\index.mjs; it is how it should works

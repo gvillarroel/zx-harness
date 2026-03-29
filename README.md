@@ -1,12 +1,42 @@
 # zx-harness
 
-Specification-first workspace for a skill suite that uses `zx` as the execution harness and coordinates `pi-mono`, `@github/copilot-sdk`, and `bash` for higher-order task automation.
+Small zx harness examples.
 
-The repository is currently in the design phase. Initial work focuses on:
 
-- Skill boundaries
-- Runtime and adapter layout
-- Documentation sources
-- Safety and execution contracts
+## Quick Start
+Install zx.
+```
+pnpm install zx
+```
 
-See [specs/README.md](specs/README.md) for the current specification index.
+## Run Examples
+```
+zx examples/hello-world/index.mjs
+```
+
+Issue knowledge example:
+```bash
+zx examples/gh-issue-knowledge/index.mjs owner/repo 123
+```
+
+Optional local sources:
+```bash
+ISSUE_KNOWLEDGE_REPO_DIR=/path/to/repo
+ISSUE_KNOWLEDGE_DIRS=/path/one:/path/two
+ISSUE_KNOWLEDGE_BRAVE_BIN=/path/to/brave-search-cli
+ISSUE_KNOWLEDGE_CONFLUENCE_HINT="Search space ENG for team notes"
+ISSUE_KNOWLEDGE_BRAVE_HINT="Use Brave MCP server if configured"
+ISSUE_KNOWLEDGE_EXTRA_SOURCES="Also inspect exported docs in /path/three"
+ISSUE_KNOWLEDGE_VERBOSE=1
+```
+
+## Configure `acli`
+Login first.
+```bash
+acli jira auth login --web
+```
+
+Use `ACLI_BIN` when `acli` is exposed by a different command or path.
+```bash
+ACLI_BIN=/path/to/acli zx examples/jira-open-tickers-acli/index.mjs
+```
