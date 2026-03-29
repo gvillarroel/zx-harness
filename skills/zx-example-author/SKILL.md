@@ -1,6 +1,6 @@
 ---
 name: zx-example-author
-description: Create minimal zx examples from short prompts. Use when asked to scaffold hello-name, hello-cop, or gh-involved-repos.
+description: Author small zx examples from short implementation requests. Use when the user wants a minimal zx script or tiny zx example, especially for interactive prompts, simple CLI wrappers, or small multi-file command examples.
 ---
 
 # zx Example Author
@@ -8,54 +8,38 @@ description: Create minimal zx examples from short prompts. Use when asked to sc
 ## Rules
 
 - Write English only.
-- Keep files minimal.
-- Each example lives in its own folder.
-- `index.mjs` is the entry point.
-- Use the `#!/usr/bin/env zx` shebang.
-- Set `$.quote = quote;`.
+- Keep examples small and runnable.
+- Match the user-requested paths exactly.
+- Create only the files needed for the requested example.
+- Use `#!/usr/bin/env zx` for zx entrypoints.
+- Set `$.quote = quote;` when interpolating shell arguments.
 - Keep failures explicit and actionable.
-- Verify required CLIs before real work when the example depends on them.
-- Match the requested file paths exactly.
-- Prefer writing the exact recipe content with one edit.
-- When a recipe matches, copy it exactly except for the requested output path.
-- On Windows, do not use bash heredocs like `cat <<EOF`.
+- Prefer direct, readable scripts over abstractions.
+- On Windows, prefer `bash.exe` when shell behavior matters.
+- Avoid repo-specific assumptions, paths, or instructions.
+- Do not hardcode benchmark-specific completion notes.
 
 ## Workflow
 
-1. Detect the target example from the prompt path.
-2. Create the parent folder if needed.
-3. Write only the required files.
-4. Use the exact recipe body when a recipe matches.
-5. Return the exact completion note for the matched recipe.
+1. Infer the example intent from the request.
+2. Pick the smallest script shape that satisfies that intent.
+3. Write the files directly with minimal ceremony.
+4. Keep the final response short and factual.
 
-## Prompt Mapping
+## Intent Patterns
 
-- `deliverables/hello-name/index.mjs` -> `hello-name`
-- `deliverables/hello-cop/index.mjs` -> `hello-cop`
-- `deliverables/gh-involved-repos/index.mjs` -> `gh-involved-repos`
-- `deliverables/gh-involved-repos/repo.ts` -> `gh-involved-repos`
+### Interactive single-file script
 
-## Completion Notes
+Use this shape when the example needs user input or a tiny argument-driven flow.
 
-- `hello-name`: `Created \`deliverables/hello-name/index.mjs\` with the requested zx hello-name script.`
-- `hello-cop`: `Created \`deliverables/hello-cop/index.mjs\` with the prescribed Copilot CLI zx script; runs \`copilot -p 'ping' --model gpt-5-mini\` via \`bash.exe\`.`
-- `gh-involved-repos`: `Created \`deliverables/gh-involved-repos/index.mjs\` and \`deliverables/gh-involved-repos/repo.ts\` with the requested gh-involved-repos example.`
+- Prefer CLI args first, then prompt if the input is missing.
+- Trim and validate user input before running commands.
+- Throw a direct error when required input is empty.
+- Use `echo` or another simple shell command for visible output.
+- Set `$.shell = "bash.exe";` on Windows if the script shells out.
+- When the request is about greeting or naming, use the domain noun in the prompt label, such as `Name:`.
 
-## Example Recipes
-
-### `hello-name`
-
-Write `index.mjs` only.
-
-- Copy the script exactly.
-- Set `$.shell = "bash.exe";`.
-- Accept the name from `process.argv.slice(3)` first.
-- Fall back to `await question("Name: ")`.
-- Trim the name.
-- Throw `A non-empty name is required.` when empty.
-- Print `hello <name>` with `echo`.
-
-Use this shape:
+Typical structure:
 
 ```js
 #!/usr/bin/env zx
@@ -63,29 +47,30 @@ Use this shape:
 $.shell = "bash.exe";
 $.quote = quote;
 
-// zx keeps the script path in argv[2], so user args start after that entry.
-const name = (
-  process.argv.slice(3).find((value) => value.trim()) ??
-  (await question("Name: "))
+const value = (
+  process.argv.slice(3).find((item) => item.trim()) ??
+  (await question("Value: "))
 ).trim();
 
-if (!name) {
-  throw new Error("A non-empty name is required.");
+if (!value) {
+  throw new Error("A non-empty value is required.");
 }
 
-await $({ stdio: "inherit" })`echo hello ${name}`;
+await $({ stdio: "inherit" })`echo ${value}`;
 ```
 
-### `hello-cop`
+### Single-file CLI wrapper
 
-Write `index.mjs` only.
+Use this shape when the example is mainly a thin zx wrapper around one CLI command.
 
-- Copy the script exactly.
-- Set `$.shell = "bash.exe";`.
-- Run the Copilot CLI with a tiny prompt.
-- Use `copilot -p 'ping' --model gpt-5-mini`.
+- Keep the wrapper minimal.
+- Preserve the exact command family the user asked for.
+- Validate the required CLI first when practical.
+- Avoid side artifacts unless the user requested them.
+- Set `$.shell = "bash.exe";` on Windows if the command relies on shell parsing.
+- If the request is clearly a smoke test, prefer one tiny command invocation over extra flow control.
 
-Use this shape:
+Typical structure:
 
 ```js
 #!/usr/bin/env zx
@@ -93,48 +78,50 @@ Use this shape:
 $.shell = "bash.exe";
 $.quote = quote;
 
-await $`copilot -p 'ping' --model gpt-5-mini`;
+await $`tool subcommand ${"arg"}`;
 ```
 
-### `gh-involved-repos`
+### Multi-file data listing example
 
-Write `index.mjs` and `repo.ts`.
+Use this shape when the example fetches data, deduplicates it, and prints flat records.
 
-- Copy the scripts exactly.
-- Keep `repo.ts` as a tiny formatter that prints `name: <owner/repo>`.
-- In `index.mjs`, import `printRepo` from `./repo.ts`.
-- Resolve the current user with `gh api user --jq .login`.
-- Search involved issues and PRs with `gh search issues --include-prs --involves ${login} --limit 1000 --json repository`.
-- Deduplicate `nameWithOwner`.
-- Print one repo per line with `printRepo(repo)`.
+- Keep the entry script focused on orchestration.
+- Put formatting or tiny helpers in a sibling module when that improves clarity.
+- Fetch the current user or active identity before running user-scoped queries.
+- Deduplicate stable keys before printing.
+- Print one record per line in a pipe-friendly format.
+- If the formatter output is named in the request, keep it literal and flat.
 
-Use this shape:
+Typical structure:
 
 ```js
 #!/usr/bin/env zx
 
-import { printRepo } from "./repo.ts";
+import { printItem } from "./item.js";
 
 $.quote = quote;
 
-// Verify gh is ready, then search issues and PRs involving the current user.
-const login = (await $`gh api user --jq .login`).stdout.trim();
-const output =
-  await $`gh search issues --include-prs --involves ${login} --limit 1000 --json repository`;
-const repos = [
-  ...new Set(
-    JSON.parse(output.stdout).map((item) => item.repository?.nameWithOwner).filter(Boolean),
-  ),
+const identity = (await $`tool whoami`).stdout.trim();
+const output = await $`tool list --for ${identity} --json`;
+const items = [
+  ...new Set(JSON.parse(output.stdout).map((item) => item.name).filter(Boolean)),
 ];
 
-for (const repo of repos) {
-  printRepo(repo);
+for (const item of items) {
+  printItem(item);
 }
 ```
 
-```ts
-// Keep output flat and easy to pipe.
-export function printRepo(name: string) {
-  console.log(`name: ${name}`);
+```js
+export function printItem(name) {
+  console.log(name);
 }
 ```
+
+## Domain Hints
+
+- For greeting-style examples, favor a tiny interactive script with argument fallback.
+- For greeting-style examples, prefer `process.argv.slice(3)` before prompting, trim the value, fail on empty input, and print through `echo`.
+- For Copilot or similar assistant CLIs, keep the example as a minimal wrapper around one prompt command, usually `tool -p <short prompt> --model <model>`.
+- For GitHub involvement-style examples, resolve the viewer with `gh api user --jq .login`, query involved issues and PRs, deduplicate `nameWithOwner`, and print one repository per line.
+- For GitHub formatter helpers, keep the helper tiny and focused on printing the final line shape.
