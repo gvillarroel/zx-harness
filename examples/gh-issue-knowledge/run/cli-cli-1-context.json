@@ -1,0 +1,274 @@
+{
+  "repo": "cli/cli",
+  "repoDir": null,
+  "issueNumber": 1,
+  "outputFile": "C:\\Users\\villa\\dev\\zx-harness\\examples\\gh-issue-knowledge\\cli-cli-1-task-knowledge.md",
+  "issue": {
+    "assignees": [],
+    "author": {
+      "id": "MDQ6VXNlcjk4NDgy",
+      "is_bot": false,
+      "login": "vilmibm",
+      "name": "Nate Smith"
+    },
+    "body": "this PR implements the interactive PR list we had in the original `cli-test` repo.\r\n\r\ncaveats:\r\n- doesn't visually split out PRs\r\n- doesn't explain what the contents of the list are\r\n- doesn't support closing because i need to remember how to do mutations with graphql\r\n\r\nit's not  ideal but it's something",
+    "closedAt": "2019-10-04T16:01:04Z",
+    "comments": [
+      {
+        "id": "IC_kwDODKw3uc7tpgEC",
+        "author": {
+          "login": "Vadim0695"
+        },
+        "authorAssociation": "NONE",
+        "body": "> this PR implements the interactive PR list we had in the original `cli-test` repo.\n> \n> caveats:\n> - doesn't visually split out PRs\n> - doesn't explain what the contents of the list are\n> - doesn't support closing because i need to remember how to do mutations with graphql\n> \n> it's not  ideal but it's something\n\n",
+        "createdAt": "2026-03-02T21:43:46Z",
+        "includesCreatedEdit": false,
+        "isMinimized": true,
+        "minimizedReason": "SPAM",
+        "reactionGroups": [],
+        "url": "https://github.com/cli/cli/pull/1#issuecomment-3987079426",
+        "viewerDidAuthor": false
+      },
+      {
+        "id": "IC_kwDODKw3uc7tphgB",
+        "author": {
+          "login": "Vadim0695"
+        },
+        "authorAssociation": "NONE",
+        "body": "trustedsiteв /wp-content/plugins/",
+        "createdAt": "2026-03-02T21:44:53Z",
+        "includesCreatedEdit": false,
+        "isMinimized": true,
+        "minimizedReason": "SPAM",
+        "reactionGroups": [],
+        "url": "https://github.com/cli/cli/pull/1#issuecomment-3987085313",
+        "viewerDidAuthor": false
+      }
+    ],
+    "createdAt": "2019-10-04T03:42:57Z",
+    "labels": [],
+    "milestone": null,
+    "projectItems": [],
+    "state": "MERGED",
+    "title": "interactive pr list",
+    "updatedAt": "2026-03-02T23:23:35Z",
+    "url": "https://github.com/cli/cli/pull/1"
+  },
+  "repository": {
+    "defaultBranchRef": {
+      "name": "trunk"
+    },
+    "description": "GitHub’s official command line tool",
+    "homepageUrl": "https://cli.github.com",
+    "name": "cli",
+    "nameWithOwner": "cli/cli",
+    "url": "https://github.com/cli/cli"
+  },
+  "recentReleases": [
+    {
+      "name": "GitHub CLI 2.89.0",
+      "tag_name": "v2.89.0",
+      "published_at": "2026-03-26T14:22:43Z",
+      "draft": false,
+      "prerelease": false
+    },
+    {
+      "name": "GitHub CLI 2.88.1",
+      "tag_name": "v2.88.1",
+      "published_at": "2026-03-12T12:24:41Z",
+      "draft": false,
+      "prerelease": false
+    },
+    {
+      "name": "GitHub CLI 2.88.0",
+      "tag_name": "v2.88.0",
+      "published_at": "2026-03-10T19:40:45Z",
+      "draft": false,
+      "prerelease": false
+    },
+    {
+      "name": "GitHub CLI 2.87.3",
+      "tag_name": "v2.87.3",
+      "published_at": "2026-02-23T19:12:37Z",
+      "draft": false,
+      "prerelease": false
+    },
+    {
+      "name": "GitHub CLI 2.87.2",
+      "tag_name": "v2.87.2",
+      "published_at": "2026-02-20T20:30:25Z",
+      "draft": false,
+      "prerelease": false
+    }
+  ],
+  "relatedPullRequests": [
+    {
+      "number": 13053,
+      "state": "open",
+      "title": "fix(repo list): use search for private visibility",
+      "updatedAt": "2026-03-28T11:51:45Z",
+      "url": "https://github.com/cli/cli/pull/13053"
+    },
+    {
+      "number": 13046,
+      "state": "merged",
+      "title": "Ensure `api` and `auth` commands record agentic invocations",
+      "updatedAt": "2026-03-27T23:45:32Z",
+      "url": "https://github.com/cli/cli/pull/13046"
+    },
+    {
+      "number": 13048,
+      "state": "open",
+      "title": "replace github.com/golang/snappy with klauspost/compress/snappy",
+      "updatedAt": "2026-03-27T23:44:06Z",
+      "url": "https://github.com/cli/cli/pull/13048"
+    },
+    {
+      "number": 13051,
+      "state": "open",
+      "title": "chore(deps): bump charm.land/bubbles/v2 from 2.0.0 to 2.1.0",
+      "updatedAt": "2026-03-27T14:03:08Z",
+      "url": "https://github.com/cli/cli/pull/13051"
+    },
+    {
+      "number": 13036,
+      "state": "open",
+      "title": "fix(repo rename): strip same-owner prefix and improve prompt clarity",
+      "updatedAt": "2026-03-27T11:19:00Z",
+      "url": "https://github.com/cli/cli/pull/13036"
+    },
+    {
+      "number": 13045,
+      "state": "open",
+      "title": "chore(deps): bump github.com/yuin/goldmark from 1.7.16 to 1.8.2",
+      "updatedAt": "2026-03-26T14:03:42Z",
+      "url": "https://github.com/cli/cli/pull/13045"
+    },
+    {
+      "number": 13044,
+      "state": "open",
+      "title": "chore(deps): bump github.com/in-toto/attestation from 1.1.2 to 1.2.0",
+      "updatedAt": "2026-03-26T14:03:39Z",
+      "url": "https://github.com/cli/cli/pull/13044"
+    },
+    {
+      "number": 12859,
+      "state": "merged",
+      "title": "Add experimental huh-only prompter gated by GH_EXPERIMENTAL_PROMPTER",
+      "updatedAt": "2026-03-26T13:38:22Z",
+      "url": "https://github.com/cli/cli/pull/12859"
+    },
+    {
+      "number": 13004,
+      "state": "merged",
+      "title": "chore(deps): bump mislav/bump-homebrew-formula-action from 3.6 to 4.1",
+      "updatedAt": "2026-03-26T13:09:36Z",
+      "url": "https://github.com/cli/cli/pull/13004"
+    },
+    {
+      "number": 13037,
+      "state": "merged",
+      "title": "Fix acceptance test failures: git identity, headRepository JSON, obsolete traversal test",
+      "updatedAt": "2026-03-26T12:32:30Z",
+      "url": "https://github.com/cli/cli/pull/13037"
+    },
+    {
+      "number": 13043,
+      "state": "open",
+      "title": "Improve help text for --created flag in gh run list",
+      "updatedAt": "2026-03-26T07:21:47Z",
+      "url": "https://github.com/cli/cli/pull/13043"
+    },
+    {
+      "number": 13042,
+      "state": "closed",
+      "title": "Fix pr status/view for merged fork PRs without tracking refs",
+      "updatedAt": "2026-03-26T06:22:31Z",
+      "url": "https://github.com/cli/cli/pull/13042"
+    },
+    {
+      "number": 12965,
+      "state": "closed",
+      "title": "fix: show user-friendly progress labels in project commands",
+      "updatedAt": "2026-03-26T04:45:50Z",
+      "url": "https://github.com/cli/cli/pull/12965"
+    },
+    {
+      "number": 12942,
+      "state": "open",
+      "title": "Add `--editor` flag to `gh issue edit` and `gh pr edit`",
+      "updatedAt": "2026-03-25T22:00:46Z",
+      "url": "https://github.com/cli/cli/pull/12942"
+    },
+    {
+      "number": 13030,
+      "state": "merged",
+      "title": "Align triage.md with current triage process",
+      "updatedAt": "2026-03-25T17:59:29Z",
+      "url": "https://github.com/cli/cli/pull/13030"
+    },
+    {
+      "number": 13025,
+      "state": "merged",
+      "title": "Consolidate actor-mode signals into ApiActorsSupported",
+      "updatedAt": "2026-03-25T17:43:20Z",
+      "url": "https://github.com/cli/cli/pull/13025"
+    },
+    {
+      "number": 13033,
+      "state": "merged",
+      "title": "define err in go func instead of use err defined in outer scope",
+      "updatedAt": "2026-03-25T17:13:38Z",
+      "url": "https://github.com/cli/cli/pull/13033"
+    },
+    {
+      "number": 12909,
+      "state": "open",
+      "title": "Remove `ChecksStatus` slow path (dead code on all supported GHES)",
+      "updatedAt": "2026-03-25T16:48:46Z",
+      "url": "https://github.com/cli/cli/pull/12909"
+    },
+    {
+      "number": 12906,
+      "state": "open",
+      "title": "Don't count cancelled checks as failures in `pr status`",
+      "updatedAt": "2026-03-25T14:48:51Z",
+      "url": "https://github.com/cli/cli/pull/12906"
+    },
+    {
+      "number": 12919,
+      "state": "closed",
+      "title": "chore(deps): bump golang.org/x/crypto from 0.48.0 to 0.49.0",
+      "updatedAt": "2026-03-25T14:39:17Z",
+      "url": "https://github.com/cli/cli/pull/12919"
+    }
+  ],
+  "externalSources": [
+    {
+      "name": "web-search",
+      "enabled": true,
+      "description": "Use Codex web search for public docs, release notes, bug reports, and upstream references."
+    },
+    {
+      "name": "local-directories",
+      "enabled": false,
+      "description": "Inspect user-provided folders for notes, docs, adjacent repos, or exported knowledge.",
+      "directories": []
+    },
+    {
+      "name": "confluence",
+      "enabled": false,
+      "description": "Optional. Set ISSUE_KNOWLEDGE_CONFLUENCE_HINT with entry instructions or search targets."
+    },
+    {
+      "name": "brave",
+      "enabled": false,
+      "description": "Optional. Set ISSUE_KNOWLEDGE_BRAVE_HINT with command usage or MCP/server details."
+    },
+    {
+      "name": "extra-hints",
+      "enabled": false,
+      "description": "Optional. Describe more sources, auth notes, or research constraints in ISSUE_KNOWLEDGE_EXTRA_SOURCES."
+    }
+  ]
+}

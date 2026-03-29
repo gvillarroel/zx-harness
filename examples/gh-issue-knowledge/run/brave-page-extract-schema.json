@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "useful",
+    "url",
+    "summary"
+  ],
+  "properties": {
+    "useful": {
+      "type": "boolean"
+    },
+    "url": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    }
+  }
+}

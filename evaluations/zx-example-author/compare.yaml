@@ -13,71 +13,162 @@ task:
     - id: hello-name
       description: Create the hello-name example from a short prompt.
       prompt: >-
-        Create a zx script at `deliverables/hello-name/index.mjs` that asks for
-        a name when none is passed, prints `hello <name>`, uses
-        zx, and returns only a brief completion note after the
-        file is written.
+        Create a small zx example in `hello-name/index.mjs` that takes a name
+        from the CLI when present, otherwise prompts for it, prints
+        `hello <name>`, and returns only a brief completion note after the file
+        is written.
       evaluation:
         assertions:
           - type: file-contains
-            path: deliverables/hello-name/index.mjs
+            path: hello-name/index.mjs
             value: "#!/usr/bin/env zx"
           - type: file-contains
-            path: deliverables/hello-name/index.mjs
+            path: hello-name/index.mjs
             value: "question("
           - type: file-contains
-            path: deliverables/hello-name/index.mjs
+            path: hello-name/index.mjs
             value: "hello ${"
           - type: file-contains
-            path: deliverables/hello-name/index.mjs
+            path: hello-name/index.mjs
             value: "process.argv"
           - type: file-contains
-            path: deliverables/hello-name/index.mjs
+            path: hello-name/index.mjs
             value: "trim("
           - type: file-contains
-            path: deliverables/hello-name/index.mjs
+            path: hello-name/index.mjs
             value: "Error"
     - id: hello-cop
       description: Create the hello-cop example from a short prompt.
       prompt: >-
-        Create a zx script at `deliverables/hello-cop/index.mjs` that runs a
-        tiny Copilot CLI prompt, uses zx, and returns only a
-        brief completion note after the file is written.
+        Create a small zx example in `hello-cop/index.mjs` that runs one tiny
+        Copilot CLI prompt with zx and returns only a brief completion note
+        after the file is written.
       evaluation:
         assertions:
           - type: file-contains
-            path: deliverables/hello-cop/index.mjs
+            path: hello-cop/index.mjs
             value: "#!/usr/bin/env zx"
           - type: file-contains
-            path: deliverables/hello-cop/index.mjs
+            path: hello-cop/index.mjs
             value: "$.quote = quote;"
           - type: file-contains
-            path: deliverables/hello-cop/index.mjs
+            path: hello-cop/index.mjs
             value: "copilot -p 'ping' --model gpt-5-mini"
     - id: gh-involved-repos
       description: Create the gh-involved-repos example from a short prompt.
       prompt: >-
-        Create a zx script at `deliverables/gh-involved-repos/index.mjs` plus
-        `deliverables/gh-involved-repos/repo.ts` that lists repos the current
-        GitHub user is involved in, prints one `name: owner/repo` per line, and
-        returns only a brief completion note after the files are written.
+        Create a small example folder named `gh-involved-repos` with
+        `index.mjs` and `repo.ts` that lists repos the current GitHub user is
+        involved in, prints one `name: owner/repo` per line, and returns only a
+        brief completion note after the files are written.
       evaluation:
         assertions:
           - type: file-contains
-            path: deliverables/gh-involved-repos/index.mjs
-            value: "import { printRepo } from \"./repo.ts\";"
+            path: gh-involved-repos/index.mjs
+            value: 'import { printRepo } from "./repo.ts";'
           - type: file-contains
-            path: deliverables/gh-involved-repos/index.mjs
+            path: gh-involved-repos/index.mjs
             value: "gh api user --jq .login"
           - type: file-contains
-            path: deliverables/gh-involved-repos/index.mjs
+            path: gh-involved-repos/index.mjs
             value: "--limit 1000 --json repository"
           - type: file-contains
-            path: deliverables/gh-involved-repos/index.mjs
+            path: gh-involved-repos/index.mjs
             value: "printRepo(repo);"
           - type: file-contains
-            path: deliverables/gh-involved-repos/repo.ts
+            path: gh-involved-repos/repo.ts
             value: "console.log(`name: ${name}`);"
+    - id: copilot-sdk-repo-summary
+      description: Create the Copilot SDK repo summary example from a short prompt.
+      prompt: >-
+        Create a folder named `copilot-sdk-repo-summary` with `index.mjs`,
+        `summarize-repo.ts`, `package.json`, `tsconfig.json`, and a short
+        README. The zx entrypoint should verify `node`, `npm`, and `git`,
+        require local dependencies to be installed, and then run
+        `npm exec -- tsx summarize-repo.ts`. The TypeScript script should
+        accept a local repo path or GitHub tree URL, summarize the repository by
+        mapping files, summarizing files in pairs with the Copilot SDK, merging
+        summaries in pairs, and writing the final markdown summary plus map and
+        tree JSON files under `run/`. Return only a brief completion note after
+        the files are written.
+      evaluation:
+        assertions:
+          - type: file-contains
+            path: copilot-sdk-repo-summary/index.mjs
+            value: "#!/usr/bin/env zx"
+          - type: file-contains
+            path: copilot-sdk-repo-summary/index.mjs
+            value: "$.quote = quote;"
+          - type: file-contains
+            path: copilot-sdk-repo-summary/index.mjs
+            value: 'for (const command of ["node", "npm", "git"])'
+          - type: file-contains
+            path: copilot-sdk-repo-summary/index.mjs
+            value: "npm exec -- tsx summarize-repo.ts"
+          - type: file-contains
+            path: copilot-sdk-repo-summary/summarize-repo.ts
+            value: "CopilotClient"
+          - type: file-contains
+            path: copilot-sdk-repo-summary/summarize-repo.ts
+            value: "approveAll"
+          - type: file-contains
+            path: copilot-sdk-repo-summary/summarize-repo.ts
+            value: "mapped_files:"
+          - type: file-contains
+            path: copilot-sdk-repo-summary/summarize-repo.ts
+            value: "merge_level:"
+          - type: file-contains
+            path: copilot-sdk-repo-summary/package.json
+            value: '"@github/copilot-sdk"'
+          - type: file-contains
+            path: copilot-sdk-repo-summary/tsconfig.json
+            value: '"module": "NodeNext"'
+    - id: pi-mono-repo-summary
+      description: Create the pi-mono SDK repo summary example from a short prompt.
+      prompt: >-
+        Create a folder named `pi-mono-repo-summary` with `index.mjs`,
+        `summarize-repo.ts`, `package.json`, `tsconfig.json`, and a short
+        README. The zx entrypoint should verify `node`, `npm`, and `git`,
+        require local dependencies to be installed, and then run
+        `npm exec -- tsx summarize-repo.ts`. The TypeScript script should
+        accept a local repo path or GitHub tree URL, choose provider and model
+        from environment variables when present, summarize the repository by
+        mapping files, summarizing files in pairs with pi-mono, merging
+        summaries in pairs, and writing the final markdown summary plus map and
+        tree JSON files under `run/`. Return only a brief completion note after
+        the files are written.
+      evaluation:
+        assertions:
+          - type: file-contains
+            path: pi-mono-repo-summary/index.mjs
+            value: "#!/usr/bin/env zx"
+          - type: file-contains
+            path: pi-mono-repo-summary/index.mjs
+            value: "$.quote = quote;"
+          - type: file-contains
+            path: pi-mono-repo-summary/index.mjs
+            value: 'for (const command of ["node", "npm", "git"])'
+          - type: file-contains
+            path: pi-mono-repo-summary/index.mjs
+            value: "npm exec -- tsx summarize-repo.ts"
+          - type: file-contains
+            path: pi-mono-repo-summary/summarize-repo.ts
+            value: "completeSimple"
+          - type: file-contains
+            path: pi-mono-repo-summary/summarize-repo.ts
+            value: "getModel"
+          - type: file-contains
+            path: pi-mono-repo-summary/summarize-repo.ts
+            value: "getOAuthApiKey"
+          - type: file-contains
+            path: pi-mono-repo-summary/summarize-repo.ts
+            value: "PI_MONO_REPO_SUMMARY_PROVIDER"
+          - type: file-contains
+            path: pi-mono-repo-summary/summarize-repo.ts
+            value: "mapped_files:"
+          - type: file-contains
+            path: pi-mono-repo-summary/package.json
+            value: '"@mariozechner/pi-ai"'
 workspace:
   sources:
     - id: base
@@ -93,7 +184,7 @@ evaluation:
   requests: 1
   timeoutMs: 600000
   tracing: false
-  maxConcurrency: 1
+  maxConcurrency: 10
   noCache: true
 comparison:
   profiles:

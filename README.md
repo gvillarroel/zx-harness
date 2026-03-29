@@ -20,6 +20,12 @@ cd examples/copilot-sdk-repo-summary && npm install
 zx examples/copilot-sdk-repo-summary/index.mjs https://github.com/github/copilot-sdk/tree/main/nodejs
 ```
 
+pi-mono SDK repository summary example:
+```bash
+cd examples/pi-mono-repo-summary && npm install
+zx examples/pi-mono-repo-summary/index.mjs https://github.com/badlogic/pi-mono
+```
+
 Issue knowledge example:
 ```bash
 zx examples/gh-issue-knowledge/index.mjs owner/repo 123
