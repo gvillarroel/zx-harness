@@ -106,3 +106,74 @@ The next iteration should target the unresolved `codex-mini` repo-summary failur
 
 - `copilot-sdk-repo-summary`
 - `pi-mono-repo-summary`
+
+## Provider Verification
+
+After the compare run, both evolved skill copies were verified directly against the repo-summary scaffold flow to confirm they still work when the task actually needs those variants.
+
+### Scaffold fix applied to both evolved skills
+
+Both evolved copies inherited a real scaffold bug in `scripts/scaffold-example.mjs`.
+
+Problem:
+
+- small examples load templates from `templates/small/<variant>/`
+- repo-summary examples actually live in `templates/repo-summary/`
+- the script incorrectly tried to resolve repo-summary templates from `templates/repo-summary/<variant>/`
+
+Fix:
+
+- keep `templates/<mode>/<variant>` only for `small`
+- use `templates/repo-summary/` directly for repo-summary variants
+
+This fix was applied to:
+
+- `evaluations/zx-example-author/evolved-skills/skill-evolution-zx-example-author/scripts/scaffold-example.mjs`
+- `evaluations/zx-example-author/evolved-skills/skill-traced-evolution-zx-example-author/scripts/scaffold-example.mjs`
+
+### `pi-mono-repo-summary`
+
+Verification workspace:
+
+- `evaluations/zx-example-author/verification/pi-mono-repo-summary`
+
+Observed results:
+
+- scaffold generation now succeeds
+- `npm install` succeeds
+- `npm exec -- tsc --noEmit` succeeds
+- a smoke run with `npm exec -- tsx summarize-repo.ts ...` did not finish within the timeout window and did not produce an output file
+
+Interpretation:
+
+- the generated project is structurally valid and currently typechecks
+- runtime behavior still needs a credentialed or longer-running smoke test before treating it as fully confirmed
+
+### `copilot-sdk-repo-summary`
+
+Verification workspace:
+
+- `evaluations/zx-example-author/verification/copilot-sdk-repo-summary`
+
+Observed results:
+
+- scaffold generation now succeeds
+- `npm install` succeeds
+- `npm exec -- tsc --noEmit` fails with current SDK API drift:
+  - `Object literal may only specify known properties, and 'model' does not exist in type 'CopilotClientOptions'.`
+  - `Property 'chat' does not exist on type 'CopilotClient'.`
+- a direct smoke run also fails at runtime on `client.chat.completions.create(...)`
+
+Interpretation:
+
+- the scaffold path is fixed
+- the current `@github/copilot-sdk` template is not compatible with the installed SDK contract and needs a dedicated compatibility pass
+
+## Updated Recommendation
+
+`skill-evolution-zx-example-author` remains the most promising skill variant for benchmark performance.
+
+For provider readiness:
+
+- `pi-mono-repo-summary` is the closer of the two repo-summary paths because it scaffolds, installs, and typechecks
+- `copilot-sdk-repo-summary` is still blocked by SDK compatibility issues and should not yet be treated as production-ready

@@ -53,7 +53,10 @@ if (!config) {
 }
 
 const targetDir = path.resolve(targetDirArg);
-const variantTemplateDir = path.join(templatesDir, config.mode, variant);
+const variantTemplateDir =
+  config.mode === "small"
+    ? path.join(templatesDir, config.mode, variant)
+    : path.join(templatesDir, config.mode);
 
 // Create the target directory first so every later write can be a simple path join.
 await mkdir(targetDir, { recursive: true });
