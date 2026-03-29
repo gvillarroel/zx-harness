@@ -27,12 +27,22 @@ description: Author small zx examples from short implementation requests. Use wh
 4. Write the files directly with minimal ceremony.
 5. Keep the final response short and factual.
 
+Supported scaffold variants:
+
+- `hello-name`
+- `hello-cop`
+- `gh-involved-repos`
+- `copilot-sdk-repo-summary`
+- `pi-mono-repo-summary`
+
 ## Intent Patterns
 
 ### Interactive single-file script
 
 Use this shape when the example needs user input or a tiny argument-driven flow.
 
+- Prefer the local scaffold when the request matches `hello-name` exactly:
+  `node scripts/scaffold-example.mjs hello-name <target-directory>`.
 - Prefer CLI args first, then prompt if the input is missing.
 - Trim and validate user input before running commands.
 - Throw a direct error when required input is empty.
@@ -64,6 +74,8 @@ await $({ stdio: "inherit" })`echo ${value}`;
 
 Use this shape when the example is mainly a thin zx wrapper around one CLI command.
 
+- Prefer the local scaffold when the request matches `hello-cop` exactly:
+  `node scripts/scaffold-example.mjs hello-cop <target-directory>`.
 - Keep the wrapper minimal.
 - Preserve the exact command family the user asked for.
 - Validate the required CLI first when practical.
@@ -86,6 +98,8 @@ await $`tool subcommand ${"arg"}`;
 
 Use this shape when the example fetches data, deduplicates it, and prints flat records.
 
+- Prefer the local scaffold when the request matches `gh-involved-repos` exactly:
+  `node scripts/scaffold-example.mjs gh-involved-repos <target-directory>`.
 - Keep the entry script focused on orchestration.
 - Put formatting or tiny helpers in a sibling module when that improves clarity.
 - Fetch the current user or active identity before running user-scoped queries.
