@@ -1,0 +1,7 @@
+#!/usr/bin/env zx
+
+$.shell = "bash.exe";
+$.quote = quote;
+
+// Keep the smoke test literal and tiny so the wrapper is easy to inspect.
+await $`copilot -p 'ping' --model gpt-5-mini`;

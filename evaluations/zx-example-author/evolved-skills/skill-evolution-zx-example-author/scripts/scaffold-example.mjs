@@ -21,9 +21,6 @@ if (!variant || !targetDirArg) {
 
 // Centralize the provider-specific placeholders so templates stay mostly static text.
 const variantConfig = {
-  "hello-name": {
-    mode: "small",
-  },
   "hello-cop": {
     mode: "small",
   },
@@ -56,74 +53,63 @@ if (!config) {
 }
 
 const targetDir = path.resolve(targetDirArg);
-const variantTemplateDir = path.join(templatesDir, config.mode, variant);
+const variantTemplateDir =
+  config.mode === "small"
+    ? path.join(templatesDir, config.mode, variant)
+    : path.join(templatesDir, config.mode);
 
 // Create the target directory first so every later write can be a simple path join.
 await mkdir(targetDir, { recursive: true });
 
+// Small variants are direct file copies with no placeholders because the structure is already fixed.
 if (config.mode === "small") {
-  // Copy every small-example template literally so the caller gets the exact benchmark recipe shape.
-  await copyTemplates(variantTemplateDir, targetDir, config);
-} else if (config.mode === "repo-summary") {
-  // Render the shared repo-summary files first because both providers share the same wrapper and package shape.
-  const sharedTemplateDir = path.join(templatesDir, "repo-summary");
-  const sharedFiles = await readdir(sharedTemplateDir, { withFileTypes: true });
-  for (const entry of sharedFiles) {
-    if (!entry.isFile()) {
-      continue;
-    }
-
-    if (!entry.name.endsWith(".tmpl")) {
-      continue;
-    }
-
-    if (entry.name.startsWith("summarize-repo.")) {
-      continue;
-    }
-
-    const templatePath = path.join(sharedTemplateDir, entry.name);
-    const template = await readFile(templatePath, "utf8");
-    const rendered = renderTemplate(template, config);
-    const targetPath = path.join(targetDir, entry.name.replace(/\.tmpl$/, ""));
-
-    await writeFile(targetPath, rendered);
-  }
-
-  // Write the provider-specific summarize script last so the variant controls the SDK details.
-  const summaryTemplate = await readFile(
-    path.join(sharedTemplateDir, config.SUMMARY_TEMPLATE_FILE),
-    "utf8",
-  );
-  await writeFile(
-    path.join(targetDir, "summarize-repo.ts"),
-    renderTemplate(summaryTemplate, config),
-  );
-} else {
-  throw new Error(`Unsupported scaffold mode "${config.mode}".`);
-}
-
-async function copyTemplates(templateDir, destinationDir, values) {
-  const entries = await readdir(templateDir, { withFileTypes: true });
-
-  // Walk directories recursively so small multi-file examples can keep helper modules beside the entrypoint.
-  for (const entry of entries) {
-    const sourcePath = path.join(templateDir, entry.name);
-    const destinationPath = path.join(destinationDir, entry.name.replace(/\.tmpl$/, ""));
-
-    if (entry.isDirectory()) {
-      await mkdir(destinationPath, { recursive: true });
-      await copyTemplates(sourcePath, destinationPath, values);
-      continue;
-    }
-
+  const templateFiles = await readdir(variantTemplateDir, { withFileTypes: true });
+  for (const entry of templateFiles) {
     if (!entry.isFile() || !entry.name.endsWith(".tmpl")) {
       continue;
     }
 
-    const template = await readFile(sourcePath, "utf8");
-    await writeFile(destinationPath, renderTemplate(template, values));
+    const templatePath = path.join(variantTemplateDir, entry.name);
+    const template = await readFile(templatePath, "utf8");
+    const targetPath = path.join(targetDir, entry.name.replace(/\.tmpl$/, ""));
+    await writeFile(targetPath, template);
   }
+
+  process.exit(0);
 }
+
+// Render the shared wrapper and package files first because both repo-summary variants use them.
+const sharedFiles = await readdir(variantTemplateDir, { withFileTypes: true });
+for (const entry of sharedFiles) {
+  if (!entry.isFile()) {
+    continue;
+  }
+
+  if (!entry.name.endsWith(".tmpl")) {
+    continue;
+  }
+
+  if (entry.name.startsWith("summarize-repo.")) {
+    continue;
+  }
+
+  const templatePath = path.join(variantTemplateDir, entry.name);
+  const template = await readFile(templatePath, "utf8");
+  const rendered = renderTemplate(template, config);
+  const targetPath = path.join(targetDir, entry.name.replace(/\.tmpl$/, ""));
+
+  await writeFile(targetPath, rendered);
+}
+
+// Write the provider-specific summarize script last so the variant controls the SDK details.
+const summaryTemplate = await readFile(
+  path.join(variantTemplateDir, config.SUMMARY_TEMPLATE_FILE),
+  "utf8",
+);
+await writeFile(
+  path.join(targetDir, "summarize-repo.ts"),
+  renderTemplate(summaryTemplate, config),
+);
 
 function renderTemplate(template, values) {
   let rendered = template;
