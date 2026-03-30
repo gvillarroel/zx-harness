@@ -6,3 +6,4 @@ package-lock.json
 evaluations/zx-example-author/verification/*/node_modules/
 evaluations/zx-example-author/verification/*/run/
 evaluations/zx-example-author/verification/*/package-lock.json
+evaluations/zx-example-author/generated/

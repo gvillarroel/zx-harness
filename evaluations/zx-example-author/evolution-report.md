@@ -1,5 +1,23 @@
 # zx-example-author Evolution Report
 
+## Current Status
+
+This document started as a single compare snapshot. The active decision flow is now the staged evaluator in `evaluations/zx-example-author/scripts/evolve-skill.mjs`.
+
+Current policy:
+
+- use the cheapest mutators by default
+- screen candidates with `codex-mini`
+- rerun only finalists in a cheap playoff
+- run the full matrix only when a challenger clears the incumbent by margin
+- keep the current skill unless a challenger wins the playoff and the verification round
+
+Latest staged run:
+
+- log: `evaluations/zx-example-author/logs/2026-03-30T06-06-32Z-evolution.md`
+- result: the current `skill` stayed on top in both the screen and the playoff
+- action: no promotion, no raised requests
+
 ## Scope
 
 This report compares the baseline `zx-example-author` skill against two evolved alternatives:
@@ -92,13 +110,13 @@ Interpretation:
 
 ## Recommendation
 
-Use `skill-evolution-zx-example-author` as the primary candidate for further iteration.
+Treat the compare snapshot below as historical evidence, not as the current winner selection rule.
 
-Keep `skill-traced-evolution-zx-example-author` as a secondary line of exploration, especially if later experiments focus on:
+For new iterations:
 
-- trace consolidation quality
-- generalization across larger prompt families
-- stronger models first
+- keep the local `skill` as the incumbent until the staged evaluator promotes a challenger
+- keep `skill-evolution-zx-example-author` and `skill-traced-evolution-zx-example-author` as fixed reference lines
+- prefer blends or mutator outputs only after they survive the cheap screen and the playoff
 
 ## Remaining Gap
 
@@ -171,7 +189,7 @@ Interpretation:
 
 ## Updated Recommendation
 
-`skill-evolution-zx-example-author` remains the most promising skill variant for benchmark performance.
+The current local `skill` is the active incumbent because it survived the latest staged screen and playoff.
 
 For provider readiness:
 
