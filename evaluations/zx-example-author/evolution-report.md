@@ -14,9 +14,13 @@ Current policy:
 
 Latest staged run:
 
-- log: `evaluations/zx-example-author/logs/2026-03-30T06-06-32Z-evolution.md`
-- result: the current `skill` stayed on top in both the screen and the playoff
+- log: `evaluations/zx-example-author/logs/2026-04-01T03-09-30Z-evolution.md`
+- mutators: codex (gpt-5.1-codex-mini), copilot (gpt-5-mini), pi (minimal)
+- screening: candidate-codex led 4/5 majority, candidate-pi 3/5, skill 2/5
+- playoff (3 repeats): skill recovered to 3/5 majority, challengers dropped to 2/5
+- result: the current `skill` stayed on top in the playoff
 - action: no promotion, no raised requests
+- status: evolution plateaued
 
 ## Scope
 
@@ -120,10 +124,17 @@ For new iterations:
 
 ## Remaining Gap
 
-The next iteration should target the unresolved `codex-mini` repo-summary failures:
+The evolution has plateaued. The persistent failures for `codex-mini` are:
 
-- `copilot-sdk-repo-summary`
-- `pi-mono-repo-summary`
+- `gh-involved-repos`: 0% across all profiles in every run — the assertion set requires exact literal shapes (`import { printRepo }`, `gh api user --jq .login`, `--limit 1000 --json repository`, `printRepo(repo);`, `console.log(\`name: \${name}\`);`) that `codex-mini` consistently drifts from
+- `copilot-sdk-repo-summary`: inconsistent — passes occasionally but not reliably
+- `pi-mono-repo-summary`: inconsistent — scaffold helps but `codex-mini` still drifts on template literals
+
+Further skill mutations are unlikely to fix these without either:
+
+1. stronger model variants in the evaluation matrix
+2. relaxing the assertion literals for `gh-involved-repos`
+3. adding `gh-involved-repos` to the scaffold-supported set with rigid templates
 
 ## Provider Verification
 
@@ -189,9 +200,10 @@ Interpretation:
 
 ## Updated Recommendation
 
-The current local `skill` is the active incumbent because it survived the latest staged screen and playoff.
+The current local `skill` is the active incumbent — it has survived two consecutive full evolution cycles (2026-03-30 and 2026-04-01) through screening, playoff, and stability checks.
 
-For provider readiness:
+For further improvement:
 
-- `pi-mono-repo-summary` is the closer of the two repo-summary paths because it scaffolds, installs, and typechecks
-- `copilot-sdk-repo-summary` is still blocked by SDK compatibility issues and should not yet be treated as production-ready
+- the `gh-involved-repos` scaffold template should be added to `scripts/scaffold-example.mjs` with rigid literal output — this is the single biggest remaining failure
+- the pi mutation of adding `hello-name` to scaffold-supported variants showed promise (3/5 screening) but couldn't sustain through playoff — worth revisiting as a manual change if `hello-name` scaffold coverage is confirmed stable
+- evolution is unlikely to yield further gains under the current `codex-mini`-only screening — consider expanding playoff variants or raising request count
