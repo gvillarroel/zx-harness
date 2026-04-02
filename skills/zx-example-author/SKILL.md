@@ -23,16 +23,18 @@ description: Author small zx examples from short implementation requests. Use wh
 
 1. Infer the example intent from the request.
 2. Extract the exact file paths, helper names, CLI family, and literal command fragments named by the user.
-3. If the request matches a supported scaffold, run the local scaffold immediately and treat its output as the default answer shape.
-4. Change scaffolded output only when the prompt requires something the scaffold does not already provide.
-5. If the request does not match a supported scaffold, pick the smallest script shape that satisfies the intent.
-6. Before finishing, reject your draft if it replaced an explicit literal with a semantically similar substitute.
-7. Keep the final response short and factual.
+3. If the request matches a supported scaffold, map it to that variant immediately before exploring other shapes.
+4. Run the local scaffold immediately and treat its output as the default answer shape.
+5. Change scaffolded output only when the prompt requires something the scaffold does not already provide.
+6. If the request does not match a supported scaffold, pick the smallest script shape that satisfies the intent.
+7. Before finishing, reject your draft if it replaced an explicit literal with a semantically similar substitute.
+8. Keep the final response short and factual.
 
 ## Supported Scaffolds
 
 Use `node scripts/scaffold-example.mjs <variant> <target-directory>` immediately when the request matches one of these variants:
 
+- `hello-name`
 - `hello-cop`
 - `gh-involved-repos`
 - `copilot-sdk-repo-summary`
@@ -51,12 +53,14 @@ Scaffold-first policy:
 
 Use this shape when the example needs user input or a tiny argument-driven flow.
 
+- Prefer the local scaffold at `scripts/scaffold-example.mjs` for supported variants such as `hello-name`.
 - Prefer CLI args first, then prompt if the input is missing.
 - Trim and validate user input before running commands.
 - Throw a direct error when required input is empty.
 - Use `echo` or another simple shell command for visible output.
 - Set `$.shell = "bash.exe";` on Windows if the script shells out.
 - When the request is about greeting or naming, use the domain noun in the prompt label, such as `Name:`.
+- For supported greeting examples, preserve the scaffolded `process.argv.slice(3)`, `question("Name: ")`, `trim()`, and `throw new Error(...)` shape.
 
 Typical structure:
 
@@ -232,8 +236,8 @@ pi-mono variant:
 
 ## Domain Hints
 
-- For greeting-style examples, favor a tiny interactive script with argument fallback.
-- For greeting-style examples, prefer `process.argv.slice(3)` before prompting, trim the value, fail on empty input, and print through `echo`.
+- For greeting-style examples, favor the `hello-name` scaffold first, then keep only prompt-required edits.
+- For greeting-style examples, prefer `process.argv.slice(3)` before prompting, trim the value, fail on empty input, and print through `echo hello ${name}`.
 - For Copilot or similar assistant CLIs, keep the example as a minimal wrapper around one prompt command, usually `tool -p <short prompt> --model <model>`.
 - For GitHub involvement-style examples, resolve the viewer with `gh api user --jq .login`, query involved issues and PRs, deduplicate `nameWithOwner`, and print one repository per line.
 - For GitHub formatter helpers, keep the helper tiny and focused on printing the final line shape.
@@ -258,5 +262,7 @@ Before finishing, verify all of these:
 - every requested file exists and no unrequested file was added
 - every named helper file and import path still matches
 - every named literal command still appears in the written files when the prompt implies it
+- for `hello-cop`, re-check `$.quote = quote;` and `copilot -p 'ping' --model gpt-5-mini` before finishing
+- for `gh-involved-repos`, re-check `import { printRepo } from "./repo.ts";`, `gh api user --jq .login`, `--limit 1000 --json repository`, `printRepo(repo);`, and `console.log(\`name: ${name}\`);`
 - scaffold-supported variants still look like the local scaffold unless the prompt required a small delta
 - the result is still the minimum runnable example for the request
