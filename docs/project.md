@@ -65,6 +65,7 @@ Support may begin as docs or examples before a reusable abstraction exists.
 ## Reading Path
 
 - use [spec.md](spec.md) for the hard contract
+- use [setup.md](setup.md) for prerequisites and first-run checks
 - use [architecture.md](architecture.md) for the execution model
 - use [examples.md](examples.md) to choose a runnable example
 - use [development.md](development.md) before adding or changing repo content

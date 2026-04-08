@@ -79,9 +79,16 @@ zx index.mjs <args>
 Update:
 
 - [README.md](README.md) when doc navigation changes
+- [setup.md](setup.md) when prerequisites or install steps change
 - [examples.md](examples.md) when an example is added or changed
 - [architecture.md](architecture.md) when the repository model changes
 - [spec.md](spec.md) when the contract changes
+
+Before merging docs work:
+
+1. verify links inside `docs/`
+2. verify commands still match the repo layout
+3. remove claims that require reading files outside `docs/`
 
 ## Writing Style
 
