@@ -23,16 +23,33 @@ description: Author small zx examples from short implementation requests. Use wh
 
 1. Infer the example intent from the request.
 2. Extract the exact file paths, helper names, CLI family, and literal command fragments named by the user.
-3. If the request matches a supported scaffold, map it to that variant immediately before exploring other shapes.
-4. Run the local scaffold immediately and treat its output as the default answer shape.
-5. Change scaffolded output only when the prompt requires something the scaffold does not already provide.
-6. If the request does not match a supported scaffold, pick the smallest script shape that satisfies the intent.
-7. Before finishing, reject your draft if it replaced an explicit literal with a semantically similar substitute.
-8. Keep the final response short and factual.
+3. If the request matches a supported scaffold, run the local skill script immediately from the workspace root and treat its output as the default answer shape.
+4. Change scaffolded output only when the prompt requires something the scaffold does not already provide.
+5. If the request does not match a supported scaffold, pick the smallest script shape that satisfies the intent.
+6. Before finishing, reject your draft if it replaced an explicit literal with a semantically similar substitute.
+7. Keep the final response short and factual.
+8. If the mapped scaffold or orchestrator command succeeds, keep its written files as the default answer and do not rewrite them from scratch.
+
+Exact command map:
+
+- `hello-name`: `node skills/zx-example-author/scripts/scaffold-example.mjs hello-name hello-name`
+- `hello-cop`: `node skills/zx-example-author/scripts/orchestrate-example.mjs hello-cop hello-cop`
+- `gh-involved-repos`: `node skills/zx-example-author/scripts/orchestrate-example.mjs gh-involved-repos gh-involved-repos`
+- `copilot-sdk-repo-summary`: `node skills/zx-example-author/scripts/scaffold-example.mjs copilot-sdk-repo-summary copilot-sdk-repo-summary`
+- `pi-mono-repo-summary`: `node skills/zx-example-author/scripts/scaffold-example.mjs pi-mono-repo-summary pi-mono-repo-summary`
+
+Exact command policy:
+
+- run the mapped command before any manual file creation
+- if it exits successfully, inspect the written files and keep them unless one required literal is still missing
+- if one required literal is missing, make the smallest possible patch instead of rewriting the file
+- do not replace a successful scaffolded file with a different implementation style
 
 ## Supported Scaffolds
 
-Use `node scripts/scaffold-example.mjs <variant> <target-directory>` immediately when the request matches one of these variants:
+For `hello-cop` and `gh-involved-repos`, prefer `node skills/zx-example-author/scripts/orchestrate-example.mjs <variant> <target-directory>` as the first command when higher quality is worth extra time. Run it from the workspace root and keep `<target-directory>` as the final folder name, such as `hello-cop` or `gh-involved-repos`. It scaffolds from the skill bundle, estimates runtime, asks `copilot` mini to review one file at a time, runs a literal-fix pass, and verifies literals before finishing.
+
+Use `node skills/zx-example-author/scripts/scaffold-example.mjs <variant> <target-directory>` immediately when the request matches one of these variants:
 
 - `hello-name`
 - `hello-cop`
@@ -43,6 +60,10 @@ Use `node scripts/scaffold-example.mjs <variant> <target-directory>` immediately
 Scaffold-first policy:
 
 - scaffold first, inspect second, edit last
+- run the command from the workspace root and point to `skills/zx-example-author/scripts/...`
+- keep `<target-directory>` equal to the requested folder name, not `workspace/<name>`
+- for scaffold-supported variants, do not start with `Set-Content`, here-strings, or handwritten file bodies
+- for scaffold-supported variants, do not switch to `node --loader ts-node/esm`, GraphQL fetch rewrites, custom package manifests, or handwritten repo walkers unless the mapped command failed first
 - prefer exact scaffold output over handwritten reimplementation
 - preserve scaffolded command literals unless the prompt explicitly overrides them
 - preserve scaffolded helper names and import paths
@@ -53,7 +74,7 @@ Scaffold-first policy:
 
 Use this shape when the example needs user input or a tiny argument-driven flow.
 
-- Prefer the local scaffold at `scripts/scaffold-example.mjs` for supported variants such as `hello-name`.
+- Prefer the local scaffold at `skills/zx-example-author/scripts/scaffold-example.mjs` for supported variants such as `hello-name`.
 - Prefer CLI args first, then prompt if the input is missing.
 - Trim and validate user input before running commands.
 - Throw a direct error when required input is empty.
@@ -86,7 +107,7 @@ await $({ stdio: "inherit" })`echo ${value}`;
 
 Use this shape when the example is mainly a thin zx wrapper around one CLI command.
 
-- Prefer the local scaffold at `scripts/scaffold-example.mjs` for supported variants such as `hello-cop`.
+- Prefer the local scaffold at `skills/zx-example-author/scripts/scaffold-example.mjs` for supported variants such as `hello-cop`.
 - Treat one-line smoke wrappers as high-risk for accidental substitution.
 - If the prompt implies `tool -p ... --model ...`, do not replace it with another CLI form unless the user explicitly requests the change.
 - Keep the wrapper minimal.
@@ -112,7 +133,7 @@ await $`tool subcommand ${"arg"}`;
 
 Use this shape when the example fetches data, deduplicates it, and prints flat records.
 
-- Prefer the local scaffold at `scripts/scaffold-example.mjs` for supported variants such as `gh-involved-repos`.
+- Prefer the local scaffold at `skills/zx-example-author/scripts/scaffold-example.mjs` for supported variants such as `gh-involved-repos`.
 - Treat helper-module naming as part of the contract when the request names a helper file or import.
 - Keep the entry script focused on orchestration.
 - Put formatting or tiny helpers in a sibling module when that improves clarity.
@@ -152,8 +173,8 @@ export function printItem(name) {
 
 Use this shape when the example is a small folder with a zx wrapper, package files, and a TypeScript summarizer that maps a repository and reduces summaries in pairs.
 
-- Prefer the local scaffold at `scripts/scaffold-example.mjs` for supported variants because it removes repetitive file creation and keeps the shape stable across runs.
-- Run it as `node scripts/scaffold-example.mjs <variant> <target-directory>`.
+- Prefer the local scaffold at `skills/zx-example-author/scripts/scaffold-example.mjs` for supported variants because it removes repetitive file creation and keeps the shape stable across runs.
+- Run it as `node skills/zx-example-author/scripts/scaffold-example.mjs <variant> <target-directory>`.
 - For supported repo-summary variants, default to the scaffold output unchanged unless the prompt adds requirements that are clearly absent.
 - Create only the requested files, usually `index.mjs`, `summarize-repo.ts`, `package.json`, `tsconfig.json`, and `README.md`.
 - Keep `index.mjs` as a thin zx wrapper around the local TypeScript entrypoint.
@@ -237,6 +258,7 @@ pi-mono variant:
 ## Domain Hints
 
 - For greeting-style examples, favor the `hello-name` scaffold first, then keep only prompt-required edits.
+- For supported variants, prefer the exact skill-bundle command path over a handwritten file creation flow.
 - For greeting-style examples, prefer `process.argv.slice(3)` before prompting, trim the value, fail on empty input, and print through `echo hello ${name}`.
 - For Copilot or similar assistant CLIs, keep the example as a minimal wrapper around one prompt command, usually `tool -p <short prompt> --model <model>`.
 - For GitHub involvement-style examples, resolve the viewer with `gh api user --jq .login`, query involved issues and PRs, deduplicate `nameWithOwner`, and print one repository per line.
