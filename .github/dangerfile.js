@@ -1,4 +1,4 @@
-import { danger, fail, message } from "danger";
+import { danger, fail, markdown, message } from "danger";
 import { buildFileLimitReport } from "./danger-pr-file-limit-rule.mjs";
 
 const report = buildFileLimitReport({
@@ -9,6 +9,7 @@ const report = buildFileLimitReport({
 
 // Keep the success path visible so the Danger comment confirms the rule ran.
 message(report.message);
+markdown(report.summaryMarkdown);
 
 // Fail the check when the PR is too broad for this spike policy.
 if (report.failure) {

@@ -135,6 +135,7 @@ zx examples/danger-pr-file-limit/index.mjs
 Notes:
 
 - reuses `.github/danger-pr-file-limit-rule.mjs`
+- previews the Danger PR summary Markdown
 - does not create GitHub PRs
 
 ### `copilot-sdk-repo-summary`

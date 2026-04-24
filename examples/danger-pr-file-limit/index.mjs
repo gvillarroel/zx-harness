@@ -32,6 +32,7 @@ for (const scenario of scenarios) {
 
   echo(`\n${status} ${scenario.name}`);
   echo(report.message);
+  echo(report.summaryMarkdown);
 
   if (report.failure) {
     echo(report.failure);
