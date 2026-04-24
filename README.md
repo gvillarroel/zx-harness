@@ -18,7 +18,7 @@ Small, inspectable zx examples for agent-driven workflows.
 - [Architecture](docs/architecture.md)
 - [Example catalog](docs/examples.md)
 - [Development guide](docs/development.md)
-- [Windows setup](docs/window.md)
+- [Windows setup](docs/windows.md)
 - [Specification](SPEC.md)
 
 ## Repository Map
@@ -60,6 +60,8 @@ zx examples/hello-name/index.mjs
 | `examples/hello-cop` | Calls Copilot CLI | requires `copilot` |
 | `examples/gh-involved-repos` | Lists repos involving the current GitHub user | requires `gh` auth |
 | `examples/gh-issue-knowledge` | Investigates one GitHub issue with Codex and optional Brave data | requires `gh` and `codex` |
+| `examples/danger-pr-file-limit` | Simulates Danger PR file-limit results | requires `node` |
+| `examples/danger-content-safety` | Simulates Danger link checks and TruffleHog output | requires `node` |
 | `examples/copilot-sdk-repo-summary` | Summarizes a repo with Copilot SDK | local `npm install` |
 | `examples/pi-mono-repo-summary` | Summarizes a repo with pi-mono SDK | local `npm install` |
 | `examples/jira-open-tickers-acli` | Jira helper material | partial example asset |
@@ -72,6 +74,8 @@ See [docs/examples.md](docs/examples.md) for inputs, dependencies, and run comma
 zx examples/hello-world/index.mjs
 zx examples/gh-involved-repos/index.mjs
 zx examples/gh-issue-knowledge/index.mjs owner/repo 123
+zx examples/danger-pr-file-limit/index.mjs
+zx examples/danger-content-safety/index.mjs
 ```
 
 Repo summary examples need local dependencies first.

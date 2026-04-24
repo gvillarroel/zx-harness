@@ -1,0 +1,41 @@
+name: Danger PR checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  danger:
+    name: Run Danger PR checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install TruffleHog
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/trufflesecurity/trufflehog/main/scripts/install.sh \
+            | sh -s -- -b /usr/local/bin
+
+      - name: Scan secrets with TruffleHog
+        run: |
+          trufflehog filesystem "${GITHUB_WORKSPACE}" \
+            --json \
+            --no-update \
+            --results=verified,unknown \
+            > "${RUNNER_TEMP}/trufflehog.jsonl" || true
+
+      - name: Run Danger
+        uses: danger/danger-js@13.0.5
+        with:
+          args: "--dangerfile .github/dangerfile.js --failOnErrors"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TRUFFLEHOG_REPORT_PATH: ${{ runner.temp }}/trufflehog.jsonl

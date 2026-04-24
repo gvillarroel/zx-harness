@@ -15,6 +15,8 @@ All runnable examples require `zx`.
 | `hello-cop` | runnable | `zx`, `copilot`, `bash.exe` on Windows | prints provider output |
 | `gh-involved-repos` | runnable | `zx`, `gh` auth | prints repo names |
 | `gh-issue-knowledge` | runnable | `zx`, `gh`, `codex` | writes a markdown knowledge file |
+| `danger-pr-file-limit` | runnable | `zx`, `node` | prints allowed and blocked PR examples |
+| `danger-content-safety` | runnable | `zx`, `node` | prints clean and blocked link/TruffleHog examples |
 | `copilot-sdk-repo-summary` | runnable | `zx`, `node`, `npm`, `git`, local `npm install` | prints repo summary |
 | `pi-mono-repo-summary` | runnable | `zx`, `node`, `npm`, `git`, local `npm install` | prints repo summary |
 | `jira-open-tickers-acli` | partial asset | local TypeScript helper only | no `index.mjs` yet |
@@ -120,6 +122,41 @@ Output:
 - `<owner>-<repo>-<issue>-task-knowledge.md` in the example folder
 - raw and filtered Brave research files under `examples/gh-issue-knowledge/run/` when Brave is enabled
 
+### `danger-pr-file-limit`
+
+Purpose:
+show one PR that passes the Danger file limit and one PR that fails it.
+
+Run:
+
+```bash
+zx examples/danger-pr-file-limit/index.mjs
+```
+
+Notes:
+
+- reuses `.github/danger-pr-file-limit-rule.mjs`
+- previews the Danger PR summary Markdown
+- does not create GitHub PRs
+
+### `danger-content-safety`
+
+Purpose:
+show one PR that passes link and TruffleHog checks and one PR that fails them.
+
+Run:
+
+```bash
+zx examples/danger-content-safety/index.mjs
+```
+
+Notes:
+
+- reuses `.github/danger-content-safety-rule.mjs`
+- checks changed text files only
+- formats TruffleHog findings without printing secret values
+- mocks network checks for deterministic local output
+
 ### `copilot-sdk-repo-summary`
 
 Purpose:
@@ -191,6 +228,8 @@ Status:
 - use `hello-cop` for a minimal provider CLI call
 - use `gh-involved-repos` for a simple authenticated GitHub workflow
 - use `gh-issue-knowledge` for a multi-step agent workflow
+- use `danger-pr-file-limit` to preview the Danger PR-size check
+- use `danger-content-safety` to preview link and secret checks
 - use a repo-summary example when local package dependencies are acceptable
 
 ## Platform Note
