@@ -1,0 +1,25 @@
+name: Danger PR file limit
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  file-limit:
+    name: Block PRs over 3 files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Danger
+        uses: danger/danger-js@13.0.5
+        with:
+          args: "--dangerfile .github/dangerfile.js --failOnErrors"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
