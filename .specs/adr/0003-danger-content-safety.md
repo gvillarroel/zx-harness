@@ -28,8 +28,8 @@ separate scanner manually.
 
 Extend the existing Danger JS workflow with `.github/danger-content-safety-rule.mjs`. Danger checks
 links in created and modified text files. TruffleHog runs before Danger and writes a JSONL report
-that Danger formats by file and line without printing secret values. Keep a local example at
-`examples/danger-content-safety`.
+that Danger formats by file and line without printing secret values. Install both scanners in the
+runner instead of using Docker. Keep a local example at `examples/danger-content-safety`.
 
 ## Consequences
 
@@ -43,4 +43,4 @@ Positive:
 Negative:
 
 - external link checks can fail because of network or server behavior
-- the workflow depends on installing TruffleHog in the runner
+- the workflow depends on installing TruffleHog and Danger in the runner

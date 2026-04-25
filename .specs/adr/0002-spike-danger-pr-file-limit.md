@@ -26,7 +26,7 @@ GitHub Actions and report review policy failures on pull requests.
 
 ## Decision
 
-Add a `pull_request` workflow that runs `danger/danger-js@13.0.5` with `.github/dangerfile.js`.
+Add a `pull_request` workflow that installs Danger JS with `npx` and runs `.github/dangerfile.js`.
 The Dangerfile fails the check when a PR changes more than three unique files. Keep the rule in
 `.github/danger-pr-file-limit-rule.mjs` so local examples can reuse it. The Danger comment also
 includes a Markdown summary table for changed file count, limit, status, and file list.
