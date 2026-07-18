@@ -11,8 +11,8 @@ All runnable examples require `zx`.
 | Example | Status | Requires | Result |
 | --- | --- | --- | --- |
 | `hello-world` | runnable | `zx`, `bash.exe` on Windows | prints `hello world` |
-| `hello-name` | runnable | `zx`, `bash.exe` on Windows | prints `hello <name>` |
-| `hello-cop` | runnable | `zx`, `copilot`, `bash.exe` on Windows | prints provider output |
+| `hello-name` | runnable | `zx` | prints `hello <name>` |
+| `hello-cop` | runnable | `zx`, `copilot` | prints provider output |
 | `gh-involved-repos` | runnable | `zx`, `gh` auth | prints repo names |
 | `gh-issue-knowledge` | runnable | `zx`, `gh`, `codex` | writes a markdown knowledge file |
 | `copilot-sdk-repo-summary` | runnable | `zx`, `node`, `npm`, `git`, local `npm install` | prints repo summary |
@@ -59,7 +59,6 @@ zx examples/hello-name/index.mjs Alice
 
 Notes:
 
-- uses `bash.exe`
 - prompts when no name argument is given
 
 ### `hello-cop`
@@ -75,7 +74,6 @@ zx examples/hello-cop/index.mjs
 
 Notes:
 
-- uses `bash.exe`
 - requires `copilot` on `PATH`
 
 ### `gh-involved-repos`

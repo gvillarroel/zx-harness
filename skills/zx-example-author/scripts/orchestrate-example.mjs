@@ -52,8 +52,8 @@ const specs = {
         classification: "entrypoint",
         literals: [
           "#!/usr/bin/env zx",
-          "$.quote = quote;",
-          "copilot -p 'ping' --model gpt-5-mini",
+          'import { execFileSync } from "node:child_process";',
+          '["-p", "ping", "--model", "auto"]',
         ],
       },
     ],
@@ -76,8 +76,8 @@ const specs = {
         classification: "entrypoint",
         literals: [
           'import { printRepo } from "./repo.ts";',
-          "gh api user --jq .login",
-          "--limit 1000 --json repository",
+          '["api", "user", "--jq", ".login"]',
+          '["search", "issues", "--include-prs"',
           "printRepo(repo);",
         ],
       },
@@ -102,16 +102,16 @@ const specs = {
       allowRewrite: false,
     },
     request:
-      "Create a folder named `copilot-sdk-repo-summary` with `index.mjs`, `summarize-repo.ts`, `package.json`, `tsconfig.json`, and a short README. The zx entrypoint should verify `node`, `npm`, and `git`, require local dependencies to be installed, and then run `npm exec -- tsx summarize-repo.ts`. The TypeScript script should accept a local repo path or GitHub tree URL, summarize the repository by mapping files, summarizing files in pairs with the Copilot SDK, merging summaries in pairs, and writing the final markdown summary plus map and tree JSON files under `run/`.",
+      "Create a folder named `copilot-sdk-repo-summary` with `index.mjs`, `summarize-repo.ts`, `package.json`, `tsconfig.json`, and a short README. The zx entrypoint should verify `node` and `git`, require local dependencies, and launch the local `tsx` CLI through `process.execPath` without a shell. The TypeScript script should accept a local repo path or GitHub tree URL, summarize the repository by mapping files, summarizing files in pairs with the Copilot SDK, merging summaries in pairs, and writing the final markdown summary plus map and tree JSON files under `run/`.",
     files: [
       {
         path: "index.mjs",
         classification: "entrypoint",
         literals: [
           "#!/usr/bin/env zx",
-          "$.quote = quote;",
-          'for (const command of ["node", "npm", "git"])',
-          "npm exec -- tsx summarize-repo.ts",
+          'for (const command of ["node", "git"])',
+          'resolve(dependenciesDir, "tsx", "dist", "cli.mjs")',
+          "execFileSync(process.execPath",
         ],
       },
       {
@@ -148,16 +148,16 @@ const specs = {
       allowRewrite: false,
     },
     request:
-      "Create a folder named `pi-mono-repo-summary` with `index.mjs`, `summarize-repo.ts`, `package.json`, `tsconfig.json`, and a short README. The zx entrypoint should verify `node`, `npm`, and `git`, require local dependencies to be installed, and then run `npm exec -- tsx summarize-repo.ts`. The TypeScript script should accept a local repo path or GitHub tree URL, choose provider and model from environment variables when present, summarize the repository by mapping files, summarizing files in pairs with pi-mono, merging summaries in pairs, and writing the final markdown summary plus map and tree JSON files under `run/`.",
+      "Create a folder named `pi-mono-repo-summary` with `index.mjs`, `summarize-repo.ts`, `package.json`, `tsconfig.json`, and a short README. The zx entrypoint should verify `node` and `git`, require local dependencies, and launch the local `tsx` CLI through `process.execPath` without a shell. The TypeScript script should accept a local repo path or GitHub tree URL, choose provider and model from environment variables when present, summarize the repository by mapping files, summarizing files in pairs with pi-mono, merging summaries in pairs, and writing the final markdown summary plus map and tree JSON files under `run/`.",
     files: [
       {
         path: "index.mjs",
         classification: "entrypoint",
         literals: [
           "#!/usr/bin/env zx",
-          "$.quote = quote;",
-          'for (const command of ["node", "npm", "git"])',
-          "npm exec -- tsx summarize-repo.ts",
+          'for (const command of ["node", "git"])',
+          'resolve(dependenciesDir, "tsx", "dist", "cli.mjs")',
+          "execFileSync(process.execPath",
         ],
       },
       {
@@ -223,18 +223,12 @@ if (estimateOnly) {
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const skillDir = path.resolve(scriptDir, "..");
 const targetDir = path.resolve(targetDirArg);
-const copilotExe = path.join(
-  process.env.LOCALAPPDATA ?? "",
-  "Microsoft",
-  "WinGet",
-  "Links",
-  "copilot.exe",
-);
+const copilotCli = process.env.COPILOT_CLI?.trim() || "copilot";
 
 // Start from the local scaffold so every variant begins from the known-good shape.
 runScaffold(skillDir, variant, targetDir);
 
-// Review each file independently with the cheapest Copilot model so the task stays small.
+// Review each file independently with Copilot's available model routing.
 for (const fileSpec of spec.files) {
   const filePath = path.join(targetDir, fileSpec.path);
   const scaffoldContent = await readFile(filePath, "utf8");
@@ -286,7 +280,7 @@ for (const fileSpec of spec.files) {
 
   for (let index = 0; index < spec.policy.reviewPasses; index += 1) {
     const reply = runCopilot(
-      copilotExe,
+      copilotCli,
       skillDir,
       reviewPrompts[index % reviewPrompts.length],
     );
@@ -319,7 +313,7 @@ for (const fileSpec of spec.files) {
     ].join("\n");
 
     const reflectionContent = normalizeCopilotReply(
-      runCopilot(copilotExe, skillDir, reflectionPrompt),
+      runCopilot(copilotCli, skillDir, reflectionPrompt),
       bestContent,
     );
     const reflectionScore = scoreContent(
@@ -364,7 +358,7 @@ for (const fileSpec of spec.files) {
       "Return only the full replacement file content with no markdown fences.",
     ].join("\n");
     const literalFixContent = normalizeCopilotReply(
-      runCopilot(copilotExe, skillDir, literalFixPrompt),
+      runCopilot(copilotCli, skillDir, literalFixPrompt),
       bestContent,
     );
     const literalFixScore = scoreContent(
@@ -404,9 +398,7 @@ function runCopilot(executable, cwd, promptText) {
       "--no-ask-user",
       "--silent",
       "--model",
-      "gpt-5-mini",
-      "--effort",
-      "low",
+      "auto",
       "--add-dir",
       cwd,
       "-p",

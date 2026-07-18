@@ -2,15 +2,13 @@
 
 ## Why
 
-Several examples set `$.shell = "bash.exe"`.
+The locked `hello-world` baseline sets `$.shell = "bash.exe"`.
 
 That keeps the shell model aligned with Windows plus WSL-backed Bash.
 
 ## Examples That Need This
 
 - `hello-world`
-- `hello-name`
-- `hello-cop`
 
 ## Recommended Setup
 

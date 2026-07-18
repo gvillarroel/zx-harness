@@ -1,16 +1,20 @@
 #!/usr/bin/env zx
 
+import { execFileSync } from "node:child_process";
 import { printRepo } from "./repo.ts";
 
-$.quote = quote;
-
 // Verify gh is ready, then search issues and PRs involving the current user.
-const login = (await $`gh api user --jq .login`).stdout.trim();
-const output =
-  await $`gh search issues --include-prs --involves ${login} --limit 1000 --json repository`;
+const login = execFileSync("gh", ["api", "user", "--jq", ".login"], {
+  encoding: "utf8",
+}).trim();
+const output = execFileSync(
+  "gh",
+  ["search", "issues", "--include-prs", "--involves", login, "--limit", "1000", "--json", "repository"],
+  { encoding: "utf8" },
+);
 const repos = [
   ...new Set(
-    JSON.parse(output.stdout).map((item) => item.repository?.nameWithOwner).filter(Boolean),
+    JSON.parse(output).map((item) => item.repository?.nameWithOwner).filter(Boolean),
   ),
 ];
 

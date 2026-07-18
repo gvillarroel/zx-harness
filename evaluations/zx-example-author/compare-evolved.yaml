@@ -50,10 +50,7 @@ task:
             value: "#!/usr/bin/env zx"
           - type: file-contains
             path: hello-cop/index.mjs
-            value: "$.quote = quote;"
-          - type: file-contains
-            path: hello-cop/index.mjs
-            value: "copilot -p 'ping' --model gpt-5-mini"
+            value: '["-p", "ping", "--model", "auto"]'
     - id: gh-involved-repos
       description: Create the gh-involved-repos example from a short prompt.
       prompt: >-
@@ -68,10 +65,10 @@ task:
             value: "import { printRepo } from \"./repo.ts\";"
           - type: file-contains
             path: gh-involved-repos/index.mjs
-            value: "gh api user --jq .login"
+            value: '["api", "user", "--jq", ".login"]'
           - type: file-contains
             path: gh-involved-repos/index.mjs
-            value: "--limit 1000 --json repository"
+            value: '"--limit", "1000", "--json", "repository"'
           - type: file-contains
             path: gh-involved-repos/index.mjs
             value: "printRepo(repo);"
@@ -83,9 +80,9 @@ task:
       prompt: >-
         Create a folder named `copilot-sdk-repo-summary` with `index.mjs`,
         `summarize-repo.ts`, `package.json`, `tsconfig.json`, and a short
-        README. The zx entrypoint should verify `node`, `npm`, and `git`,
-        require local dependencies to be installed, and then run
-        `npm exec -- tsx summarize-repo.ts`. The TypeScript script should
+        README. The zx entrypoint should verify `node` and `git`, require local
+        dependencies, and launch the local `tsx` CLI through `process.execPath`
+        without a shell. The TypeScript script should
         accept a local repo path or GitHub tree URL, summarize the repository by
         mapping files, summarizing files in pairs with the Copilot SDK, merging
         summaries in pairs, and writing the final markdown summary plus map and
@@ -98,13 +95,10 @@ task:
             value: "#!/usr/bin/env zx"
           - type: file-contains
             path: copilot-sdk-repo-summary/index.mjs
-            value: "$.quote = quote;"
+            value: "for (const command of [\"node\", \"git\"])"
           - type: file-contains
             path: copilot-sdk-repo-summary/index.mjs
-            value: "for (const command of [\"node\", \"npm\", \"git\"])"
-          - type: file-contains
-            path: copilot-sdk-repo-summary/index.mjs
-            value: "npm exec -- tsx summarize-repo.ts"
+            value: "execFileSync(process.execPath"
           - type: file-contains
             path: copilot-sdk-repo-summary/summarize-repo.ts
             value: "CopilotClient"
@@ -128,9 +122,9 @@ task:
       prompt: >-
         Create a folder named `pi-mono-repo-summary` with `index.mjs`,
         `summarize-repo.ts`, `package.json`, `tsconfig.json`, and a short
-        README. The zx entrypoint should verify `node`, `npm`, and `git`,
-        require local dependencies to be installed, and then run
-        `npm exec -- tsx summarize-repo.ts`. The TypeScript script should
+        README. The zx entrypoint should verify `node` and `git`, require local
+        dependencies, and launch the local `tsx` CLI through `process.execPath`
+        without a shell. The TypeScript script should
         accept a local repo path or GitHub tree URL, choose provider and model
         from environment variables when present, summarize the repository by
         mapping files, summarizing files in pairs with pi-mono, merging
@@ -144,13 +138,10 @@ task:
             value: "#!/usr/bin/env zx"
           - type: file-contains
             path: pi-mono-repo-summary/index.mjs
-            value: "$.quote = quote;"
+            value: "for (const command of [\"node\", \"git\"])"
           - type: file-contains
             path: pi-mono-repo-summary/index.mjs
-            value: "for (const command of [\"node\", \"npm\", \"git\"])"
-          - type: file-contains
-            path: pi-mono-repo-summary/index.mjs
-            value: "npm exec -- tsx summarize-repo.ts"
+            value: "execFileSync(process.execPath"
           - type: file-contains
             path: pi-mono-repo-summary/summarize-repo.ts
             value: "completeSimple"
@@ -173,7 +164,7 @@ workspace:
   sources:
     - id: base
       type: local-path
-      path: C:/Users/villa/dev/zx-harness/evaluations/zx-example-author/fixtures/base
+      path: evaluations/zx-example-author/fixtures/base
       target: /
   setup:
     initializeGit: true
@@ -206,7 +197,7 @@ comparison:
         skills:
           - source:
               type: local-path
-              path: C:/Users/villa/dev/zx-harness/skills/zx-example-author
+              path: skills/zx-example-author
               skillId: zx-example-author
             install:
               strategy: workspace-overlay
@@ -223,7 +214,7 @@ comparison:
         skills:
           - source:
               type: local-path
-              path: C:/Users/villa/dev/zx-harness/evaluations/zx-example-author/evolved-skills/skill-evolution-zx-example-author
+              path: evaluations/zx-example-author/evolved-skills/skill-evolution-zx-example-author
               skillId: zx-example-author
             install:
               strategy: workspace-overlay
@@ -242,7 +233,7 @@ comparison:
         skills:
           - source:
               type: local-path
-              path: C:/Users/villa/dev/zx-harness/evaluations/zx-example-author/evolved-skills/skill-traced-evolution-zx-example-author
+              path: evaluations/zx-example-author/evolved-skills/skill-traced-evolution-zx-example-author
               skillId: zx-example-author
             install:
               strategy: workspace-overlay
