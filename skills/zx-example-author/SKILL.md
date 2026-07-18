@@ -12,7 +12,7 @@ description: Author small zx examples from short implementation requests. Use wh
 - Match the user-requested paths exactly.
 - Create only the files needed for the requested example.
 - Use `#!/usr/bin/env zx` for zx entrypoints.
-- Prefer direct JavaScript APIs when no shell is needed. Otherwise let zx use the current environment's default quoting.
+- Prefer direct JavaScript APIs when no shell is needed. Never interpolate dynamic values into `$`; pass an argument array to `execFileSync` or `spawn` instead. If the user explicitly requires shell parsing, configure a matching shell and quote function for that requested environment.
 - Keep failures explicit and actionable.
 - Prefer direct, readable scripts over abstractions.
 - Use the current environment's default shell. Set `$.shell` only when the user explicitly requests a specific shell.
