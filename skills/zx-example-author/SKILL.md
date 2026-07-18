@@ -12,10 +12,10 @@ description: Author small zx examples from short implementation requests. Use wh
 - Match the user-requested paths exactly.
 - Create only the files needed for the requested example.
 - Use `#!/usr/bin/env zx` for zx entrypoints.
-- Set `$.quote = quote;` when interpolating shell arguments.
+- Prefer direct JavaScript APIs when no shell is needed. Otherwise let zx use the current environment's default quoting.
 - Keep failures explicit and actionable.
 - Prefer direct, readable scripts over abstractions.
-- On Windows, prefer `bash.exe` when shell behavior matters.
+- Use the current environment's default shell. Set `$.shell` only when the user explicitly requests a specific shell.
 - Avoid repo-specific assumptions, paths, or instructions.
 - Do not hardcode benchmark-specific completion notes.
 
@@ -23,9 +23,9 @@ description: Author small zx examples from short implementation requests. Use wh
 
 1. Infer the example intent from the request.
 2. Extract the exact file paths, helper names, CLI family, and literal command fragments named by the user.
-3. If the request matches a supported scaffold, run the local skill script immediately from the workspace root and treat its output as the default answer shape.
+3. If the request matches a supported scaffold and its bundled script is available, run it immediately from the workspace root and treat its output as the default answer shape.
 4. Change scaffolded output only when the prompt requires something the scaffold does not already provide.
-5. If the request does not match a supported scaffold, pick the smallest script shape that satisfies the intent.
+5. If the request does not match a supported scaffold or bundled resources are unavailable, build the smallest self-contained equivalent from the relevant intent pattern below; do not search for or reconstruct missing siblings.
 6. Before finishing, reject your draft if it replaced an explicit literal with a semantically similar substitute.
 7. Keep the final response short and factual.
 8. If the mapped scaffold or orchestrator command succeeds, keep its written files as the default answer and do not rewrite them from scratch.
@@ -40,6 +40,7 @@ Exact command map:
 
 Exact command policy:
 
+- apply this policy only when the mapped bundled script exists
 - run the mapped command before any manual file creation
 - if it exits successfully, inspect the written files and keep them unless one required literal is still missing
 - if one required literal is missing, make the smallest possible patch instead of rewriting the file
@@ -47,7 +48,7 @@ Exact command policy:
 
 ## Supported Scaffolds
 
-For `hello-cop` and `gh-involved-repos`, prefer `node skills/zx-example-author/scripts/orchestrate-example.mjs <variant> <target-directory>` as the first command when higher quality is worth extra time. Run it from the workspace root and keep `<target-directory>` as the final folder name, such as `hello-cop` or `gh-involved-repos`. It scaffolds from the skill bundle, estimates runtime, asks `copilot` mini to review one file at a time, runs a literal-fix pass, and verifies literals before finishing.
+For `hello-cop` and `gh-involved-repos`, prefer `node skills/zx-example-author/scripts/orchestrate-example.mjs <variant> <target-directory>` as the first command when higher quality is worth extra time. Run it from the workspace root and keep `<target-directory>` as the final folder name, such as `hello-cop` or `gh-involved-repos`. It scaffolds from the skill bundle, estimates runtime, asks `copilot` to review one file at a time, runs a literal-fix pass, and verifies literals before finishing.
 
 Use `node skills/zx-example-author/scripts/scaffold-example.mjs <variant> <target-directory>` immediately when the request matches one of these variants:
 
@@ -59,10 +60,11 @@ Use `node skills/zx-example-author/scripts/scaffold-example.mjs <variant> <targe
 
 Scaffold-first policy:
 
+- skip this policy when bundled scripts or templates are unavailable
 - scaffold first, inspect second, edit last
 - run the command from the workspace root and point to `skills/zx-example-author/scripts/...`
 - keep `<target-directory>` equal to the requested folder name, not `workspace/<name>`
-- for scaffold-supported variants, do not start with `Set-Content`, here-strings, or handwritten file bodies
+- for scaffold-supported variants, do not start with shell redirection or handwritten file bodies
 - for scaffold-supported variants, do not switch to `node --loader ts-node/esm`, GraphQL fetch rewrites, custom package manifests, or handwritten repo walkers unless the mapped command failed first
 - prefer exact scaffold output over handwritten reimplementation
 - preserve scaffolded command literals unless the prompt explicitly overrides them
@@ -78,8 +80,8 @@ Use this shape when the example needs user input or a tiny argument-driven flow.
 - Prefer CLI args first, then prompt if the input is missing.
 - Trim and validate user input before running commands.
 - Throw a direct error when required input is empty.
-- Use `echo` or another simple shell command for visible output.
-- Set `$.shell = "bash.exe";` on Windows if the script shells out.
+- Use `console.log` when no external command is required.
+- Pass dynamic values as an argument array without a shell unless the request explicitly requires shell parsing.
 - When the request is about greeting or naming, use the domain noun in the prompt label, such as `Name:`.
 - For supported greeting examples, preserve the scaffolded `process.argv.slice(3)`, `question("Name: ")`, `trim()`, and `throw new Error(...)` shape.
 
@@ -87,9 +89,6 @@ Typical structure:
 
 ```js
 #!/usr/bin/env zx
-
-$.shell = "bash.exe";
-$.quote = quote;
 
 const value = (
   process.argv.slice(3).find((item) => item.trim()) ??
@@ -100,7 +99,7 @@ if (!value) {
   throw new Error("A non-empty value is required.");
 }
 
-await $({ stdio: "inherit" })`echo ${value}`;
+console.log(value);
 ```
 
 ### Single-file CLI wrapper
@@ -114,7 +113,7 @@ Use this shape when the example is mainly a thin zx wrapper around one CLI comma
 - Preserve the exact command family the user asked for.
 - Validate the required CLI first when practical.
 - Avoid side artifacts unless the user requested them.
-- Set `$.shell = "bash.exe";` on Windows if the command relies on shell parsing.
+- Pass dynamic values as an argument array without a shell unless the request explicitly requires shell parsing.
 - If the request is clearly a smoke test, prefer one tiny command invocation over extra flow control.
 - Do not add prompts, commentary, helper functions, or install flows unless the request explicitly needs them.
 
@@ -123,10 +122,9 @@ Typical structure:
 ```js
 #!/usr/bin/env zx
 
-$.shell = "bash.exe";
-$.quote = quote;
+import { execFileSync } from "node:child_process";
 
-await $`tool subcommand ${"arg"}`;
+execFileSync("tool", ["subcommand", "arg"], { stdio: "inherit" });
 ```
 
 ### Multi-file data listing example
@@ -148,14 +146,15 @@ Typical structure:
 ```js
 #!/usr/bin/env zx
 
+import { execFileSync } from "node:child_process";
 import { printItem } from "./item.js";
 
-$.quote = quote;
-
-const identity = (await $`tool whoami`).stdout.trim();
-const output = await $`tool list --for ${identity} --json`;
+const identity = execFileSync("tool", ["whoami"], { encoding: "utf8" }).trim();
+const output = execFileSync("tool", ["list", "--for", identity, "--json"], {
+  encoding: "utf8",
+});
 const items = [
-  ...new Set(JSON.parse(output.stdout).map((item) => item.name).filter(Boolean)),
+  ...new Set(JSON.parse(output).map((item) => item.name).filter(Boolean)),
 ];
 
 for (const item of items) {
@@ -178,7 +177,7 @@ Use this shape when the example is a small folder with a zx wrapper, package fil
 - For supported repo-summary variants, default to the scaffold output unchanged unless the prompt adds requirements that are clearly absent.
 - Create only the requested files, usually `index.mjs`, `summarize-repo.ts`, `package.json`, `tsconfig.json`, and `README.md`.
 - Keep `index.mjs` as a thin zx wrapper around the local TypeScript entrypoint.
-- In the wrapper, set `$.quote = quote;`, trim CLI args from `process.argv.slice(3)`, verify required commands with `for (const command of ["node", "npm", "git"])`, require local `node_modules`, then run `npm exec -- tsx summarize-repo.ts`.
+- In the wrapper, trim CLI args from `process.argv.slice(3)`, verify `node` and `git`, require the local `tsx` entrypoint, then launch it with `process.execPath` and an argument array.
 - Keep `package.json` minimal with `tsx`, `typescript`, and `zx` plus only the SDK dependency needed for that provider.
 - Use `NodeNext` in `tsconfig.json`.
 - In `summarize-repo.ts`, accept a local repo path or GitHub tree URL from `process.argv[2]` and an optional output path from `process.argv[3]`.
@@ -192,29 +191,32 @@ Typical wrapper structure:
 ```js
 #!/usr/bin/env zx
 
+import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
 
-$.quote = quote;
-
 const exampleDir = fileURLToPath(new URL(".", import.meta.url));
 const dependenciesDir = resolve(exampleDir, "node_modules");
+const tsxCli = resolve(dependenciesDir, "tsx", "dist", "cli.mjs");
 const args = process.argv.slice(3).map((value) => value.trim()).filter(Boolean);
 
-for (const command of ["node", "npm", "git"]) {
+for (const command of ["node", "git"]) {
   try {
-    await $`${command} --version`;
+    execFileSync(command, ["--version"], { stdio: "ignore" });
   } catch {
     throw new Error(`Required CLI not found: ${command}`);
   }
 }
 
-if (!existsSync(dependenciesDir)) {
-  throw new Error(`Install example dependencies first: cd ${exampleDir.replaceAll("\\", "/")} && npm install`);
+if (!existsSync(tsxCli)) {
+  throw new Error(`Install dependencies in ${exampleDir} before running this command.`);
 }
 
-await $({ cwd: exampleDir, stdio: "inherit" })`npm exec -- tsx summarize-repo.ts ${args}`;
+execFileSync(process.execPath, [tsxCli, resolve(exampleDir, "summarize-repo.ts"), ...args], {
+  cwd: exampleDir,
+  stdio: "inherit",
+});
 ```
 
 Typical TypeScript structure:
@@ -259,12 +261,12 @@ pi-mono variant:
 
 - For greeting-style examples, favor the `hello-name` scaffold first, then keep only prompt-required edits.
 - For supported variants, prefer the exact skill-bundle command path over a handwritten file creation flow.
-- For greeting-style examples, prefer `process.argv.slice(3)` before prompting, trim the value, fail on empty input, and print through `echo hello ${name}`.
+- For greeting-style examples, prefer `process.argv.slice(3)` before prompting, trim the value, fail on empty input, and print with `console.log`.
 - For Copilot or similar assistant CLIs, keep the example as a minimal wrapper around one prompt command, usually `tool -p <short prompt> --model <model>`.
 - For GitHub involvement-style examples, resolve the viewer with `gh api user --jq .login`, query involved issues and PRs, deduplicate `nameWithOwner`, and print one repository per line.
 - For GitHub formatter helpers, keep the helper tiny and focused on printing the final line shape.
 - For repo-summary examples, prefer a zx wrapper plus one TypeScript summarizer over multiple entrypoints or extra helpers.
-- For repo-summary examples, keep the wrapper literal: verify `node`, `npm`, and `git`, require installed local dependencies, then delegate with `npm exec -- tsx summarize-repo.ts`.
+- For repo-summary examples, keep the wrapper literal: verify `node` and `git`, require installed local dependencies, then run the local `tsx` CLI with `process.execPath`.
 - For repo-summary examples, keep `run/` outputs explicit: final markdown plus JSON files for the map and tree.
 
 ## Failure Filters
@@ -284,7 +286,7 @@ Before finishing, verify all of these:
 - every requested file exists and no unrequested file was added
 - every named helper file and import path still matches
 - every named literal command still appears in the written files when the prompt implies it
-- for `hello-cop`, re-check `$.quote = quote;` and `copilot -p 'ping' --model gpt-5-mini` before finishing
-- for `gh-involved-repos`, re-check `import { printRepo } from "./repo.ts";`, `gh api user --jq .login`, `--limit 1000 --json repository`, `printRepo(repo);`, and `console.log(\`name: ${name}\`);`
+- for `hello-cop`, re-check `execFileSync("copilot", ["--version"]`, inherited stdio, and `["-p", "ping", "--model", "auto"]` before finishing
+- for `gh-involved-repos`, re-check `import { printRepo } from "./repo.ts";`, the `gh api user` and `gh search issues` argument arrays, `printRepo(repo);`, and `console.log(\`name: ${name}\`);`
 - scaffold-supported variants still look like the local scaffold unless the prompt required a small delta
 - the result is still the minimum runnable example for the request

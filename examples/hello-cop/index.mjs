@@ -1,6 +1,11 @@
 #!/usr/bin/env zx
 
-$.shell = "bash.exe";
-$.quote = quote;
+import { execFileSync } from "node:child_process";
 
-await $`copilot -p 'ping' --model gpt-5-mini`;
+try {
+  execFileSync("copilot", ["--version"], { stdio: "ignore" });
+} catch {
+  throw new Error("Required CLI not found: copilot");
+}
+
+execFileSync("copilot", ["-p", "ping", "--model", "auto"], { stdio: "inherit" });
