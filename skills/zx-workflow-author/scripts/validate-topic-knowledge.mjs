@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 import { spawn } from "node:child_process";
-import { createHash } from "node:crypto";
 import {
   mkdtemp,
+  mkdir,
   readFile,
   readdir,
   rm,
@@ -15,387 +15,158 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const skillDir = fileURLToPath(new URL("..", import.meta.url));
-const repoRoot = resolve(skillDir, "..", "..");
-const fixtureDir = resolve(skillDir, "scripts", "fixtures", "topic-knowledge");
 const scaffold = resolve(skillDir, "scripts", "scaffold-topic-knowledge.mjs");
-const okfSkill = process.env.TOPIC_OKF_SKILL ?? resolve(fixtureDir, "fake-okf-skill");
-const fakeHarness = resolve(fixtureDir, "fake-harness.mjs");
-const fakePowerShellHarness = resolve(fixtureDir, "fake-harness.ps1");
-const temporaryRoot = await mkdtemp(resolve(tmpdir(), "topic-knowledge-workflow-"));
+const temporaryRoot = await mkdtemp(resolve(tmpdir(), "compact-topic-harness-"));
 const target = resolve(temporaryRoot, "workflow");
+const okfSkill = resolve(temporaryRoot, "okf-skill");
+const fakeCli = resolve(temporaryRoot, "fake-cli.cjs");
+const topic = "agentic retrieval evaluation";
+const harnesses = ["codex", "copilot", "pi", "opencode"];
 
 try {
-  // Scaffold a fresh standalone workflow and replace only its user-owned source configuration.
-  await run(process.execPath, [scaffold, target], repoRoot);
-  const presetPlan = JSON.parse(
-    (
-      await run(
-        process.execPath,
-        [
-          resolve(target, "index.mjs"),
-          "--root",
-          target,
-          "--config",
-          "knowledge.config.json",
-          "--dry-run",
-          "--auto-harness",
-        ],
-        target,
-      )
-    ).stdout,
-  );
-  assert(
-    presetPlan.processor.harnesses.map((harness) => harness.id).join(",") ===
-      "codex,copilot,pi,opencode",
-    "auto discovery did not materialize every built-in harness",
-  );
-  assert(
-    presetPlan.processor.harnesses.every(
-      (harness) => harness.preset === harness.id && harness.argumentCount > 0,
-    ),
-    "a built-in harness lacks its non-interactive preset",
-  );
-  const config = {
-    topic: "agentic retrieval augmented generation",
-    know: {
-      command: process.execPath,
-      args: [resolve(fixtureDir, "fake-know.mjs")],
-    },
-    sources: [
-      {
-        type: "arxiv-search",
-        query: "{topic}",
-        maxResults: 5,
-        sortBy: "relevance",
-        sortOrder: "descending",
-      },
-      {
-        type: "site",
-        url: "https://example.test/agentic-rag",
-        sourceId: "agentic-rag-notes",
-        maxDepth: 1,
-        maxPages: 5,
-      },
-      {
-        type: "github-repo",
-        url: "https://github.com/example/agentic-rag",
-        branches: ["main"],
-      },
-    ],
-    processor: {
-      required: true,
-      autoDiscover: false,
-      timeoutMs: 30_000,
-      probeTimeoutMs: 5_000,
-      harnesses: [
-        {
-          id: "fixture-missing",
-          command: "topic-knowledge-harness-that-does-not-exist",
-          probeArgs: ["--version"],
-          args: [],
-        },
-        {
-          id: "fixture-primary",
-          preset: "codex",
-          command: process.execPath,
-          probeArgs: [fakeHarness, "--probe"],
-          args: [
-            fakeHarness,
-            "--run",
-            "--id",
-            "fixture-primary",
-            "--batch",
-            "{batch}",
-            "--candidate",
-            "{candidate}",
-            "--prompt",
-            "{prompt}",
-          ],
-        },
-        {
-          id: "fixture-secondary",
-          preset: "pi",
-          command: process.execPath,
-          probeArgs: [fakeHarness, "--probe"],
-          args: [
-            fakeHarness,
-            "--run",
-            "--id",
-            "fixture-secondary",
-            "--batch",
-            "{batch}",
-            "--candidate",
-            "{candidate}",
-            "--prompt-text",
-            "{promptText}",
-          ],
-        },
-        {
-          id: "fixture-mutator",
-          preset: "copilot",
-          command: process.execPath,
-          probeArgs: [fakeHarness, "--probe"],
-          args: [
-            fakeHarness,
-            "--run",
-            "--id",
-            "fixture-mutator",
-            "--mode",
-            "mutator",
-            "--batch",
-            "{batch}",
-            "--candidate",
-            "{candidate}",
-            "--prompt",
-            "{prompt}",
-          ],
-        },
-        {
-          id: "fixture-stdout",
-          preset: "opencode",
-          command: process.execPath,
-          probeArgs: [fakeHarness, "--probe"],
-          stdoutPath: "derived/{runId}-fixture-stdout.md",
-          args: [
-            fakeHarness,
-            "--run",
-            "--id",
-            "fixture-stdout",
-            "--mode",
-            "stdout",
-            "--batch",
-            "{batch}",
-            "--candidate",
-            "{candidate}",
-            "--prompt",
-            "{prompt}",
-          ],
-        },
-        ...(process.platform === "win32"
-          ? [
-              {
-                id: "fixture-powershell",
-                command: fakePowerShellHarness,
-                probeArgs: ["--probe", "literal; exit 77"],
-                args: [],
-              },
-            ]
-          : []),
-      ],
-    },
-    export: true,
-  };
-  await writeFile(resolve(target, "knowledge.config.json"), `${JSON.stringify(config, null, 2)}\n`);
-  const probeReport = JSON.parse(
-    (
-      await run(
-        process.execPath,
-        [
-          resolve(target, "index.mjs"),
-          "--root",
-          target,
-          "--config",
-          "knowledge.config.json",
-          "--probe-harnesses",
-        ],
-        target,
-      )
-    ).stdout,
-  );
-  assert(
-    probeReport.harnesses.find((harness) => harness.id === "fixture-missing")?.available === false,
-    "probe mode did not report an absent harness",
-  );
-  assert(
-    ["fixture-primary", "fixture-secondary", "fixture-mutator", "fixture-stdout"].every(
-      (id) => probeReport.harnesses.find((harness) => harness.id === id)?.available,
-    ),
-    "probe mode did not report every command adapter",
-  );
-  if (process.platform === "win32") {
-    assert(
-      probeReport.harnesses.find((harness) => harness.id === "fixture-powershell")?.available,
-      "Windows PowerShell harness shim was not launchable",
+  // Scaffold and install only the generated standalone dependency.
+  await run(process.execPath, [scaffold, target], skillDir);
+  await runNpm(target, ["install", "--ignore-scripts", "--no-audit", "--no-fund"]);
+  const zxCli = resolve(target, "node_modules", "zx", "build", "cli.js");
+
+  // Enforce the byte objective and prove each wrapper carries a distinct prompt simulation.
+  const moduleSizes = {};
+  const plans = [];
+  for (const name of (await readdir(target)).filter((value) => value.endsWith(".mjs"))) {
+    moduleSizes[name] = (await stat(resolve(target, name))).size;
+  }
+  assert(Math.max(...Object.values(moduleSizes)) <= 7000, "an executable exceeds 7000 bytes");
+  for (const harness of harnesses) {
+    const result = await run(
+      process.execPath,
+      [zxCli, resolve(target, `${harness}.mjs`), topic, "--dry-run"],
+      target,
     );
+    plans.push(JSON.parse(lastLine(result.stdout)));
   }
-  const commonArgs = [
-    resolve(target, "index.mjs"),
-    "--root",
-    target,
-    "--config",
-    "knowledge.config.json",
-    "--okf-skill",
-    okfSkill,
-  ];
+  assert(new Set(plans.map(({ prompt }) => prompt)).size === 4, "harness prompts are aliases");
 
-  // The first run must publish both arXiv discoveries plus two distinct direct source types.
-  await run(process.execPath, commonArgs, target, {
-    TOPIC_KNOWLEDGE_RUN_ID: "run-1",
-    FAKE_KNOW_REVISION: "1",
-  });
-  const topicDir = resolve(target, "topics", "agentic-retrieval-augmented-generation");
-  const firstReport = await json(resolve(topicDir, "runs", "run-1.json"));
-  assert(firstReport.newContentVersions.length === 4, "first run did not process four source documents");
-  assert(firstReport.validationPassed && firstReport.published && firstReport.exported, "first run gates failed");
-  assert(firstReport.processor.selected === "fixture-primary", "auto selection did not skip the missing harness");
-  assert(firstReport.processor.selectedPreset === "codex", "Codex preset metadata was not preserved");
-  assert(
-    JSON.stringify(firstReport.processor.probes) ===
-      JSON.stringify([
-        { id: "fixture-missing", available: false },
-        { id: "fixture-primary", available: true },
-      ]),
-    "auto selection probe order changed",
+  // A fifth wrapper exercises the exported command adapter without changing the shared runtime.
+  await writeFile(
+    resolve(target, "custom.mjs"),
+    '#!/usr/bin/env zx\nimport { runHarness } from "./topic.mjs";\nawait runHarness({ harness: "custom", prompt: "Custom simulation.", command: ({ prompt }) => ["custom-cli", prompt] });\n',
   );
-  const firstIndex = await readFile(resolve(topicDir, "okf", "index.md"), "utf8");
-  assert((firstIndex.match(/^\* \[/gm) ?? []).length === 5, "first index lacks the harness-derived concept");
-  const firstStateText = await readFile(resolve(topicDir, "state.json"), "utf8");
-  const firstLibraryDigests = await conceptDigests(resolve(topicDir, "okf"));
+  const custom = JSON.parse(
+    lastLine(
+      (
+        await run(
+          process.execPath,
+          [zxCli, resolve(target, "custom.mjs"), topic, "--dry-run"],
+          target,
+        )
+      ).stdout,
+    ),
+  );
+  assert(custom.command === "custom-cli", "arbitrary harness adapter was not preserved");
 
-  // The second run synchronizes sources but must process and publish no unchanged files.
-  await run(process.execPath, commonArgs, target, {
-    TOPIC_KNOWLEDGE_RUN_ID: "run-2",
-    FAKE_KNOW_REVISION: "1",
-  });
-  const secondReport = await json(resolve(topicDir, "runs", "run-2.json"));
-  assert(secondReport.newContentVersions.length === 0, "unchanged files were reprocessed");
-  assert(secondReport.validationPassed && !secondReport.published && !secondReport.exported, "empty batch mutated output");
-  assert(secondReport.processor.status === "skipped-empty-batch", "empty batch invoked a harness");
-  assert((await readFile(resolve(topicDir, "state.json"), "utf8")) === firstStateText, "empty batch changed state");
-  assert(
-    JSON.stringify(await conceptDigests(resolve(topicDir, "okf"))) === JSON.stringify(firstLibraryDigests),
-    "empty batch changed published concept bytes",
+  // Route every external CLI through one argument-array fake; Python remains the real OKF gate.
+  await writeFile(fakeCli, buildFakeCliSource());
+  const commands = Object.fromEntries(
+    [...harnesses, "know", "jq", "rg", "fd", "git"].map((name) => [
+      name,
+      [process.execPath, fakeCli, name],
+    ]),
+  );
+  await mkdir(resolve(okfSkill, "scripts"), { recursive: true });
+  await writeFile(
+    resolve(okfSkill, "scripts", "validate_okf_bundle.py"),
+    "from pathlib import Path\nimport sys\nroot=Path(sys.argv[1])\nassert (root/'index.md').is_file()\nfor p in root.rglob('*.md'):\n    if p.name not in {'index.md','log.md'}:\n        assert p.read_text(encoding='utf-8').startswith('---\\ntype:')\n",
   );
 
-  // A later arXiv result must add exactly one concept while preserving every prior concept digest.
-  await run(
-    process.execPath,
-    [...commonArgs, "--harness", "fixture-secondary"],
-    target,
-    {
-      TOPIC_KNOWLEDGE_RUN_ID: "run-3",
-      FAKE_KNOW_REVISION: "2",
-    },
-  );
-  const thirdReport = await json(resolve(topicDir, "runs", "run-3.json"));
-  assert(thirdReport.newContentVersions.length === 1, "incremental arXiv run did not isolate one new paper");
-  assert(thirdReport.published && thirdReport.validationPassed, "incremental publication failed");
-  assert(thirdReport.processor.selected === "fixture-secondary", "explicit harness selection was ignored");
-  assert(thirdReport.processor.selectedPreset === "pi", "pi preset metadata was not preserved");
-  const thirdIndex = await readFile(resolve(topicDir, "okf", "index.md"), "utf8");
-  assert((thirdIndex.match(/^\* \[/gm) ?? []).length === 7, "updated index lacks the second derived concept");
-  assert(thirdIndex.includes("[Incremental Knowledge Agents]"), "folded YAML title was truncated");
-  const thirdDigests = await conceptDigests(resolve(topicDir, "okf"));
-  for (const [path, hash] of Object.entries(firstLibraryDigests)) {
-    assert(thirdDigests[path] === hash, `existing concept was rewritten: ${path}`);
+  // Enable two non-arXiv source adapters while keeping one topic as the only CLI input.
+  const sourcesPath = resolve(target, "sources.json");
+  const sources = JSON.parse(await readFile(sourcesPath, "utf8"));
+  sources[0].enabled = true;
+  sources[1].enabled = true;
+  await writeFile(sourcesPath, `${JSON.stringify(sources, null, 2)}\n`);
+  const env = {
+    FAKE_REVISION: "1",
+    OPEN_KNOWLEDGE_FORMAT_SKILL: okfSkill,
+    TOPIC_COMMANDS_JSON: JSON.stringify(commands),
+  };
+
+  // Run all four harnesses; their independent ledgers may process the same initial source batch.
+  for (const harness of harnesses) {
+    const result = await run(
+      process.execPath,
+      [zxCli, resolve(target, `${harness}.mjs`), topic],
+      target,
+      env,
+    );
+    assert(JSON.parse(lastLine(result.stdout)).status === "published", `${harness} did not publish`);
   }
-  assert(Object.keys((await json(resolve(topicDir, "state.json"))).processed).length === 5, "state lacks five digests");
+  const topicRoot = resolve(target, "topics", topic.replaceAll(" ", "-"));
+  const firstConcept = (await readdir(resolve(topicRoot, "okf")))
+    .filter((name) => name.startsWith("codex-"))[0];
+  const firstBytes = await readFile(resolve(topicRoot, "okf", firstConcept));
 
-  // A harness may use any implementation, but it cannot mutate knowledge outside the declared batch.
-  const thirdStateText = await readFile(resolve(topicDir, "state.json"), "utf8");
-  const rejected = await run(
+  // An unchanged rerun must skip the harness and preserve every published concept byte.
+  const unchanged = await run(
     process.execPath,
-    [...commonArgs, "--harness", "fixture-mutator"],
+    [zxCli, resolve(target, "codex.mjs"), topic],
     target,
-    {
-      TOPIC_KNOWLEDGE_RUN_ID: "run-4",
-      FAKE_KNOW_REVISION: "3",
-    },
-    true,
+    env,
   );
-  assert(rejected.code !== 0, "historical harness mutation unexpectedly passed");
-  const fourthReport = await json(resolve(topicDir, "runs", "run-4.json"));
+  assert(JSON.parse(lastLine(unchanged.stdout)).status === "unchanged", "unchanged files reprocessed");
   assert(
-    fourthReport.processor.status === "rejected" && fourthReport.failure.stage === "processor-isolation",
-    "historical harness mutation lacks a rejected receipt",
-  );
-  assert((await readFile(resolve(topicDir, "state.json"), "utf8")) === thirdStateText, "rejected batch changed state");
-  assert(
-    JSON.stringify(await conceptDigests(resolve(topicDir, "okf"))) === JSON.stringify(thirdDigests),
-    "rejected harness changed the published library",
-  );
-  assert(
-    !(await readdir(topicDir)).some((name) => name.startsWith(".okf-candidate-")),
-    "rejected harness left a candidate directory",
+    Buffer.compare(firstBytes, await readFile(resolve(topicRoot, "okf", firstConcept))) === 0,
+    "unchanged run rewrote a concept",
   );
 
-  // The same new source remains pending and succeeds later through another configured harness.
-  await run(
+  // A changed source version must add one concept and rebuild a valid deterministic index.
+  const changed = await run(
     process.execPath,
-    [...commonArgs, "--harness", "fixture-stdout"],
+    [zxCli, resolve(target, "codex.mjs"), topic],
     target,
-    {
-      TOPIC_KNOWLEDGE_RUN_ID: "run-5",
-      FAKE_KNOW_REVISION: "3",
-    },
+    { ...env, FAKE_REVISION: "2" },
   );
-  const fifthReport = await json(resolve(topicDir, "runs", "run-5.json"));
-  assert(fifthReport.newContentVersions.length === 1, "rejected source version was not retried");
-  assert(fifthReport.processor.selected === "fixture-stdout" && fifthReport.published, "stdout recovery run failed");
-  assert(fifthReport.processor.selectedPreset === "opencode", "OpenCode preset metadata was not preserved");
-  const fifthIndex = await readFile(resolve(topicDir, "okf", "index.md"), "utf8");
-  assert((fifthIndex.match(/^\* \[/gm) ?? []).length === 9, "recovery index has the wrong concept count");
-  assert(Object.keys((await json(resolve(topicDir, "state.json"))).processed).length === 6, "state lacks six digests");
-
-  // Optional processing remains deterministic when no harness is configured or available.
-  config.processor = { required: false, harnesses: [] };
-  await writeFile(resolve(target, "knowledge.config.json"), `${JSON.stringify(config, null, 2)}\n`);
-  await run(process.execPath, commonArgs, target, {
-    TOPIC_KNOWLEDGE_RUN_ID: "run-6",
-    FAKE_KNOW_REVISION: "4",
-  });
-  const sixthReport = await json(resolve(topicDir, "runs", "run-6.json"));
-  assert(sixthReport.newContentVersions.length === 1, "passthrough run did not isolate one new paper");
+  assert(JSON.parse(lastLine(changed.stdout)).status === "published", "new source version was skipped");
+  const index = await readFile(resolve(topicRoot, "okf", "index.md"), "utf8");
+  assert((index.match(/^- \[/gm) ?? []).length === 5, "index does not list five concepts");
   assert(
-    sixthReport.processor.status === "passthrough" && sixthReport.processor.selected === null,
-    "optional processor did not use validated passthrough",
+    Buffer.compare(firstBytes, await readFile(resolve(topicRoot, "okf", firstConcept))) === 0,
+    "incremental run rewrote historical bytes",
   );
-  const sixthIndex = await readFile(resolve(topicDir, "okf", "index.md"), "utf8");
-  assert((sixthIndex.match(/^\* \[/gm) ?? []).length === 10, "passthrough index has the wrong concept count");
-  assert(Object.keys((await json(resolve(topicDir, "state.json"))).processed).length === 7, "state lacks seven digests");
-
-  // Confirm the scaffold is portable and contains no source-skill dependency.
-  for (const name of (await readdir(target)).filter((value) => value !== "knowledge.config.json")) {
-    const path = resolve(target, name);
-    if ((await stat(path)).isFile()) {
-      assert(!(await readFile(path, "utf8")).includes("skills/zx-workflow-author"), `scaffold leaks skill path: ${name}`);
-    }
-  }
-  console.log("topic knowledge workflow validation passed.");
+  console.log(
+    JSON.stringify({
+      moduleSizes,
+      harnesses,
+      customHarness: custom.command,
+      incremental: true,
+      okfValidated: true,
+    }),
+  );
 } finally {
-  // Remove all generated topic stores and fixture exports after the three-run proof.
+  // Remove isolated stores, fake credentials, and generated projects after every outcome.
   await rm(temporaryRoot, { recursive: true, force: true });
-}
-
-async function conceptDigests(root) {
-  const result = {};
-  const pending = [root];
-  while (pending.length > 0) {
-    const current = pending.pop();
-    for (const entry of await readdir(current, { withFileTypes: true })) {
-      const path = resolve(current, entry.name);
-      if (entry.isDirectory()) {
-        pending.push(path);
-      } else if (entry.isFile() && entry.name.endsWith(".md") && entry.name !== "index.md") {
-        const relativePath = path.slice(root.length + 1).replaceAll("\\", "/");
-        result[relativePath] = createHash("sha256").update(await readFile(path)).digest("hex");
-      }
-    }
-  }
-  return Object.fromEntries(Object.entries(result).sort(([left], [right]) => left.localeCompare(right)));
-}
-
-async function json(path) {
-  return JSON.parse(await readFile(path, "utf8"));
 }
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-async function run(command, args, cwd, env = {}, allowFailure = false) {
-  // Invoke every fixture stage without a shell to preserve the production escaping boundary.
-  const result = await new Promise((resolvePromise, rejectPromise) => {
+function lastLine(text) {
+  return text.trim().split(/\r?\n/).filter(Boolean).at(-1);
+}
+
+async function runNpm(cwd, args) {
+  // Use npm's JavaScript entrypoint on Windows so no command shell is required.
+  const bundled = resolve(process.execPath, "..", "node_modules", "npm", "bin", "npm-cli.js");
+  return await run(
+    (await stat(bundled).catch(() => null)) ? process.execPath : "npm",
+    (await stat(bundled).catch(() => null)) ? [bundled, ...args] : args,
+    cwd,
+  );
+}
+
+async function run(command, args, cwd, env = {}) {
+  // Pass every dynamic value as an argument and capture a complete reproducible receipt.
+  return await new Promise((resolvePromise, rejectPromise) => {
     const child = spawn(command, args, {
       cwd,
       env: { ...process.env, ...env },
@@ -412,11 +183,70 @@ async function run(command, args, cwd, env = {}, allowFailure = false) {
     });
     child.on("error", rejectPromise);
     child.on("close", (code) => {
-      resolvePromise({ code: code ?? 1, stdout, stderr });
+      if (code === 0) resolvePromise({ stdout, stderr });
+      else rejectPromise(new Error(`${command} exited ${code}\n${stdout}\n${stderr}`));
     });
   });
-  if (result.code !== 0 && !allowFailure) {
-    throw new Error(`${command} exited ${result.code}\n${result.stdout}\n${result.stderr}`);
+}
+
+function buildFakeCliSource() {
+  return String.raw`#!/usr/bin/env node
+const { createHash } = require("node:crypto");
+const { mkdirSync, readFileSync, readdirSync, writeFileSync } = require("node:fs");
+const { basename, dirname, resolve } = require("node:path");
+
+const tools = ["codex", "copilot", "pi", "opencode", "know", "jq", "rg", "fd", "git"];
+const invoked = basename(process.argv0).replace(/\.exe$/i, "");
+const direct = tools.includes(invoked);
+const tool = direct ? invoked : process.argv[2];
+const args = process.argv.slice(direct ? 1 : 3);
+if (tools.includes(tool)) {
+const value = (flag) => args[args.indexOf(flag) + 1];
+if (["codex", "copilot", "pi", "opencode"].includes(tool)) {
+  console.log("# Finding\n\nEvidence synthesized by " + tool + ".");
+} else if (tool === "know" && args.includes("search")) {
+  console.log(JSON.stringify([{ url: "https://arxiv.org/abs/2401.00001" }]));
+} else if (tool === "know" && args.includes("sync")) {
+  const store = value("--store");
+  for (const [kind, title] of [["arxiv", "Paper"], ["site", "Site"]]) {
+    const file = resolve(store, kind, "source.md");
+    mkdirSync(dirname(file), { recursive: true });
+    writeFileSync(file, "---\ntype: source\ntitle: " + title + "\n---\n\nrevision " + (process.env.FAKE_REVISION ?? "1") + "\n");
   }
-  return result;
+} else if (tool === "jq") {
+  const paths = args.filter((arg) => !arg.startsWith("-") && !arg.includes("|") && !arg.startsWith("."));
+  if (args.includes("-s")) {
+    const objects = paths.slice(-2).map((path) => JSON.parse(readFileSync(path, "utf8")));
+    console.log(JSON.stringify(Object.assign({}, ...objects)));
+  } else {
+    const data = JSON.parse(readFileSync(paths.at(-1), "utf8"));
+    if (Array.isArray(data) && data.some((item) => "type" in item)) {
+      for (const item of data.filter(({ enabled }) => enabled)) {
+        console.log([item.type, item.url, item.branch ?? ""].join("\t"));
+      }
+    } else {
+      for (const item of data) if (item.url) console.log(item.url);
+    }
+  }
+} else if (tool === "fd") {
+  const root = resolve(args.at(-1));
+  const pending = [root];
+  while (pending.length) {
+    const current = pending.pop();
+    for (const entry of readdirSync(current, { withFileTypes: true })) {
+      const path = resolve(current, entry.name);
+      if (entry.isDirectory()) pending.push(path);
+      else if (entry.name.endsWith(".md") && !["index.md", "log.md"].includes(entry.name)) console.log(path);
+    }
+  }
+} else if (tool === "rg") {
+  const text = readFileSync(resolve(args.at(-1)), "utf8");
+  console.log(text.split(/\r?\n/).find((line) => line.startsWith("title:")) ?? "");
+} else if (tool === "git") {
+  const bytes = readFileSync(resolve(args.at(-1)));
+  console.log(createHash("sha256").update(bytes).digest("hex"));
+}
+process.exit(0);
+}
+`;
 }

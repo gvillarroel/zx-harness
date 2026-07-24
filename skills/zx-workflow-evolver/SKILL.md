@@ -11,13 +11,17 @@ description: Evolve and optimize generated zx or TypeScript workflow scripts wit
 2. Read [references/benchmark-contract.md](references/benchmark-contract.md).
 3. Convert observed risks into independent Harbor tasks or hidden cases with numeric rewards.
 4. Freeze the baseline script, config, dependency lock, task digests, Harbor version, agent, and model.
-5. Partition cases by task family into development, validation, and untouched holdout cohorts.
-6. Run the baseline before proposing changes.
-7. Read [references/evolution-loop.md](references/evolution-loop.md).
-8. Change one explicit behavior per candidate. Preserve the original and record the hypothesis.
-9. Use development diagnostics to repair candidates and validation rewards to select them.
-10. Run the selected candidate and frozen baseline on identical holdout attempts.
-11. Promote only when provenance matches, no trial errors exist, mean reward improves, and no protected
+5. For size, define `MAX_SCRIPT_BYTES`, `script_size_bytes`, and
+   `script_size_negative = -script_size_bytes`.
+6. Partition cases by task family into development, validation, and untouched holdout cohorts.
+7. Run the baseline before proposing changes.
+8. Read [references/evolution-loop.md](references/evolution-loop.md).
+9. Use the `harbor-trace-distillation` protocol when case-level rewards and diagnostics should
+   mutate a skill.
+10. Change one explicit behavior per candidate. Preserve the original and record the hypothesis.
+11. Run same-task candidate development before opening holdout evidence.
+12. Run the selected candidate and frozen baseline on identical holdout attempts.
+13. Promote only when provenance matches, no trial errors exist, mean reward improves, and no protected
     metric or task family regresses.
 
 ## Harbor Commands
@@ -36,6 +40,15 @@ node <skill-directory>/scripts/run-benchmark.mjs
 
 The runner uses Harbor 0.18.0, creates a unique evidence directory, and never overwrites a prior job.
 On Windows it uses WSL when Harbor and Docker are available there.
+
+Prepare the compact topic-harness cohort:
+
+```bash
+node <skill-directory>/scripts/prepare-topic-harness-trace.mjs <run-directory> <baseline-skill>
+```
+
+Run Trace Distillation with schema 2, two discovery tasks, physically new same-task development
+attempts, and the two generated holdouts.
 
 ## Mutation Rules
 

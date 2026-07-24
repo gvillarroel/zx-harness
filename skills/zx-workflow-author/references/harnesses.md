@@ -36,15 +36,13 @@ When an SDK cannot be installed, author a command stage around the exact harness
 machine-readable or file output and gate it like any other command. Never parse interactive ANSI
 output.
 
-For topic knowledge, use the ordered `processor.harnesses` command protocol. A harness can be a CLI
-or a thin executable wrapper around any SDK. It receives an immutable batch manifest and an isolated
-OKF candidate through argument placeholders and `TOPIC_KNOWLEDGE_*` environment variables. Probe
-availability before selection, pass arguments without a shell, and keep prior concepts immutable.
+Topic scaffolds contain one entrypoint for each installed route: `codex.mjs`, `copilot.mjs`,
+`pi.mjs`, and `opencode.mjs`. Each supplies a different prompt and passes an argument array to the
+shared `runHarness` boundary. Execute exactly one with one topic.
 
-Use built-in `codex`, `copilot`, `pi`, or `opencode` presets when those CLIs are installed. Run
-`--probe-harnesses --auto-harness` to inspect versions and required flags without a model call. Keep
-discovery opt-in; use `--harness <id>` for deterministic routing. On Windows, launch `.ps1` shims
-through PowerShell's `-File` argument boundary and reject command-only `.cmd` adapters.
+An additional CLI or SDK needs only a wrapper that supplies `{ harness, prompt, command }`.
+`TOPIC_COMMANDS_JSON` may map a command name to an executable plus fixed prefix arguments for tests,
+containers, or alternate installed harnesses. Dynamic values remain separate arguments.
 
 ## Token Controls
 

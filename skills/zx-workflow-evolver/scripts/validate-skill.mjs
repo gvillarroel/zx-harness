@@ -8,6 +8,8 @@ import { fileURLToPath } from "node:url";
 
 const skillDir = fileURLToPath(new URL("..", import.meta.url));
 const taskDir = resolve(skillDir, "assets", "harbor", "workflow-resilience");
+const sizeTaskDir = resolve(skillDir, "assets", "harbor", "topic-harness-size");
+const prepareSizeTrace = resolve(skillDir, "scripts", "prepare-topic-harness-trace.mjs");
 const temporaryRoot = await mkdtemp(resolve(tmpdir(), "zx-workflow-evolver-"));
 
 try {
@@ -55,9 +57,48 @@ try {
     'name = "zx-harness/workflow-resilience"',
     'network_mode = "public"',
   ]) {
-    if (!taskToml.includes(required)) {
+  if (!taskToml.includes(required)) {
       throw new Error(`task.toml is missing ${required}`);
     }
+  }
+
+  // Validate the Trace Distillation template and its exact negative byte objective.
+  for (const path of [
+    "task.toml",
+    "instruction.md",
+    "environment/Dockerfile",
+    "solution/solve.sh",
+    "tests/test.sh",
+    "tests/verify.mjs",
+  ]) {
+    if (!(await stat(resolve(sizeTaskDir, path)).catch(() => null))) {
+      throw new Error(`Topic size task is missing ${path}`);
+    }
+  }
+  const sizeVerifier = await readFile(resolve(sizeTaskDir, "tests", "verify.mjs"), "utf8");
+  for (const required of [
+    "MAX_SCRIPT_BYTES",
+    "script_size_bytes",
+    "script_size_negative = -script_size_bytes",
+    'const harnesses = ["codex", "copilot", "pi", "opencode"]',
+  ]) {
+    if (!sizeVerifier.includes(required)) {
+      throw new Error(`Topic size verifier is missing ${required}`);
+    }
+  }
+  const prepared = resolve(temporaryRoot, "topic-size-trace");
+  await run(
+    process.execPath,
+    [prepareSizeTrace, prepared, resolve(skillDir, "..", "zx-workflow-author")],
+    skillDir,
+  );
+  const objective = JSON.parse(await readFile(resolve(prepared, "objective.json"), "utf8"));
+  if (
+    objective.MAX_SCRIPT_BYTES !== 7000 ||
+    objective.rewardKey !== "script_size_negative" ||
+    objective.definition !== "script_size_negative = -script_size_bytes"
+  ) {
+    throw new Error(`Topic size objective drifted: ${JSON.stringify(objective)}`);
   }
 
   // Execute hidden cases locally first for fast, dependency-free feedback on the reference script.

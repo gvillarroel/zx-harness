@@ -2,7 +2,8 @@
 adr: "0007"
 title: "ADR 0007: Route Topic Batches Through Provider-Neutral Harness Commands"
 summary: "Probe ordered command adapters so any available harness can process only the current knowledge batch."
-status: "Accepted"
+status: "Superseded"
+superseded_by: "0009"
 date: "2026-07-23"
 product: "zx-harness"
 owner: "Platform Architecture"
@@ -18,7 +19,7 @@ tags:
 
 ## Status
 
-Accepted
+Superseded by ADR 0009.
 
 ## Context
 

@@ -25,6 +25,20 @@ Every workflow benchmark must score numeric dimensions before aggregating `rewar
 
 Keep a metric protected when optimization must not trade it away.
 
+## Negative Byte Objective
+
+Define one byte cap and expose both signs:
+
+```js
+const MAX_SCRIPT_BYTES = 7000;
+const script_size_bytes = Math.max(...scriptFileSizes);
+const script_size_negative = -script_size_bytes;
+```
+
+Use `script_size_negative` as the Harbor reward so a smaller file is a larger value. Require
+functional, safety, incremental, and validation rewards separately; size never compensates for a
+broken workflow. Measure every executable module so splitting cannot hide bytes.
+
 ## Repeatability
 
 Pin Harbor, base images, runtime dependencies, agent version, model, attempts, and task digests.
@@ -46,3 +60,7 @@ diagnostics.
 hidden verifier runs independent retry, rollback, context, confinement, redaction, and determinism
 cases. Copy its structure, not its fixture answers, when building development, validation, and
 holdout task families for a real script.
+
+`assets/harbor/topic-harness-size` is the template for a two-discovery/two-holdout Trace
+Distillation campaign. Its oracle executes the injected skill and its verifier owns the negative
+byte reward.

@@ -12,20 +12,19 @@ description: Generate or improve standalone zx and TypeScript workflows that coo
 3. Assign deterministic collection, search, parsing, ranking, and validation to static stages.
 4. Assign only ambiguous synthesis, code design, or repair to a harness stage.
 5. Define each intelligent stage's gate before its prompt.
-6. For topic research or knowledge ingestion, follow
-   [references/topic-knowledge.md](references/topic-knowledge.md) and use its dedicated scaffolder.
-7. Otherwise, create a plan matching [references/workflow-spec.md](references/workflow-spec.md).
-8. Scaffold from the target repository, replacing `<skill-directory>` with this skill's absolute
-   path:
+6. For topic research, read [references/topic-knowledge.md](references/topic-knowledge.md), then
+   scaffold the four small harness entrypoints:
 
    ```bash
-   node <skill-directory>/scripts/scaffold-workflow.mjs <plan.json> <target-directory>
+   node <skill-directory>/scripts/scaffold-topic-knowledge.mjs <target-directory>
    ```
 
-9. Inspect generated commands, paths, mutation declarations, and model IDs.
-10. Run `npm install`, then `npm run dry-run` in the generated directory.
-11. Execute the smallest safe fixture or target subset.
-12. Keep the workflow only after its gates and rollback behavior are proven.
+7. Run `npm install`, then execute one harness with one topic:
+   `npm run <codex|copilot|pi|opencode> -- "<topic>"`.
+8. For other work, create [references/workflow-spec.md](references/workflow-spec.md) and run
+   `node <skill-directory>/scripts/scaffold-workflow.mjs <plan.json> <target-directory>`.
+9. Inspect commands, paths, mutation declarations, and gates.
+10. Execute the smallest safe fixture and keep only a proven workflow.
 
 ## Composition Rules
 
@@ -41,10 +40,10 @@ description: Generate or improve standalone zx and TypeScript workflows that coo
 - Declare every path a command may mutate. Terminal failure must restore those paths.
 - Keep credentials out of plans, prompts, logs, and model output.
 - Make expensive, remote, or destructive commands opt-in through plan arguments or environment.
-- For topic batches, accept any harness through the provider-neutral command protocol and preserve
-  all prior concept bytes.
-- Prefer the built-in Codex, Copilot, pi, or OpenCode preset; probe without inference before
-  enabling first-available discovery.
+- For topic batches, keep deterministic collection in the shared runtime and one short,
+  prompt-specific wrapper per installed harness.
+- Generate Codex, Copilot, pi, and OpenCode wrappers. A new harness needs only another wrapper
+  around the exported `runHarness` contract.
 
 ## Resource Routing
 
@@ -64,4 +63,5 @@ description: Generate or improve standalone zx and TypeScript workflows that coo
 - Every mutating command has a gate and complete `mutates` paths.
 - An offline fixture proves retry feedback and strong-model escalation.
 - A failing fixture proves declared mutations are restored.
-- Topic fixtures prove automatic and explicit harness selection plus rejection of historical edits.
+- Topic fixtures prove four distinct prompts, new-file-only processing, OKF validation, and the
+  negative byte-size objective.

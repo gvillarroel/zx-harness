@@ -2,7 +2,8 @@
 adr: "0008"
 title: "ADR 0008: Discover Installed Topic Harnesses Through Safe Presets"
 summary: "Provide opt-in Codex, Copilot, pi, and OpenCode presets plus probe-only discovery and safe Windows launchers."
-status: "Accepted"
+status: "Superseded"
+superseded_by: "0009"
 date: "2026-07-23"
 product: "zx-harness"
 owner: "Platform Architecture"
@@ -18,7 +19,7 @@ tags:
 
 ## Status
 
-Accepted
+Superseded by ADR 0009.
 
 ## Context
 

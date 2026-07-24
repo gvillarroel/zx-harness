@@ -46,10 +46,10 @@ Generated workflows must:
 ## Supported Composition
 
 - Static: any non-interactive CLI, Jira clients, GitHub CLI, tests, schemas, and local TF-IDF
-- Intelligent: built-in Codex, Copilot, pi, and OpenCode routes plus arbitrary command adapters
+- Intelligent: short Codex, Copilot, pi, and OpenCode wrappers plus arbitrary command adapters
 - Gates: commands, required text, and required JSON paths
-- Knowledge: `know` sources, opt-in harness discovery, immutable prior concepts,
-  hash-incremental OKF Markdown publication, and atomic index updates
+- Knowledge: one-topic entrypoints, `know` sources, per-harness hash ledgers,
+  staged OKF Markdown publication, and deterministic index updates
 
 ## Validation
 
@@ -59,3 +59,6 @@ prove rollback restores a declared mutation.
 Evolution skills must also validate a native Harbor 0.18.0 task, publish a passing oracle solution,
 score correctness, resilience, efficiency, security, and determinism independently, and keep
 development, validation, and holdout evidence separate.
+
+Script-size evolution must expose `MAX_SCRIPT_BYTES`, measure `script_size_bytes`, optimize
+`script_size_negative = -script_size_bytes`, and keep functional gates non-compensating.
