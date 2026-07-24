@@ -1,0 +1,4 @@
+interface:
+  display_name: "zx Workflow Evolver"
+  short_description: "Evolve zx scripts with Harbor evidence"
+  default_prompt: "Use $zx-workflow-evolver to benchmark and optimize this generated zx workflow."

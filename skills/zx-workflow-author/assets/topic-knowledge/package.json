@@ -1,0 +1,14 @@
+{
+  "name": "topic-knowledge-workflow",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check index.mjs",
+    "dry-run": "zx index.mjs --config knowledge.config.json --dry-run",
+    "probe-harnesses": "zx index.mjs --config knowledge.config.json --probe-harnesses --auto-harness",
+    "start": "zx index.mjs --config knowledge.config.json"
+  },
+  "dependencies": {
+    "zx": "8.8.5"
+  }
+}

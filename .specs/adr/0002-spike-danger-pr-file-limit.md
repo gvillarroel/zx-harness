@@ -2,7 +2,7 @@
 adr: "0002"
 title: "ADR 0002: Spike Danger JS PR File Limit"
 summary: "Use Danger JS in GitHub Actions to block PRs that touch more than three files."
-status: "Proposed"
+status: "Superseded"
 date: "2026-04-23"
 product: "zx-harness"
 owner: "Platform Architecture"
@@ -17,7 +17,7 @@ tags:
 
 ## Status
 
-Proposed
+Superseded by ADR 0004.
 
 ## Context
 

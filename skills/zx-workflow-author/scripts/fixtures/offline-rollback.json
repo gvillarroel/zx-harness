@@ -1,0 +1,22 @@
+{
+  "name": "offline-rollback-proof",
+  "description": "Prove a terminal command-gate failure restores a declared file.",
+  "stages": [
+    {
+      "id": "mutate",
+      "kind": "command",
+      "command": "node",
+      "args": [
+        "-e",
+        "require('node:fs').writeFileSync('protected.txt', 'changed')"
+      ],
+      "mutates": ["protected.txt"],
+      "attempts": 1,
+      "gate": {
+        "kind": "contains",
+        "path": "protected.txt",
+        "values": ["accepted"]
+      }
+    }
+  ]
+}

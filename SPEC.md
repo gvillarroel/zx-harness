@@ -1,65 +1,61 @@
 # zx-harness Specification
 
-## Overview
-`zx-harness` defines a lightweight harness model for code-assistance workflows built with scripting-first tools.
+## Purpose
 
-The current target stack is:
+`zx-harness` publishes skills that teach AI agents to author efficient zx workflows.
 
-- TypeScript or modern Node.js modules for orchestration
-- Bash for explicit shell execution stages
-- CLI-based agent SDKs as execution backends
+Generated workflows combine:
 
-The repository should favor small, inspectable examples over framework-heavy abstractions.
+1. deterministic CLI or local computation for collection and filtering
+2. TypeScript harness SDKs only for work that needs intelligence
+3. executable gates that accept, retry, escalate, or roll back each result
 
-## Repository Structure
+## Repository Scope
 
-- `examples/`: runnable, isolated harness examples
-- `skills/`: skills that improve how agents build or extend this harness style
-- `evaluations/`: evaluation assets for skills and example behavior
-- `fixtures/`: stable files used by examples and evaluations
-- `docs/`: supporting documentation
-- `README.md`: repository entry point aligned with this specification
-- `SPEC.md`: source of truth for repository scope and contracts
-- `AGENTS.md`: repository-specific agent instructions
-- `.gitignore`: local ignore rules when present
+Product artifacts live only under `skills/`. Root files may provide governance, CI, and discovery.
+Do not add standalone examples, docs, evaluations, or a shared runtime framework.
 
-## Supported Agent SDKs
+## Skill Contract
 
-The harness is expected to support these CLI SDK families:
+Each `skills/<name>/` package must contain:
 
-- Copilot CLI SDK
-- PI Mono CLI SDK
-- Opencode CLI SDK
+- `SKILL.md` with only `name` and `description` frontmatter
+- `agents/openai.yaml`
+- reusable `scripts/`, `references/`, or `assets/` only when required
+- a deterministic validation command
 
-Support may begin as documentation or examples before a shared abstraction exists.
+Skills must generate project-local workflows. They must not require this repository at runtime.
 
-## Example Contract
+## Workflow Contract
 
-Every example inside `examples/` must follow these rules:
+Generated workflows must:
 
-- Each example lives in its own folder.
-- `index.mjs` is the entry point.
-- shebang should be for run zx
-- Prompts, hooks, and helper files must stay inside that example folder.
-- Each example must be isolated: everything specific to its execution must live inside its folder.
-- `index.mjs` must define which external CLIs are required and verify they are available before doing real work.
-- Failure states must be explicit and actionable.
-- Example files and output-facing text must be written in English.
+- use `#!/usr/bin/env zx` for their entrypoint
+- pass dynamic CLI arguments without shell interpolation
+- keep orchestration in TypeScript when using SDKs
+- collect and reduce evidence before invoking a model
+- select the least expensive capable model, escalating only after gate feedback
+- cap context by file count and bytes
+- define the acceptance gate before the intelligent stage
+- stage model output until its gate passes
+- retry with concrete gate feedback
+- snapshot declared mutations and restore them after terminal failure
+- persist an inspectable run log without secrets
+- support dry-run planning
 
-### Required Example Set
+## Supported Composition
 
-The repository must provide these examples:
+- Static: any non-interactive CLI, Jira clients, GitHub CLI, tests, schemas, and local TF-IDF
+- Intelligent: built-in Codex, Copilot, pi, and OpenCode routes plus arbitrary command adapters
+- Gates: commands, required text, and required JSON paths
+- Knowledge: `know` sources, opt-in harness discovery, immutable prior concepts,
+  hash-incremental OKF Markdown publication, and atomic index updates
 
-- `examples/hello-world`: print `hello world`
-- `examples/hello-name`: ask for a user-provided name and print `hello <name>`
-- `examples/gh-involved-repos`: list the repos that user is involved
-- `examples/hello-cop`: run a prompt using copilot cli
+## Validation
 
-## Current Delivery Priority
+CI must validate skill metadata, scaffold real-task plans, execute an offline retry fixture, and
+prove rollback restores a declared mutation.
 
-The first milestone for this repository is:
-
-1. Keep the repository structure minimal and coherent.
-2. Make the required examples runnable.
-3. Document platform-specific setup, especially Windows + WSL for bash-backed examples.
-4. Grow shared skills and evaluations only after the example contract is stable.
+Evolution skills must also validate a native Harbor 0.18.0 task, publish a passing oracle solution,
+score correctness, resilience, efficiency, security, and determinism independently, and keep
+development, validation, and holdout evidence separate.

@@ -6,4 +6,7 @@ Constrains:
 - Prefer sequential, async and looping than a lot of functions to decompose on scripts
 - Prefer tmux when terminal multiplexing helps
 - Before say that something is done, test it manually if is possible
-- never change examples\hello-world\index.mjs; it is how it should works
+- Keep product artifacts under `skills/`; root files are only for governance, discovery, and CI
+- Generated workflows must be standalone after scaffolding
+- Record durable technical or workflow decisions as ADRs under `.specs/adr/*.md`
+- Read existing ADRs before changing a previously chosen technical direction

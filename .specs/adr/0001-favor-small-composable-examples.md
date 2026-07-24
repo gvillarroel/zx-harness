@@ -2,7 +2,7 @@
 adr: "0001"
 title: "ADR 0001: Favor Small Composable Examples Over Monolithic Harnesses"
 summary: "Keep zx examples small and composable so each workflow can be understood, tested, and reused independently."
-status: "Proposed"
+status: "Superseded"
 date: "2026-04-05"
 product: "zx-harness"
 owner: "Platform Architecture"
@@ -17,7 +17,7 @@ tags:
 
 ## Status
 
-Proposed
+Superseded by ADR 0004.
 
 ## Context
 

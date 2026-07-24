@@ -1,0 +1,9 @@
+{
+  "reason": [
+    "Incomplete proposal.",
+    "APPROVED\n\nVerification:\n- Run the deterministic gate."
+  ],
+  "generate-change": [
+    "{\"path\":\"feature.txt\",\"content\":\"quality-improved\\n\"}"
+  ]
+}

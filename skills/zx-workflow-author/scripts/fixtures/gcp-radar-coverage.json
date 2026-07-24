@@ -1,0 +1,51 @@
+{
+  "name": "gcp-radar-coverage-recovery",
+  "description": "Use static relevance, harness reasoning, and quality gates to improve Step 3/4 coverage for a target product.",
+  "stages": [
+    {
+      "id": "rank-coverage-evidence",
+      "kind": "tfidf",
+      "queryFile": "data/step-02/current/products/bigquery.md",
+      "roots": [
+        "data/step-03/current/products/bigquery",
+        "data/step-04/current/products/bigquery"
+      ],
+      "extensions": [".json", ".md"],
+      "output": "run/bigquery-ranked-evidence.json",
+      "limit": 30,
+      "maxFiles": 500,
+      "maxBytesPerFile": 24000,
+      "gate": {
+        "kind": "json",
+        "path": "run/bigquery-ranked-evidence.json",
+        "required": ["0.path", "0.score"]
+      }
+    },
+    {
+      "id": "design-targeted-recovery",
+      "kind": "harness",
+      "provider": "copilot",
+      "prompt": "Design the smallest targeted Step 3 and Step 4 rerun that improves feature coverage. Cite evidence paths, propose measurable corpus-health thresholds, and list exact verification commands.",
+      "inputs": [
+        {
+          "path": "data/step-02/current/products/bigquery.md",
+          "maxBytes": 30000
+        },
+        {
+          "path": "run/bigquery-ranked-evidence.json",
+          "maxBytes": 30000
+        }
+      ],
+      "output": "run/bigquery-recovery-plan.md",
+      "attempts": 2,
+      "models": {
+        "fast": "gpt-5-mini",
+        "strong": "gpt-5.4"
+      },
+      "gate": {
+        "kind": "contains",
+        "values": ["Evidence:", "Thresholds:", "Verification:"]
+      }
+    }
+  ]
+}

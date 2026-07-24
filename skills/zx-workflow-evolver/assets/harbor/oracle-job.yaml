@@ -1,0 +1,12 @@
+job_name: "zx-workflow-resilience-oracle"
+jobs_dir: "../../../../.tmp/harbor/jobs"
+n_attempts: 1
+n_concurrent_trials: 1
+quiet: false
+environment:
+  type: "docker"
+  delete: true
+agents:
+  - name: "oracle"
+tasks:
+  - path: "workflow-resilience"

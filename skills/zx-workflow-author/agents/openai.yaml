@@ -1,0 +1,4 @@
+interface:
+  display_name: "zx Workflow Author"
+  short_description: "Build gated, harness-neutral zx workflows"
+  default_prompt: "Use $zx-workflow-author to turn this repository task into a verified zx workflow."

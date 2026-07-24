@@ -2,7 +2,7 @@
 adr: "0003"
 title: "ADR 0003: Check Changed Content With Danger And TruffleHog"
 summary: "Use Danger JS for changed-file reporting, link checks, and TruffleHog findings."
-status: "Proposed"
+status: "Superseded"
 date: "2026-04-24"
 product: "zx-harness"
 owner: "Platform Architecture"
@@ -17,7 +17,7 @@ tags:
 
 ## Status
 
-Proposed
+Superseded by ADR 0004.
 
 ## Context
 
