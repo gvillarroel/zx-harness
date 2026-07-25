@@ -50,6 +50,9 @@ for (const harness of harnesses) {
 
 // Inspect the shared runtime for the deterministic tools and external OKF validation boundary.
 const runtime = await readFile(join(generated, "topic.mjs"), "utf8").catch(() => "");
+const generatedCode = (
+  await Promise.all(modules.map((name) => readFile(join(generated, name), "utf8")))
+).join("\n");
 const terminal_tools = ["know", "jq", "rg", "fd", "git"].every((tool) => runtime.includes(`"${tool}"`))
   ? 1
   : 0;
@@ -87,7 +90,7 @@ const prompt_diversity =
 
 // Require direct argument-array execution and reject any fallback to a command shell.
 const safe_arguments =
-  runtime.includes("promisify(execFile)") && !runtime.includes("shell: true") ? 1 : 0;
+  generatedCode.includes("execFile(") && !generatedCode.includes("shell: true") ? 1 : 0;
 const size_gate = script_size_bytes > 0 && script_size_bytes <= MAX_SCRIPT_BYTES ? 1 : 0;
 
 // Keep correctness gates non-compensating while exposing the exact negative byte objective.

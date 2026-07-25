@@ -21,4 +21,5 @@ topic and owns `topics/<slug>/`.
 - `OPEN_KNOWLEDGE_FORMAT_SKILL` points to the external OKF skill; its validator gates promotion.
 - Codex, Copilot, pi, and OpenCode have different prompts and non-interactive argument arrays.
 - Any additional CLI or SDK wrapper can call `runHarness({ harness, prompt, command })`.
+- `TOPIC_COMMANDS_JSON` maps commands to argv prefixes; Windows npm shims resolve without a shell.
 - Credentials remain inherited environment variables. Generated files never reference this skill.

@@ -40,10 +40,11 @@ const wrappers = {
   },
 };
 
-// Copy one reviewed runtime and add four prompt-specific, independently executable wrappers.
+// Copy reviewed runtimes and add four prompt-specific, independently executable wrappers.
 await mkdir(target, { recursive: true });
 const scriptDir = fileURLToPath(new URL(".", import.meta.url));
 await copyFile(resolve(scriptDir, "topic-runtime.mjs"), resolve(target, "topic.mjs"));
+await copyFile(resolve(scriptDir, "command-runtime.mjs"), resolve(target, "command-runtime.mjs"));
 for (const [harness, { prompt, command }] of Object.entries(wrappers)) {
   const config = `{ harness: ${JSON.stringify(harness)}, prompt: ${JSON.stringify(prompt)}, command: ${command} }`;
   await writeFile(

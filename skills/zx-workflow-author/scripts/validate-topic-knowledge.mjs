@@ -12,7 +12,7 @@ import {
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const skillDir = fileURLToPath(new URL("..", import.meta.url));
 const scaffold = resolve(skillDir, "scripts", "scaffold-topic-knowledge.mjs");
@@ -64,6 +64,15 @@ try {
   );
   assert(custom.command === "custom-cli", "arbitrary harness adapter was not preserved");
 
+  // Prove argv-only harness execution closes stdin instead of waiting for hidden interactive input.
+  const commandRuntime = await import(pathToFileURL(resolve(target, "command-runtime.mjs")));
+  const eof = await commandRuntime.run(
+    process.execPath,
+    ["-e", 'process.stdin.resume();process.stdin.on("end",()=>console.log("EOF"))'],
+    { timeout: 5000 },
+  );
+  assert(eof.stdout.trim() === "EOF", "the command runtime left harness stdin open");
+
   // Route every external CLI through one argument-array fake; Python remains the real OKF gate.
   await writeFile(fakeCli, buildFakeCliSource());
   const commands = Object.fromEntries(
@@ -75,7 +84,7 @@ try {
   await mkdir(resolve(okfSkill, "scripts"), { recursive: true });
   await writeFile(
     resolve(okfSkill, "scripts", "validate_okf_bundle.py"),
-    "from pathlib import Path\nimport sys\nroot=Path(sys.argv[1])\nassert (root/'index.md').is_file()\nfor p in root.rglob('*.md'):\n    if p.name not in {'index.md','log.md'}:\n        assert p.read_text(encoding='utf-8').startswith('---\\ntype:')\n",
+    "from pathlib import Path\nimport sys\nroot=Path(sys.argv[1])\nindex=(root/'index.md').read_text(encoding='utf-8')\nassert all(not line or line.startswith('# ') or line.startswith('* [') for line in index.splitlines())\nfor p in root.rglob('*.md'):\n    if p.name not in {'index.md','log.md'}:\n        assert p.read_text(encoding='utf-8').startswith('---\\ntype:')\n",
   );
 
   // Enable two non-arXiv source adapters while keeping one topic as the only CLI input.
@@ -101,6 +110,10 @@ try {
     assert(JSON.parse(lastLine(result.stdout)).status === "published", `${harness} did not publish`);
   }
   const topicRoot = resolve(target, "topics", topic.replaceAll(" ", "-"));
+  assert(
+    await stat(resolve(topicRoot, ".know", ".fake-source-arxiv")).catch(() => null),
+    "the real arXiv response shape did not register a source",
+  );
   const firstConcept = (await readdir(resolve(topicRoot, "okf")))
     .filter((name) => name.startsWith("codex-"))[0];
   const firstBytes = await readFile(resolve(topicRoot, "okf", firstConcept));
@@ -127,7 +140,7 @@ try {
   );
   assert(JSON.parse(lastLine(changed.stdout)).status === "published", "new source version was skipped");
   const index = await readFile(resolve(topicRoot, "okf", "index.md"), "utf8");
-  assert((index.match(/^- \[/gm) ?? []).length === 5, "index does not list five concepts");
+  assert((index.match(/^\* \[/gm) ?? []).length === 5, "index does not list five concepts");
   assert(
     Buffer.compare(firstBytes, await readFile(resolve(topicRoot, "okf", firstConcept))) === 0,
     "incremental run rewrote historical bytes",
@@ -205,10 +218,17 @@ const value = (flag) => args[args.indexOf(flag) + 1];
 if (["codex", "copilot", "pi", "opencode"].includes(tool)) {
   console.log("# Finding\n\nEvidence synthesized by " + tool + ".");
 } else if (tool === "know" && args.includes("search")) {
-  console.log(JSON.stringify([{ url: "https://arxiv.org/abs/2401.00001" }]));
+  console.log(JSON.stringify({ entries: [{ id: "http://arxiv.org/abs/2401.00001", links: { alternate: "https://arxiv.org/abs/2401.00001" } }] }));
+} else if (tool === "know" && args.includes("add") && !args.includes("key")) {
+  const store = value("--store");
+  const kind = args[args.indexOf("add") + 1];
+  mkdirSync(store, { recursive: true });
+  writeFileSync(resolve(store, ".fake-source-" + kind), "registered\n");
 } else if (tool === "know" && args.includes("sync")) {
   const store = value("--store");
-  for (const [kind, title] of [["arxiv", "Paper"], ["site", "Site"]]) {
+  for (const marker of readdirSync(store).filter((name) => name.startsWith(".fake-source-"))) {
+    const kind = marker.slice(".fake-source-".length);
+    const title = kind.replaceAll("-", " ");
     const file = resolve(store, kind, "source.md");
     mkdirSync(dirname(file), { recursive: true });
     writeFileSync(file, "---\ntype: source\ntitle: " + title + "\n---\n\nrevision " + (process.env.FAKE_REVISION ?? "1") + "\n");
@@ -225,7 +245,10 @@ if (["codex", "copilot", "pi", "opencode"].includes(tool)) {
         console.log([item.type, item.url, item.branch ?? ""].join("\t"));
       }
     } else {
-      for (const item of data) if (item.url) console.log(item.url);
+      for (const item of (Array.isArray(data) ? data : data.entries ?? [])) {
+        const url = item.url ?? item.links?.alternate ?? item.id ?? item.pdf_url;
+        if (url) console.log(url);
+      }
     }
   }
 } else if (tool === "fd") {

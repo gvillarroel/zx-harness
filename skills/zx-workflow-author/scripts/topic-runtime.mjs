@@ -1,21 +1,8 @@
 #!/usr/bin/env zx
 
-import { execFile } from "node:child_process";
 import { cp, mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
-import { promisify } from "node:util";
-
-const execute = promisify(execFile);
-const commandOverrides = JSON.parse(process.env.TOPIC_COMMANDS_JSON ?? "{}");
-const run = (file, args, options = {}) => {
-  const [executable = file, ...prefix] = commandOverrides[file] ?? [];
-  return execute(executable, [...prefix, ...args], {
-    windowsHide: true,
-    maxBuffer: 8 * 1024 * 1024,
-    ...options,
-  });
-};
-const soft = (...args) => run(...args).catch((error) => error);
+import { run, soft } from "./command-runtime.mjs";
 
 export async function runHarness({ harness, prompt, command }) {
   // One topic is the interface; dry-run stays local.
@@ -58,7 +45,7 @@ export async function runHarness({ harness, prompt, command }) {
   const arxivFile = join(root, "arxiv.json");
   await writeFile(arxivFile, arxiv.stdout);
   const urls = (
-    await run("jq", ["-r", ".. | objects | .url? // empty", arxivFile])
+    await run("jq", ["-r", "..|objects|.url? //.links?.alternate? //.id? //empty", arxivFile])
   ).stdout
     .trim()
     .split(/\r?\n/)
@@ -166,7 +153,7 @@ ${response.stdout.trim()}
       .replace(/^title:\s*/, "")
       .trim();
     const link = relative(candidate, file).replaceAll("\\", "/");
-    links.push(`- [${title || link}](${link})`);
+    links.push(`* [${title || link}](${link})`);
   }
   await writeFile(join(candidate, "index.md"), `# ${topic}\n\n${links.join("\n")}\n`);
   const okfSkill = process.env.OPEN_KNOWLEDGE_FORMAT_SKILL;
