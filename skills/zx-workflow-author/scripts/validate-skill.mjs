@@ -13,8 +13,8 @@ const fixturesDir = resolve(skillDir, "scripts", "fixtures");
 const temporaryRoot = await mkdtemp(resolve(tmpdir(), "zx-workflow-author-"));
 
 try {
-  // Confirm the repository exposes only skills as product artifacts.
-  for (const forbidden of ["deliverables", "docs", "evaluations", "examples", "results"]) {
+  // Human guides may live in docs; executable product artifacts still belong only to skills.
+  for (const forbidden of ["deliverables", "evaluations", "examples", "results"]) {
     if (await stat(resolve(repoRoot, forbidden)).catch(() => null)) {
       throw new Error(`Forbidden top-level product directory exists: ${forbidden}`);
     }

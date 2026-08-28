@@ -13,7 +13,9 @@ Generated workflows combine:
 ## Repository Scope
 
 Product artifacts live only under `skills/`. Root files may provide governance, CI, and discovery.
-Do not add standalone examples, docs, evaluations, or a shared runtime framework.
+Human onboarding and maintenance guides live under `docs/`, indexed by `docs/README.md`.
+Do not add standalone executable examples, evaluations, or a shared runtime framework outside the skills.
+Generated skills must never depend on repository-level documentation at runtime.
 
 ## Skill Contract
 

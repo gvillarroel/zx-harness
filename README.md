@@ -1,21 +1,23 @@
-# zx-harness
+# ZX Harness
 
-Skills for authoring zx workflows that combine deterministic tools, TypeScript harness SDKs, and
-quality gates.
+Self-contained skills for authoring and evolving ZX workflows that combine deterministic tools, TypeScript harness SDKs, model calls, and quality gates. Generated workflows are intended to remain standalone after scaffolding.
 
-Available skills:
+The author and evolver have separate responsibilities. Preserve protected metrics, evidence provenance, and independent validation when evolving a workflow.
 
-- [`zx-workflow-author`](skills/zx-workflow-author/SKILL.md): generate project-local workflows with
-  static collection, TF-IDF reduction, short Codex/Copilot/pi/OpenCode scripts, arbitrary harness
-  wrappers, model escalation, retries, and incremental multi-source knowledge ingestion.
-- [`zx-workflow-evolver`](skills/zx-workflow-evolver/SKILL.md): optimize generated workflows with
-  repeatable Harbor evidence, negative byte objectives, protected metrics, and holdout promotion.
+## Get started
 
-Validate:
+Start with the [skill and workflow guide](docs/getting-started.md), then read `SPEC.md` and the owning skill contract. Deterministic checks run with Node.js.
 
-```bash
+```sh
 node skills/zx-workflow-author/scripts/validate-skill.mjs
 node skills/zx-workflow-evolver/scripts/validate-skill.mjs
 ```
 
-See [`SPEC.md`](SPEC.md) for the contract.
+## Documentation
+
+- [Documentation index](docs/README.md)
+- [Usage and operations](docs/getting-started.md)
+- [Repository layout and validation](docs/repository-guide.md)
+- [Global specification](SPEC.md)
+- [Architecture decisions](.specs/adr/)
+- [AGENTS.md](AGENTS.md)
