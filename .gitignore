@@ -1,4 +1,7 @@
 .tmp/
+.skill-library/
 node_modules/
 package-lock.json
 .zx-workflow/
+__pycache__/
+*.pyc

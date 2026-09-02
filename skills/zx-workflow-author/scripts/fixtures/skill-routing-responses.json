@@ -1,0 +1,13 @@
+{
+  "review-acceptance": [
+    {
+      "promptIncludes": [
+        "### Specialized skill: acceptance-review",
+        "ACCEPTANCE_SENTINEL",
+        "REFERENCE_SENTINEL",
+        "Binding workflow constraints:"
+      ],
+      "response": "APPROVED\nVerification: every criterion has an observable gate."
+    }
+  ]
+}

@@ -24,3 +24,7 @@ jobs:
       - run: node skills/zx-workflow-author/scripts/validate-skill.mjs
 
       - run: node skills/zx-workflow-evolver/scripts/validate-skill.mjs
+
+      - run: node skills/zx-repository-issue-workflow/scripts/validate-skill.mjs
+
+      - run: node skills/zx-prompt-solver/scripts/validate-skill.mjs

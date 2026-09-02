@@ -9,6 +9,9 @@ const generated = resolve(generatedInput);
 const logs = resolve(logsInput);
 const topic = process.env.TOPIC ?? "bounded topic";
 const MAX_SCRIPT_BYTES = Number(process.env.MAX_SCRIPT_BYTES ?? "7000");
+const evaluationProfile = process.env.EVALUATION_PROFILE ?? "standard";
+const zxCommand = process.env.ZX_COMMAND ?? "zx";
+const zxCommandArgs = JSON.parse(process.env.ZX_COMMAND_ARGS ?? "[]");
 const harnesses = ["codex", "copilot", "pi", "opencode"];
 const diagnostics = [];
 
@@ -24,28 +27,52 @@ const script_size_bytes = Math.max(0, ...Object.values(sizes));
 const script_size_negative = -script_size_bytes;
 const script_total_bytes = Object.values(sizes).reduce((sum, size) => sum + size, 0);
 
-// Verify one topic is sufficient to dry-run every distinct harness entrypoint.
+// Verify every entrypoint preserves one exact topic and emits the same plan on a repeated dry-run.
 let functional = 1;
+let deterministic = 1;
 const plans = [];
 for (const harness of harnesses) {
   const script = join(generated, `${harness}.mjs`);
-  const run = spawnSync("zx", [script, topic, "--dry-run"], {
-    cwd: generated,
-    encoding: "utf8",
-    env: { ...process.env, TOPIC_DRY_RUN: "1" },
-  });
+  const runs = [0, 1].map(() =>
+    spawnSync(zxCommand, [...zxCommandArgs, script, topic, "--dry-run"], {
+      cwd: generated,
+      encoding: "utf8",
+      env: { ...process.env, TOPIC_DRY_RUN: "1" },
+    }),
+  );
   try {
-    const plan = JSON.parse(run.stdout.trim());
+    const plan = JSON.parse(runs[0].stdout.trim());
+    const repeatedPlan = JSON.parse(runs[1].stdout.trim());
     plans.push(plan);
-    if (run.status !== 0 || plan.topic !== topic || plan.harness !== harness) {
+    if (runs.some((run) => run.status !== 0) || plan.topic !== topic || plan.harness !== harness) {
       throw new Error("dry-run plan mismatch");
+    }
+    if (JSON.stringify(plan) !== JSON.stringify(repeatedPlan)) {
+      deterministic = 0;
+      throw new Error("repeated dry-run changed the plan");
     }
   } catch (error) {
     functional = 0;
     diagnostics.push(
-      `${harness}: ${error.message}; stderr=${String(run.stderr ?? run.error?.message ?? "").trim()}`,
+      `${harness}: ${error.message}; stderr=${String(
+        runs[0].stderr ?? runs[0].error?.message ?? "",
+      ).trim()}`,
     );
   }
+}
+
+// Make each cohort exercise a distinct input risk while keeping the exact cases verifier-owned.
+const profileMatched = {
+  standard: /[a-z0-9]/iu.test(topic),
+  unicode: /[^\u0000-\u007f]/u.test(topic),
+  punctuation: topic.includes("++") && topic.includes("-"),
+  "shell-metacharacters": topic.includes("$(") && topic.includes(";"),
+  "option-like": topic.startsWith("--"),
+  "path-like": topic.includes("../"),
+}[evaluationProfile] === true;
+if (!profileMatched) {
+  functional = 0;
+  diagnostics.push(`topic does not match evaluation profile: ${evaluationProfile}`);
 }
 
 // Inspect the shared runtime for the deterministic tools and external OKF validation boundary.
@@ -92,15 +119,18 @@ const prompt_diversity =
 const safe_arguments =
   generatedCode.includes("execFile(") && !generatedCode.includes("shell: true") ? 1 : 0;
 const size_gate = script_size_bytes > 0 && script_size_bytes <= MAX_SCRIPT_BYTES ? 1 : 0;
+const dry_run_purity = (await stat(join(generated, "topics")).catch(() => null)) ? 0 : 1;
 
 // Keep correctness gates non-compensating while exposing the exact negative byte objective.
 const rewards = {
   reward: functional && size_gate && terminal_tools && incremental && okf && sources
-    && prompt_diversity && safe_arguments ? 1 : 0,
+    && prompt_diversity && safe_arguments && deterministic && dry_run_purity ? 1 : 0,
   script_size_bytes,
   script_size_negative,
   script_total_bytes,
   functional,
+  deterministic,
+  dry_run_purity,
   size_gate,
   terminal_tools,
   incremental,
@@ -112,5 +142,5 @@ const rewards = {
 await writeFile(join(logs, "reward.json"), `${JSON.stringify(rewards, null, 2)}\n`);
 await writeFile(
   join(logs, "diagnostics.json"),
-  `${JSON.stringify({ MAX_SCRIPT_BYTES, sizes, diagnostics, plans }, null, 2)}\n`,
+  `${JSON.stringify({ MAX_SCRIPT_BYTES, evaluationProfile, sizes, diagnostics, plans }, null, 2)}\n`,
 );

@@ -1,0 +1,5 @@
+interface:
+  display_name: "zx Repository Issue Workflow"
+  short_description: "Generate permanent pi-powered issue workflows"
+  default_prompt: "Use $zx-repository-issue-workflow to generate and verify a repository-specific issue-solving workflow."
+

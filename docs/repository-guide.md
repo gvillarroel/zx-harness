@@ -6,7 +6,7 @@ Self-contained skills for authoring and evolving ZX workflows that combine deter
 
 | Path | Responsibility |
 | --- | --- |
-| `skills/` | Standalone author/evolver bundles, runtime assets, and validators. |
+| `skills/` | Standalone author/evolver bundles, dataset-authoring contracts, runtime assets, and validators. |
 | `.specs/adr/` | Durable workflow and evaluation decisions. |
 | `docs/` | User orientation and repository maintenance. |
 | `SPEC.md` | Global product and workflow contract. |
@@ -41,5 +41,11 @@ Run the owning bundle's additional deterministic validators when its resources c
 ## Data and operating boundaries
 
 Keep product artifacts under `skills/`, preserve standalone runtime boundaries, and leave generated workflows, study jobs, and installed skill libraries out of root documentation. Do not include uncommitted experimental skills in a published catalog until their bundle is published and validated.
+
+Bundled Harbor tasks remain smoke probes owned by their skill. Use
+[`harbor-author-evaluation-datasets`](../skills/harbor-author-evaluation-datasets/SKILL.md)
+to author any larger external cohort, keep its rendered tasks and sealed splits
+outside this repository, and pass completed split roots to the maintained study
+organizer. Do not create a second repository-level evaluation runtime.
 
 [Back to the documentation index](README.md).

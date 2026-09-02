@@ -18,6 +18,8 @@ node skills/zx-workflow-evolver/scripts/validate-skill.mjs
 - [Documentation index](docs/README.md)
 - [Usage and operations](docs/getting-started.md)
 - [Repository layout and validation](docs/repository-guide.md)
+- [Harbor evaluation dataset authoring skill](skills/harbor-author-evaluation-datasets/SKILL.md)
+- [DeepSWE repository-workflow evaluation](skills/zx-repository-issue-workflow/references/deep-swe-evaluation.md)
 - [Global specification](SPEC.md)
 - [Architecture decisions](.specs/adr/)
 - [AGENTS.md](AGENTS.md)

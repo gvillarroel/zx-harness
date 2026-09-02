@@ -4,6 +4,7 @@
 
 Use at least three task families:
 
+- discovery: exposes traces without deciding promotion
 - development: exposes actionable diagnostics for repair
 - validation: selects among candidates without supplying new mutations
 - holdout: remains unread until one candidate is selected
@@ -54,6 +55,18 @@ diagnostics.
 - Missing rewards, incomplete trials, or mismatched task checksums invalidate comparison.
 - Never replace a failed or missing reward with zero merely to make an aggregate computable.
 
+## External Task Intake
+
+Register disjoint development and validation manifests before evolution. Inspect only public
+development tasks. Before any model-visible run, execute the exact task's oracle with pinned Harbor;
+require reward `1`, no exception, and an accessible image. Bind dataset version, task checksum, and
+image digest when available. Local task paths belong under Harbor `tasks`; registry packages belong
+under `datasets`.
+
+Prompt-compiled bundles must expose `generated_script_count = 1`. `SKILL.md` is data, not another
+script. Keep correctness non-compensating and optimize bytes only among passing one-script bundles.
+Provider, registry, authentication, timeout, and infrastructure failures remain non-evaluable.
+
 ## Bundled Probe
 
 `assets/harbor/workflow-resilience` is one complex smoke task, not a complete evolution cohort. Its
@@ -61,6 +74,6 @@ hidden verifier runs independent retry, rollback, context, confinement, redactio
 cases. Copy its structure, not its fixture answers, when building development, validation, and
 holdout task families for a real script.
 
-`assets/harbor/topic-harness-size` is the template for a two-discovery/two-holdout Trace
-Distillation campaign. Its oracle executes the injected skill and its verifier owns the negative
-byte reward.
+`assets/harbor/topic-harness-size` is the template for a two-task-per-split Trace Distillation
+campaign. Its oracle executes the injected skill. Its verifier owns the negative byte reward and
+exercises ordinary, Unicode, punctuation, shell-metacharacter, option-like, and path-like topics.

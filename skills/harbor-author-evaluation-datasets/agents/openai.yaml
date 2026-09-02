@@ -1,0 +1,5 @@
+interface:
+  display_name: "Harbor Author Evaluation Datasets"
+  short_description: "Build leakage-resistant Harbor task datasets"
+  default_prompt: "Use $harbor-author-evaluation-datasets to design and audit reproducible Harbor datasets for skill evolution."
+

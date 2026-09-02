@@ -23,6 +23,7 @@ collect = []
 [verifier.env]
 TOPIC = "__TOPIC__"
 MAX_SCRIPT_BYTES = "__MAX_SCRIPT_BYTES__"
+EVALUATION_PROFILE = "__EVALUATION_PROFILE__"
 
 [agent]
 timeout_sec = 600.0

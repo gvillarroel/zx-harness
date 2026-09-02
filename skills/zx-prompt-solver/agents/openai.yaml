@@ -1,0 +1,4 @@
+interface:
+  display_name: "zx Prompt Solver Benchmark"
+  short_description: "Measure isolated prompt-to-zx compilation"
+  default_prompt: "Use $zx-prompt-solver only for the prompt-to-program benchmark boundary."

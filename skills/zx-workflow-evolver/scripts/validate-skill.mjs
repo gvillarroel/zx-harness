@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 const skillDir = fileURLToPath(new URL("..", import.meta.url));
 const taskDir = resolve(skillDir, "assets", "harbor", "workflow-resilience");
 const sizeTaskDir = resolve(skillDir, "assets", "harbor", "topic-harness-size");
-const prepareSizeTrace = resolve(skillDir, "scripts", "prepare-topic-harness-trace.mjs");
+const evaluationValidator = resolve(skillDir, "scripts", "validate-evaluations.mjs");
 const temporaryRoot = await mkdtemp(resolve(tmpdir(), "zx-workflow-evolver-"));
 
 try {
@@ -86,20 +86,8 @@ try {
       throw new Error(`Topic size verifier is missing ${required}`);
     }
   }
-  const prepared = resolve(temporaryRoot, "topic-size-trace");
-  await run(
-    process.execPath,
-    [prepareSizeTrace, prepared, resolve(skillDir, "..", "zx-workflow-author")],
-    skillDir,
-  );
-  const objective = JSON.parse(await readFile(resolve(prepared, "objective.json"), "utf8"));
-  if (
-    objective.MAX_SCRIPT_BYTES !== 7000 ||
-    objective.rewardKey !== "script_size_negative" ||
-    objective.definition !== "script_size_negative = -script_size_bytes"
-  ) {
-    throw new Error(`Topic size objective drifted: ${JSON.stringify(objective)}`);
-  }
+  // Exercise all generated split contracts and adversarial profiles before Harbor resolution.
+  await run(process.execPath, [evaluationValidator], skillDir);
 
   // Execute hidden cases locally first for fast, dependency-free feedback on the reference script.
   const verifier = resolve(taskDir, "tests", "verify.mjs");

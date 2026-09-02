@@ -47,8 +47,22 @@ Prepare the compact topic-harness cohort:
 node <skill-directory>/scripts/prepare-topic-harness-trace.mjs <run-directory> <baseline-skill>
 ```
 
-Run Trace Distillation with schema 2, two discovery tasks, physically new same-task development
-attempts, and the two generated holdouts.
+The command emits two tasks per discovery, development, validation, and holdout split plus a
+selection-gated `evaluation-plan.json`. Run Trace Distillation on development, select on validation,
+then release the two generated holdouts.
+
+Validate every generated cohort and adversarial topic profile:
+
+```bash
+node <skill-directory>/scripts/validate-evaluations.mjs
+```
+
+This verifies all dataset locks and jobs but executes only optimizer-visible profiles. After a
+recorded candidate selection releases holdout, run:
+
+```bash
+node <skill-directory>/scripts/validate-evaluations.mjs --release-holdout
+```
 
 ## Mutation Rules
 

@@ -96,3 +96,20 @@ For pi, set `provider` to `pi` and use `provider/model` identifiers:
 
 Keep attempts between 1 and 4. Attempt one uses `models.fast`; later attempts use `models.strong`
 and receive the previous gate diagnostics.
+
+## Skill-Aware Scaffold
+
+`skills` is optional and valid only on harness stages. Select one to three names after scanning the
+provided library as described in [skill-libraries.md](skill-libraries.md), then pass its path:
+
+```json
+{"skills": ["code-review"]}
+```
+
+```bash
+node <skill-directory>/scripts/scaffold-workflow.mjs <plan.json> <target-directory> \
+  --skill-library <skill-library>
+```
+
+The scaffold fails when a selected name is absent or ambiguous. It embeds only selected Markdown
+guidance; generated workflows never read the source library.

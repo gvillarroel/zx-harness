@@ -3,12 +3,29 @@
 import { cp, mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import { isAbsolute, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  compileSkill,
+  MAX_STAGE_SKILL_BYTES,
+  scanSkillLibrary,
+} from "./inspect-skill-library.mjs";
 
-const [, , planInput, targetInput] = process.argv;
+const [planInput, targetInput, ...options] = process.argv.slice(2);
+let skillLibraryInput = "";
+
+// Parse one optional library flag explicitly so unknown options cannot silently alter scaffolding.
+for (let index = 0; index < options.length; index += 1) {
+  if (options[index] !== "--skill-library" || !options[index + 1] || skillLibraryInput) {
+    throw new Error(`Unknown or incomplete option: ${options[index]}`);
+  }
+  skillLibraryInput = options[index + 1];
+  index += 1;
+}
 
 // Require explicit inputs because guessing either path can overwrite unrelated project files.
 if (!planInput || !targetInput) {
-  throw new Error("Usage: node scaffold-workflow.mjs <plan.json> <target-directory>");
+  throw new Error(
+    "Usage: node scaffold-workflow.mjs <plan.json> <target-directory> [--skill-library <directory>]",
+  );
 }
 
 const skillDir = fileURLToPath(new URL("..", import.meta.url));
@@ -19,6 +36,42 @@ const plan = JSON.parse(await readFile(planFile, "utf8"));
 
 // Validate the plan before creating a target so an invalid request leaves no partial scaffold.
 validatePlan(plan);
+
+// Resolve stage-selected skills from descriptions the author reviewed; runtime never guesses routing.
+const selectedSkillNames = [
+  ...new Set(
+    plan.stages.flatMap((stage) => (stage.kind === "harness" ? (stage.skills ?? []) : [])),
+  ),
+].sort();
+const skillBundles = {};
+if (selectedSkillNames.length && !skillLibraryInput) {
+  throw new Error("Harness stages select skills, but --skill-library was not provided.");
+}
+if (skillLibraryInput) {
+  const { catalog } = await scanSkillLibrary(skillLibraryInput);
+  const entries = new Map(catalog.map((entry) => [entry.name, entry]));
+  for (const name of selectedSkillNames) {
+    const entry = entries.get(name);
+    if (!entry) {
+      throw new Error(`Selected skill is not in the library: ${name}`);
+    }
+    skillBundles[name] = await compileSkill(entry);
+    if (skillBundles[name].missingReferences.length) {
+      console.warn(
+        `Skill ${name} has unavailable Markdown references: ${skillBundles[name].missingReferences.join(", ")}`,
+      );
+    }
+  }
+  for (const stage of plan.stages.filter((value) => value.kind === "harness")) {
+    const bytes = (stage.skills ?? []).reduce(
+      (total, name) => total + Buffer.byteLength(skillBundles[name].instructions),
+      0,
+    );
+    if (bytes > MAX_STAGE_SKILL_BYTES) {
+      throw new Error(`Selected skills exceed the stage prompt budget: ${stage.id}`);
+    }
+  }
+}
 
 // Refuse to merge with an existing directory because generated runtimes must be auditable.
 const targetStats = await stat(targetDir).catch(() => null);
@@ -33,6 +86,13 @@ if (targetStats && (await readdir(targetDir)).length > 0) {
 await mkdir(targetDir, { recursive: true });
 await cp(runtimeDir, targetDir, { recursive: true });
 await writeFile(resolve(targetDir, "workflow.plan.json"), `${JSON.stringify(plan, null, 2)}\n`);
+if (selectedSkillNames.length) {
+  // Embed only selected prompt guidance and digests so the generated workflow is standalone.
+  await writeFile(
+    resolve(targetDir, "workflow.skills.json"),
+    `${JSON.stringify({ version: 1, skills: skillBundles }, null, 2)}\n`,
+  );
+}
 
 // Install only the harness SDKs named by the plan, keeping each generated workflow minimal.
 const dependencies = {
@@ -76,7 +136,9 @@ const packageJson = {
 };
 await writeFile(resolve(targetDir, "package.json"), `${JSON.stringify(packageJson, null, 2)}\n`);
 
-console.log(`Scaffolded ${plan.name} at ${targetDir}`);
+console.log(
+  `Scaffolded ${plan.name} at ${targetDir}; embedded skills: ${selectedSkillNames.join(", ") || "none"}`,
+);
 
 function validatePlan(plan) {
   if (!plan || !/^[a-z0-9][a-z0-9-]{1,62}$/.test(plan.name)) {
@@ -96,6 +158,19 @@ function validatePlan(plan) {
     const attempts = stage.attempts ?? 1;
     if (!Number.isInteger(attempts) || attempts < 1 || attempts > 4) {
       throw new Error(`Stage attempts must be 1-4: ${stage.id}`);
+    }
+
+    if (stage.skills !== undefined) {
+      if (
+        stage.kind !== "harness" ||
+        !Array.isArray(stage.skills) ||
+        stage.skills.length === 0 ||
+        stage.skills.length > 3 ||
+        new Set(stage.skills).size !== stage.skills.length ||
+        stage.skills.some((name) => !/^[a-z0-9][a-z0-9._-]{0,127}$/.test(name))
+      ) {
+        throw new Error(`Stage skills must be 1-3 unique skill names on a harness stage: ${stage.id}`);
+      }
     }
 
     if (stage.kind === "command") {

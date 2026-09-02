@@ -168,13 +168,15 @@ function lastLine(text) {
 }
 
 async function runNpm(cwd, args) {
-  // Use npm's JavaScript entrypoint on Windows so no command shell is required.
+  // Prefer npm's active JavaScript entrypoint because npx-provided Node binaries have no adjacent npm.
   const bundled = resolve(process.execPath, "..", "node_modules", "npm", "bin", "npm-cli.js");
-  return await run(
-    (await stat(bundled).catch(() => null)) ? process.execPath : "npm",
-    (await stat(bundled).catch(() => null)) ? [bundled, ...args] : args,
-    cwd,
-  );
+  const active = process.env.npm_execpath ?? "";
+  for (const npmCli of [active, bundled].filter(Boolean)) {
+    if (await stat(npmCli).catch(() => null)) {
+      return await run(process.execPath, [npmCli, ...args], cwd);
+    }
+  }
+  return await run("npm", args, cwd);
 }
 
 async function run(command, args, cwd, env = {}) {
