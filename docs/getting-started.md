@@ -1,36 +1,45 @@
-# ZX Harness: usage and operations
+# Generate a Problem-Solving Workflow
 
-This working-copy guide retains pre-existing local changes that are not part of the published documentation commit. Validate local implementation before publishing those changes.
+`zx-workflow-author` creates one standalone program for a class of runtime problems. The generated
+program may collect and rank evidence, call different agents in isolated contexts, inject selected
+skills, validate candidates, retry with rejection evidence, and roll back failed mutations.
 
-Run commands from the repository root unless a different working directory is shown.
+Use the problem-type guide for [issue triage, issue resolution, and code
+review](../skills/zx-workflow-author/references/problem-types.md). Each request produces a
+purpose-built workflow for that recurring type; the resulting `solve.mjs` receives the concrete
+repository, issue, pull request, diff, or task at runtime.
 
-Skills for authoring zx workflows that combine deterministic tools, TypeScript harness SDKs, and
-quality gates.
+## Author
 
-Product skills:
+Use [`zx-workflow-author`](../skills/zx-workflow-author/SKILL.md) against the target repository. Define
+the plan described in
+[`references/workflow-spec.md`](../skills/zx-workflow-author/references/workflow-spec.md), then scaffold:
 
-- [`zx-workflow-author`](../skills/zx-workflow-author/SKILL.md): generate project-local workflows with
-  static collection, TF-IDF reduction, short Codex/Copilot/pi/OpenCode scripts, arbitrary harness
-  wrappers, stage-scoped skill libraries, model escalation, retries, and incremental knowledge.
-- [`zx-workflow-evolver`](../skills/zx-workflow-evolver/SKILL.md): optimize generated workflows with
-  repeatable Harbor evidence, negative byte objectives, protected metrics, and holdout promotion.
-- [`zx-repository-issue-workflow`](../skills/zx-repository-issue-workflow/SKILL.md): generate one
-  repository-specific zx workflow that analyzes new issues, selects native pi skills, invokes Luna
-  or pre-routed Sol, gates changes in an isolated worktree, and applies only passing patches.
+```bash
+node skills/zx-workflow-author/scripts/scaffold-workflow.mjs workflow.plan.json generated-workflow \
+  --skill-library path/to/optional-skills
+```
 
-Benchmark experiments:
+Omit `--skill-library` when no producer or reviewer selects skills. The target must be empty.
 
-- [`zx-prompt-solver`](../skills/zx-prompt-solver/SKILL.md): compile one Harbor task prompt into a
-  disposable zx skill and execute only its script. It does not implement the repository issue
-  workflow objective.
+## Verify and run
 
-Validate:
+```bash
+cd generated-workflow
+npm install
+npm run check
+npx --no-install zx solve.mjs --dry-run
+npx --no-install zx solve.mjs --problem "Fix the queue race without changing public APIs"
+npx --no-install zx solve.mjs --problem-file issue.md
+npx --no-install zx solve.mjs --state-root /tmp/workflow-state --problem-file issue.md
+```
+
+Inspect `events.jsonl`, `model-calls.jsonl`, and the declared outputs under the state root. Structured
+Codex adapters record nested token use; unmetered adapters make exact total-cost claims incomplete.
+Agent authentication is ambient; credentials do not belong in the plan or run evidence.
+
+## Validate this repository
 
 ```bash
 node skills/zx-workflow-author/scripts/validate-skill.mjs
-node skills/zx-workflow-evolver/scripts/validate-skill.mjs
-node skills/zx-repository-issue-workflow/scripts/validate-skill.mjs
-node skills/zx-prompt-solver/scripts/validate-skill.mjs
 ```
-
-See [`SPEC.md`](../SPEC.md) for the contract.

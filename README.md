@@ -1,25 +1,22 @@
 # ZX Harness
 
-Self-contained skills for authoring and evolving ZX workflows that combine deterministic tools, TypeScript harness SDKs, model calls, and quality gates. Generated workflows are intended to remain standalone after scaffolding.
+One skill generates standalone zx programs for recurring code-assistant work such as repository issue
+triage, issue resolution, and code review. Generated programs accept each concrete problem at runtime
+and combine deterministic context reduction, isolated agent calls, selected skills, executable gates,
+independent review, retries, and rollback.
 
-The author and evolver have separate responsibilities. Preserve protected metrics, evidence provenance, and independent validation when evolving a workflow.
+Start with [`zx-workflow-author`](skills/zx-workflow-author/SKILL.md). Its generated `solve.mjs` can
+orchestrate Codex, Copilot, pi, OpenCode, or another tested non-interactive agent without depending on
+this repository.
 
-## Get started
-
-Start with the [skill and workflow guide](docs/getting-started.md), then read `SPEC.md` and the owning skill contract. Deterministic checks run with Node.js.
-
-```sh
+```bash
 node skills/zx-workflow-author/scripts/validate-skill.mjs
-node skills/zx-workflow-evolver/scripts/validate-skill.mjs
 ```
 
 ## Documentation
 
-- [Documentation index](docs/README.md)
-- [Usage and operations](docs/getting-started.md)
-- [Repository layout and validation](docs/repository-guide.md)
-- [Harbor evaluation dataset authoring skill](skills/harbor-author-evaluation-datasets/SKILL.md)
-- [DeepSWE repository-workflow evaluation](skills/zx-repository-issue-workflow/references/deep-swe-evaluation.md)
-- [Global specification](SPEC.md)
+- [Usage](docs/getting-started.md)
+- [Repository guide](docs/repository-guide.md)
+- [Specification](SPEC.md)
 - [Architecture decisions](.specs/adr/)
-- [AGENTS.md](AGENTS.md)
+- [Agent instructions](AGENTS.md)

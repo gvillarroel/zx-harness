@@ -1,9 +1,27 @@
 {
   "reason": [
-    "Incomplete proposal.",
-    "APPROVED\n\nVerification:\n- Run the deterministic gate."
+    {
+      "promptIncludes": ["Runtime problem:", "coverage retry evidence"],
+      "response": "Incomplete proposal."
+    },
+    {
+      "promptIncludes": ["Previous gate failure:", "coverage retry evidence"],
+      "response": "APPROVED\n\nVerification:\n- Run the deterministic gate."
+    },
+    {
+      "promptIncludes": ["Previous gate failure:", "quality-review: Missing edge case"],
+      "response": "APPROVED\n\nEdge cases: overlapping operations.\n\nVerification:\n- Run the deterministic gate."
+    }
   ],
-  "generate-change": [
-    "{\"path\":\"feature.txt\",\"content\":\"quality-improved\\n\"}"
+  "reason:quality-review": [
+    {
+      "promptIncludes": ["Candidate to review:", "APPROVED", "coverage retry evidence"],
+      "promptExcludes": ["Edge cases:"],
+      "response": "{\"passed\":false,\"feedback\":\"Missing edge case coverage.\",\"evidence\":[]}"
+    },
+    {
+      "promptIncludes": ["Candidate to review:", "APPROVED", "Edge cases:", "coverage retry evidence"],
+      "response": "{\"passed\":true,\"feedback\":\"Verification is executable.\",\"evidence\":[\"deterministic gate\"]}"
+    }
   ]
 }

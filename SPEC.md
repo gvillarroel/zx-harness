@@ -2,101 +2,87 @@
 
 ## Purpose
 
-`zx-harness` publishes skills that teach AI agents to author efficient zx workflows.
+`zx-harness` publishes one skill: `zx-workflow-author`. It teaches an agent to generate a standalone
+zx program that receives a problem at runtime and orchestrates the best available deterministic tools,
+skills, agents, and acceptance gates for that problem class.
 
-Generated workflows combine:
+The generated program, not this repository or an encoded example answer, solves each problem.
 
-1. deterministic CLI or local computation for collection and filtering
-2. TypeScript harness SDKs only for work that needs intelligence
-3. executable gates that accept, retry, escalate, or roll back each result
+Primary problem types include repository issue triage, resolution of a concrete repository issue,
+code review, and other recurring software-engineering workflows with equivalent evidence boundaries.
 
-## Repository Issue Workflow Objective
+## Product Boundary
 
-Generate one durable, repository-local workflow from stable repository evidence. Reuse that frozen
-workflow across new issues. At runtime it must classify the issue, reduce repository context, select
-relevant skills, invoke the pi coding agent, run executable gates, retry with diagnostics, and apply
-only a passing patch.
+`skills/` must contain exactly `skills/zx-workflow-author/` and exactly one `SKILL.md`. Benchmark,
+dataset-authoring, evolution, provider, and repository-specific concerns are inputs to the authoring
+policy—not separately published skills.
 
-The author may inspect repository structure, instructions, manifests, and tests while generating the
-workflow. It must not solve an evaluation issue or embed issue answers, task-specific patches,
-verifier internals, or generated-result helpers. The runtime pi call performs the issue analysis and
-implementation.
+Root files provide governance, discovery, and CI. Human procedures live under `docs/`. Generated
+workflows must not depend on this repository after scaffolding.
 
-Use GPT-5.6 Luna by default. Route a whole issue to GPT-5.6 Sol only when its predeclared repository
-sector requires more capability. Gate results may trigger another bounded attempt on the same model;
-they must not cause Luna-to-Sol fallback.
+## Authoring Objective
 
-## Repository Scope
+The skill must generate one reusable workflow for a declared problem class. At authoring time it:
 
-Product artifacts live only under `skills/`. Root files may provide governance, CI, and discovery.
-Human onboarding and maintenance guides live under `docs/`, indexed by `docs/README.md`.
-Do not add standalone executable examples, evaluations, or a shared runtime framework outside the skills.
-Generated skills must never depend on repository-level documentation at runtime.
+1. identifies observable acceptance evidence and mutation boundaries
+2. identifies whether the workflow is triage, issue resolution, code review, or a custom problem type
+3. inventories available non-interactive code-assistant CLIs and exact agent adapters
+4. assigns deterministic work before intelligent work
+5. separates producer, reviewer, and retry contexts
+6. selects only relevant skills for each context
+7. defines executable gates before prompts
+8. chooses bounded model routes, retries, promotion, and recovery
+9. validates representative runtime problems for the intended type
 
-## Skill Contract
+The author may inspect stable repository evidence and installed tool help. It must not inspect sealed
+evaluation answers or encode task-specific patches, verifier internals, or generated-result helpers.
 
-Each `skills/<name>/` package must contain:
-
-- `SKILL.md` with only `name` and `description` frontmatter
-- `agents/openai.yaml`
-- reusable `scripts/`, `references/`, or `assets/` only when required
-- a deterministic validation command
-
-Skills must generate project-local workflows. They must not require this repository at runtime.
-
-## Workflow Contract
+## Generated Workflow Contract
 
 Generated workflows must:
 
-- use `#!/usr/bin/env zx` for their entrypoint
-- pass dynamic CLI arguments without shell interpolation
-- keep orchestration in TypeScript when using SDKs
-- collect and reduce evidence before invoking a model
-- select the least expensive capable model, escalating only after gate feedback
-- cap context by file count and bytes
-- bind stage-scoped external skill guidance by name and digest without a runtime library dependency
-- define the acceptance gate before the intelligent stage
-- stage model output until its gate passes
-- retry with concrete gate feedback
-- snapshot declared mutations and restore them after terminal failure
-- persist an inspectable run log without secrets
-- support dry-run planning
-- generate one repository issue executable; expose planning as its dry-run mode
+- expose one `#!/usr/bin/env zx` entrypoint named `solve.mjs`
+- require one runtime `--problem` or `--problem-file`, except dry-run planning
+- pass dynamic values through argv arrays or closed stdin without shell interpolation
+- keep the problem immutable across stages and retries
+- collect, filter, and rank context deterministically before invoking an agent
+- cap every file and context independently
+- start a fresh process for every producer attempt and reviewer
+- give each context only its prompt, declared inputs, selected skills, and applicable feedback
+- embed selected Markdown guidance and references by name and SHA-256 without a runtime library
+- treat injected skills as advisory and unable to broaden authority
+- use the least expensive capable model first and escalate only after concrete rejection evidence
+- require a deterministic gate for every agent stage
+- run deterministic gates before optional independent reviewer agents
+- feed bounded, redacted gate or reviewer feedback into bounded retries
+- snapshot declared mutations, restore before retry, and restore after terminal failure
+- stage candidate output and promote it atomically only after all gates pass
+- persist an inspectable JSONL event log without raw problems or secrets
+- support dry-run inspection of stages, routes, skills, gates, reviewers, retries, and mutations
 
-## Supported Composition
+Use an isolated Git worktree when a mutating agent's paths cannot be enumerated safely.
 
-- Static: any non-interactive CLI, Jira clients, GitHub CLI, tests, schemas, and local TF-IDF
-- Intelligent: short Codex, Copilot, pi, and OpenCode wrappers, arbitrary command adapters, and
-  stage-scoped external skill guidance selected from descriptions
-- Gates: commands, required text, and required JSON paths
-- Knowledge: one-topic entrypoints, `know` sources, per-harness hash ledgers,
-  staged OKF Markdown publication, and deterministic index updates
-- Repository issues: one frozen repository profile and zx workflow, native pi skill selection,
-  isolated agent worktrees, executable gates, bounded same-route retries, and accepted-patch memory
-- Benchmark experiment: one tool-free prompt compiler call, a frozen two-file skill, and one zx
-  executor
+## Composition Evolution
+
+Evaluation improves the single skill's composition policy. It may change stage boundaries, context
+budgets, skill selection, agent routing, gates, reviewers, retry behavior, or recovery rules. It must
+not publish another skill or specialize the runtime to evaluation answers.
+
+Only disjoint development evidence may diagnose, rank, or select a change. Freeze one candidate before
+sealed validation; validation accepts or rejects without feeding another mutation into the same study.
+Promote only general rules supported across problem families with no protected-metric regression.
 
 ## Validation
 
-CI must validate skill metadata, scaffold real-task plans, execute an offline retry fixture, and
-prove rollback restores a declared mutation.
+CI must prove:
 
-Evolution skills must also validate a native Harbor 0.18.0 task, publish a passing oracle solution,
-score correctness, resilience, efficiency, security, and determinism independently, and keep
-development, validation, and holdout evidence separate.
-
-Script-size evolution must expose `MAX_SCRIPT_BYTES`, measure `script_size_bytes`, optimize
-`script_size_negative = -script_size_bytes`, and keep functional gates non-compensating.
-
-Prompt solvers must prove the exact task prompt is the only task-specific generator input, reject
-invalid bundles before upload, expose `generated_script_count = 1`, execute only the frozen zx
-entrypoint, and make no repair call. External development tasks must pass their task-owned oracle in
-the pinned Harbor version before inference; bind the dataset version and task checksum.
-
-Repository issue workflow evaluations must freeze one generated workflow across multiple issues in
-the same repository. Register disjoint development and sealed validation cohorts before evolution.
-Only development evidence may change the workflow. Freeze its digest before releasing validation,
-and keep expected answers in verifiers rather than prompts, profiles, skills, or runtime assets.
-External repository benchmarks must keep whole repository families in one split. When a benchmark
-requires another Harbor-compatible runner, pin it separately, preserve native task bytes and
-verifier isolation, and prove artifact provenance before an existing evolver consumes its evidence.
+- exactly one skill directory and one `SKILL.md` exist under `skills/`
+- metadata and the plan schema are valid
+- generated workflows are standalone and expose `solve.mjs`
+- runtime problems remain one argv value and drive default TF-IDF selection
+- producer and reviewer contexts receive only their selected digest-bound skills
+- deterministic rejection escalates the configured model and preserves feedback
+- reviewers run in independent contexts and can reject a candidate
+- representative issue-triage, issue-resolution, and code-review plans run through the same skill
+- logs redact common credentials
+- retries restore checkpoints and terminal failure rolls back mutations

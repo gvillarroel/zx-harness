@@ -1,0 +1,210 @@
+[
+  {
+    "problem": "owner/repository",
+    "output": "run/triage.json",
+    "plan": {
+      "name": "issue-triage-probe",
+      "description": "Triage repository issues without mutating the repository or remote issue state.",
+      "controls": [
+        {
+          "path": ".policy/workflow-control.txt",
+          "sha256": "sha256:a42c67ec55b8fcec991d265ecd5f0f173465cbe5831f35954175db654b28debc"
+        }
+      ],
+      "agents": {
+        "triager": {
+          "provider": "code-assistant",
+          "command": "node",
+          "args": ["--version"]
+        },
+        "reviewer": {
+          "provider": "independent-code-assistant",
+          "command": "node",
+          "args": ["--version"]
+        }
+      },
+      "stages": [
+        {
+          "id": "collect-issues",
+          "kind": "command",
+          "command": "node",
+          "args": ["-e", "process.stdout.write(JSON.stringify({repository:process.argv[1],issues:[]}))", "{problem}"],
+          "stdout": "run/issues.json",
+          "gate": {
+            "kind": "json",
+            "path": "run/issues.json",
+            "required": ["repository", "issues"]
+          }
+        },
+        {
+          "id": "triage",
+          "kind": "agent",
+          "agent": "triager",
+          "prompt": "Classify each issue by impact, urgency, component, confidence, and next action. Do not mutate remote state.",
+          "inputs": [{ "path": "run/issues.json", "maxBytes": 12000 }],
+          "output": "run/triage.json",
+          "models": { "fast": "fast-triage", "strong": "strong-triage" },
+          "gate": {
+            "kind": "json",
+            "required": ["repository", "decisions", "summary"]
+          },
+          "reviewers": [
+            {
+              "id": "high-impact-sample",
+              "agent": "reviewer",
+              "model": "review-triage",
+              "prompt": "Check identifiers, evidence, and high-impact classifications without changing issue state."
+            }
+          ]
+        }
+      ]
+    },
+    "responses": {
+      "triage": [
+        {
+          "promptIncludes": ["Runtime problem:\nowner/repository", "Evidence: run/issues.json", "Do not mutate remote state"],
+          "response": "{\"repository\":\"owner/repository\",\"decisions\":[],\"summary\":\"No open issues in the fixture.\"}"
+        }
+      ],
+      "triage:high-impact-sample": [
+        {
+          "promptIncludes": ["Candidate to review:", "owner/repository", "without changing issue state"],
+          "response": "{\"passed\":true,\"feedback\":\"Identifiers and evidence are consistent.\",\"evidence\":[\"normalized issue list\"]}"
+        }
+      ]
+    }
+  },
+  {
+    "problem": "https://github.com/owner/repository/issues/42",
+    "output": "run/solution.md",
+    "plan": {
+      "name": "issue-resolution-probe",
+      "description": "Resolve a repository issue through bounded context, a code assistant, tests, and independent review.",
+      "controls": [
+        {
+          "path": ".policy/workflow-control.txt",
+          "sha256": "sha256:a42c67ec55b8fcec991d265ecd5f0f173465cbe5831f35954175db654b28debc"
+        }
+      ],
+      "agents": {
+        "solver": {
+          "provider": "code-assistant",
+          "command": "node",
+          "args": ["--version"]
+        },
+        "reviewer": {
+          "provider": "independent-code-assistant",
+          "command": "node",
+          "args": ["--version"]
+        }
+      },
+      "stages": [
+        {
+          "id": "collect-issue",
+          "kind": "command",
+          "command": "node",
+          "args": ["-e", "process.stdout.write(JSON.stringify({issue:process.argv[1],acceptance:['focused regression']}))", "{problem}"],
+          "stdout": "run/issue.json",
+          "gate": {
+            "kind": "json",
+            "path": "run/issue.json",
+            "required": ["issue", "acceptance"]
+          }
+        },
+        {
+          "id": "solve-issue",
+          "kind": "agent",
+          "agent": "solver",
+          "prompt": "Diagnose and implement the smallest complete fix. Preserve repository instructions and provide executable verification.",
+          "inputs": [{ "path": "run/issue.json", "maxBytes": 12000 }],
+          "output": "run/solution.md",
+          "mutates": ["worktree"],
+          "attempts": 2,
+          "models": { "fast": "fast-code", "strong": "strong-code" },
+          "gate": {
+            "kind": "contains",
+            "values": ["Patch:", "Tests:"]
+          },
+          "reviewers": [
+            {
+              "id": "patch-review",
+              "agent": "reviewer",
+              "model": "review-code",
+              "prompt": "Review correctness, regression coverage, mutation scope, and compatibility from the candidate and evidence."
+            }
+          ]
+        }
+      ]
+    },
+    "responses": {
+      "solve-issue": [
+        {
+          "promptIncludes": ["Runtime problem:\nhttps://github.com/owner/repository/issues/42", "Evidence: run/issue.json", "smallest complete fix"],
+          "response": "Patch: bounded fixture change.\nTests: focused regression and repository checks."
+        }
+      ],
+      "solve-issue:patch-review": [
+        {
+          "promptIncludes": ["Candidate to review:", "Patch:", "focused regression"],
+          "response": "{\"passed\":true,\"feedback\":\"The patch and checks satisfy the fixture contract.\",\"evidence\":[\"focused regression\"]}"
+        }
+      ]
+    }
+  },
+  {
+    "problem": "PR 77",
+    "output": "run/review.json",
+    "plan": {
+      "name": "code-review-probe",
+      "description": "Review a proposed repository change without mutating source or remote state.",
+      "controls": [
+        {
+          "path": ".policy/workflow-control.txt",
+          "sha256": "sha256:a42c67ec55b8fcec991d265ecd5f0f173465cbe5831f35954175db654b28debc"
+        }
+      ],
+      "agents": {
+        "reviewer": {
+          "provider": "code-assistant",
+          "command": "node",
+          "args": ["--version"]
+        }
+      },
+      "stages": [
+        {
+          "id": "collect-diff",
+          "kind": "command",
+          "command": "node",
+          "args": ["-e", "process.stdout.write('target=' + process.argv[1] + '\\nfile=src/example.ts\\nline=10\\n')", "{problem}"],
+          "stdout": "run/diff.txt",
+          "gate": {
+            "kind": "contains",
+            "path": "run/diff.txt",
+            "values": ["target=", "file=", "line="]
+          }
+        },
+        {
+          "id": "review-change",
+          "kind": "agent",
+          "agent": "reviewer",
+          "prompt": "Report only actionable correctness findings grounded in changed lines. Do not modify source or remote state.",
+          "inputs": [{ "path": "run/diff.txt", "maxBytes": 12000 }],
+          "output": "run/review.json",
+          "models": { "fast": "fast-review", "strong": "strong-review" },
+          "gate": {
+            "kind": "json",
+            "required": ["target", "findings", "verdict"]
+          }
+        }
+      ]
+    },
+    "responses": {
+      "review-change": [
+        {
+          "promptIncludes": ["Runtime problem:\nPR 77", "Evidence: run/diff.txt", "actionable correctness findings", "Do not modify source"],
+          "response": "{\"target\":\"PR 77\",\"findings\":[],\"verdict\":\"No actionable fixture findings.\"}"
+        }
+      ]
+    }
+  }
+]

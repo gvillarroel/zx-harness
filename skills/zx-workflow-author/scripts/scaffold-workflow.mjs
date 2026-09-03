@@ -40,12 +40,16 @@ validatePlan(plan);
 // Resolve stage-selected skills from descriptions the author reviewed; runtime never guesses routing.
 const selectedSkillNames = [
   ...new Set(
-    plan.stages.flatMap((stage) => (stage.kind === "harness" ? (stage.skills ?? []) : [])),
+    plan.stages.flatMap((stage) =>
+      stage.kind === "agent"
+        ? [...(stage.skills ?? []), ...(stage.reviewers ?? []).flatMap((reviewer) => reviewer.skills ?? [])]
+        : [],
+    ),
   ),
 ].sort();
 const skillBundles = {};
 if (selectedSkillNames.length && !skillLibraryInput) {
-  throw new Error("Harness stages select skills, but --skill-library was not provided.");
+  throw new Error("Agent contexts select skills, but --skill-library was not provided.");
 }
 if (skillLibraryInput) {
   const { catalog } = await scanSkillLibrary(skillLibraryInput);
@@ -62,13 +66,22 @@ if (skillLibraryInput) {
       );
     }
   }
-  for (const stage of plan.stages.filter((value) => value.kind === "harness")) {
-    const bytes = (stage.skills ?? []).reduce(
-      (total, name) => total + Buffer.byteLength(skillBundles[name].instructions),
-      0,
-    );
-    if (bytes > MAX_STAGE_SKILL_BYTES) {
-      throw new Error(`Selected skills exceed the stage prompt budget: ${stage.id}`);
+  for (const stage of plan.stages.filter((value) => value.kind === "agent")) {
+    const contexts = [
+      { id: stage.id, skills: stage.skills ?? [] },
+      ...(stage.reviewers ?? []).map((reviewer) => ({
+        id: `${stage.id}:${reviewer.id}`,
+        skills: reviewer.skills ?? [],
+      })),
+    ];
+    for (const context of contexts) {
+      const bytes = context.skills.reduce(
+        (total, name) => total + Buffer.byteLength(skillBundles[name].instructions),
+        0,
+      );
+      if (bytes > MAX_STAGE_SKILL_BYTES) {
+        throw new Error(`Selected skills exceed the context budget: ${context.id}`);
+      }
     }
   }
 }
@@ -94,34 +107,13 @@ if (selectedSkillNames.length) {
   );
 }
 
-// Install only the harness SDKs named by the plan, keeping each generated workflow minimal.
+// Keep the generated dependency surface fixed; agent CLIs are invoked through shell-free adapters.
 const dependencies = {
   "@types/node": "26.1.1",
   tsx: "4.23.1",
   typescript: "7.0.2",
   zx: "8.8.5",
 };
-const usesCopilot = plan.stages.some((stage) => stage.kind === "harness" && stage.provider === "copilot");
-const usesPi = plan.stages.some((stage) => stage.kind === "harness" && stage.provider === "pi");
-if (usesCopilot) {
-  dependencies["@github/copilot-sdk"] = "1.0.7";
-}
-if (usesPi) {
-  dependencies["@earendil-works/pi-ai"] = "0.80.10";
-}
-
-// Declare only an absent optional SDK so TypeScript still validates the provider actually installed.
-const optionalTypes = [
-  usesCopilot
-    ? ""
-    : 'declare module "@github/copilot-sdk" {\n  export const CopilotClient: any;\n}\n',
-  usesPi
-    ? ""
-    : 'declare module "@earendil-works/pi-ai/providers/all" {\n  export function builtinModels(): any;\n}\n',
-]
-  .filter(Boolean)
-  .join("\n");
-await writeFile(resolve(targetDir, "optional-sdk.d.ts"), optionalTypes);
 
 const packageJson = {
   name: plan.name,
@@ -129,8 +121,8 @@ const packageJson = {
   type: "module",
   scripts: {
     check: "tsc --noEmit",
-    "dry-run": "tsx workflow.ts --dry-run",
-    start: "zx index.mjs",
+    "dry-run": "zx solve.mjs --dry-run",
+    start: "zx solve.mjs",
   },
   dependencies: Object.fromEntries(Object.entries(dependencies).sort(([left], [right]) => left.localeCompare(right))),
 };
@@ -144,8 +136,97 @@ function validatePlan(plan) {
   if (!plan || !/^[a-z0-9][a-z0-9-]{1,62}$/.test(plan.name)) {
     throw new Error("Plan name must be a lowercase slug with 2-63 characters.");
   }
-  if (!plan.description?.trim() || !Array.isArray(plan.stages) || plan.stages.length === 0) {
-    throw new Error("Plan requires a description and at least one stage.");
+  if (
+    !plan.description?.trim() ||
+    !plan.agents ||
+    typeof plan.agents !== "object" ||
+    !Array.isArray(plan.stages) ||
+    plan.stages.length === 0
+  ) {
+    throw new Error("Plan requires a description, agents, and at least one stage.");
+  }
+  if (plan.budgets !== undefined) {
+    const allowed = new Set(["maxAgentCalls", "maxInputTokens", "maxOutputTokens", "maxWallTimeMs"]);
+    const entries = Object.entries(plan.budgets);
+    if (
+      !plan.budgets ||
+      typeof plan.budgets !== "object" ||
+      Array.isArray(plan.budgets) ||
+      entries.length === 0 ||
+      entries.some(([key, amount]) => !allowed.has(key) || !Number.isSafeInteger(amount) || amount <= 0)
+    ) {
+      throw new Error("Plan budgets must contain only positive safe integer limits.");
+    }
+  }
+  if (plan.controls !== undefined && (!Array.isArray(plan.controls) || plan.controls.length === 0)) {
+    throw new Error("Plan controls must be a non-empty array when declared.");
+  }
+  const protectedPaths = [];
+  const protectedPathKeys = new Set();
+  for (const [index, control] of (plan.controls ?? []).entries()) {
+    const keys = control && typeof control === "object" ? Object.keys(control).sort().join(",") : "";
+    const normalizedPath = normalizeRepoRelativePath(control?.path);
+    if (
+      keys !== "path,sha256" ||
+      !normalizedPath ||
+      typeof control.sha256 !== "string" ||
+      !/^sha256:[0-9a-f]{64}$/.test(control.sha256)
+    ) {
+      throw new Error(`Protected control is invalid: ${index}`);
+    }
+    const pathKey = normalizedPath.toLowerCase();
+    if (protectedPathKeys.has(pathKey)) {
+      throw new Error(`Protected control paths must be unique: ${normalizedPath}`);
+    }
+    protectedPathKeys.add(pathKey);
+    protectedPaths.push(normalizedPath);
+  }
+  for (const [name, agent] of Object.entries(plan.agents)) {
+    if (
+      !/^[a-z0-9][a-z0-9-]{1,62}$/.test(name) ||
+      !agent?.provider?.trim() ||
+      !agent?.command?.trim() ||
+      !Array.isArray(agent.args ?? []) ||
+      !["stdin", "argument"].includes(agent.promptMode ?? "stdin") ||
+      !["text", "codex-jsonl"].includes(agent.resultFormat ?? "text")
+    ) {
+      throw new Error(`Agent definition is incomplete: ${name}`);
+    }
+    if (agent.promptMode === "argument" && !(agent.args ?? []).some((argument) => argument.includes("{prompt}"))) {
+      throw new Error(`Argument-mode agent must include {prompt}: ${name}`);
+    }
+    if (agent.resultFormat === "codex-jsonl") {
+      const args = agent.args ?? [];
+      const execIndex = args.indexOf("exec");
+      const lastMessageIndex = args.indexOf("--output-last-message");
+      if (
+        agent.provider.toLowerCase() !== "codex" ||
+        (agent.promptMode ?? "stdin") !== "stdin" ||
+        execIndex < 0 ||
+        args.filter((argument) => argument === "exec").length !== 1 ||
+        args.indexOf("--json") < execIndex ||
+        args.indexOf("--ephemeral") < execIndex ||
+        args.indexOf("--ignore-user-config") < execIndex ||
+        ["--json", "--ephemeral", "--ignore-user-config"].some(
+          (flag) => args.filter((argument) => argument === flag).length !== 1,
+        ) ||
+        args.filter((argument) => argument === "--output-last-message").length !== 1 ||
+        args.some((argument) => ["-o", "--experimental-json", "resume", "fork", "review"].includes(argument)) ||
+        !args.includes("{model}") ||
+        lastMessageIndex < execIndex ||
+        args[lastMessageIndex + 1] !== "{lastMessage}"
+      ) {
+        throw new Error(
+          `codex-jsonl agents require Codex, stdin, model routing, isolated config, ephemeral JSONL, and last-message evidence: ${name}`,
+        );
+      }
+    } else if ((agent.args ?? []).some((argument) => argument.includes("{lastMessage}"))) {
+      throw new Error(`Only codex-jsonl agents may use {lastMessage}: ${name}`);
+    }
+    rejectSecretEnv(agent.env, `agent ${name}`);
+    if (agent.cwd && (isAbsolute(agent.cwd) || agent.cwd.split(/[\\/]/).includes(".."))) {
+      throw new Error(`Agent cwd must be repository-relative: ${name}`);
+    }
   }
 
   const ids = new Set();
@@ -159,17 +240,32 @@ function validatePlan(plan) {
     if (!Number.isInteger(attempts) || attempts < 1 || attempts > 4) {
       throw new Error(`Stage attempts must be 1-4: ${stage.id}`);
     }
+    if (
+      stage.mutates !== undefined &&
+      (!Array.isArray(stage.mutates) ||
+        stage.mutates.some((path) => !normalizeRepoRelativePath(path)) ||
+        new Set(stage.mutates.map((path) => normalizeRepoRelativePath(path).toLowerCase())).size !==
+          stage.mutates.length)
+    ) {
+      throw new Error(`Stage mutation paths must be unique and repository-relative: ${stage.id}`);
+    }
+    for (const mutation of stage.mutates ?? []) {
+      const normalizedMutation = normalizeRepoRelativePath(mutation);
+      if (protectedPaths.some((control) => planPathsOverlap(control, normalizedMutation))) {
+        throw new Error(`Protected controls must not overlap stage mutations: ${stage.id}:${mutation}`);
+      }
+    }
 
     if (stage.skills !== undefined) {
       if (
-        stage.kind !== "harness" ||
+        stage.kind !== "agent" ||
         !Array.isArray(stage.skills) ||
         stage.skills.length === 0 ||
         stage.skills.length > 3 ||
         new Set(stage.skills).size !== stage.skills.length ||
         stage.skills.some((name) => !/^[a-z0-9][a-z0-9._-]{0,127}$/.test(name))
       ) {
-        throw new Error(`Stage skills must be 1-3 unique skill names on a harness stage: ${stage.id}`);
+        throw new Error(`Stage skills must be 1-3 unique skill names on an agent stage: ${stage.id}`);
       }
     }
 
@@ -182,19 +278,45 @@ function validatePlan(plan) {
       }
       rejectSecretEnv(stage.env, stage.id);
     } else if (stage.kind === "tfidf") {
-      if ((!stage.query && !stage.queryFile) || !stage.roots?.length || !stage.output) {
+      if (!stage.roots?.length || !stage.output) {
         throw new Error(`TF-IDF stage is incomplete: ${stage.id}`);
       }
-    } else if (stage.kind === "harness") {
+    } else if (stage.kind === "agent") {
       if (
-        !["copilot", "pi"].includes(stage.provider) ||
+        !plan.agents[stage.agent] ||
         !stage.prompt ||
         !stage.output ||
         !stage.models?.fast ||
         !stage.models?.strong ||
         !stage.gate
       ) {
-        throw new Error(`Harness stage requires provider, prompt, models, output, and gate: ${stage.id}`);
+        throw new Error(`Agent stage requires agent, prompt, models, output, and gate: ${stage.id}`);
+      }
+      if (!Array.isArray(stage.reviewers ?? []) || (stage.reviewers ?? []).length > 3) {
+        throw new Error(`Agent stage supports at most three reviewers: ${stage.id}`);
+      }
+      const reviewerIds = new Set();
+      for (const reviewer of stage.reviewers ?? []) {
+        if (
+          !/^[a-z0-9][a-z0-9-]{1,62}$/.test(reviewer.id) ||
+          reviewerIds.has(reviewer.id) ||
+          !plan.agents[reviewer.agent] ||
+          !reviewer.model?.trim() ||
+          !reviewer.prompt?.trim()
+        ) {
+          throw new Error(`Reviewer is incomplete or duplicated: ${stage.id}:${reviewer.id}`);
+        }
+        reviewerIds.add(reviewer.id);
+        if (
+          reviewer.skills !== undefined &&
+          (!Array.isArray(reviewer.skills) ||
+            reviewer.skills.length === 0 ||
+            reviewer.skills.length > 3 ||
+            new Set(reviewer.skills).size !== reviewer.skills.length ||
+            reviewer.skills.some((name) => !/^[a-z0-9][a-z0-9._-]{0,127}$/.test(name)))
+        ) {
+          throw new Error(`Reviewer skills must be 1-3 unique names: ${stage.id}:${reviewer.id}`);
+        }
       }
     } else {
       throw new Error(`Unknown stage kind: ${stage.kind}`);
@@ -209,6 +331,9 @@ function validatePlan(plan) {
       ...(stage.roots ?? []),
       ...(stage.mutates ?? []),
       ...(stage.inputs ?? []).map((input) => input.path),
+      ...(stage.reviewers ?? []).flatMap((reviewer) =>
+        (reviewer.inputs ?? []).map((input) => input.path),
+      ),
       stage.gate?.path,
       stage.gate?.cwd,
     ].filter(Boolean);
@@ -222,6 +347,18 @@ function validatePlan(plan) {
       rejectSecretEnv(stage.gate.env, `${stage.id} gate`);
     }
   }
+  if (plan.budgets?.maxInputTokens !== undefined || plan.budgets?.maxOutputTokens !== undefined) {
+    const usedAgents = new Set(
+      plan.stages.flatMap((stage) =>
+        stage.kind === "agent"
+          ? [stage.agent, ...(stage.reviewers ?? []).map((reviewer) => reviewer.agent)]
+          : [],
+      ),
+    );
+    if ([...usedAgents].some((name) => plan.agents[name].resultFormat !== "codex-jsonl")) {
+      throw new Error("Token budgets require metered codex-jsonl for every used agent.");
+    }
+  }
 }
 
 function rejectSecretEnv(env, location) {
@@ -230,4 +367,29 @@ function rejectSecretEnv(env, location) {
       throw new Error(`Do not store credential environment values in plans (${location}: ${key}).`);
     }
   }
+}
+
+function normalizeRepoRelativePath(value) {
+  if (
+    typeof value !== "string" ||
+    !value ||
+    value !== value.trim() ||
+    value.includes("\0") ||
+    isAbsolute(value) ||
+    /^[a-zA-Z]:[\\/]/.test(value) ||
+    value.startsWith("\\\\")
+  ) {
+    return null;
+  }
+  const segments = value.split(/[\\/]/);
+  if (segments.some((segment) => !segment || segment === "." || segment === "..")) {
+    return null;
+  }
+  return segments.join("/");
+}
+
+function planPathsOverlap(left, right) {
+  const a = left.toLowerCase();
+  const b = right.toLowerCase();
+  return a === b || a.startsWith(`${b}/`) || b.startsWith(`${a}/`);
 }

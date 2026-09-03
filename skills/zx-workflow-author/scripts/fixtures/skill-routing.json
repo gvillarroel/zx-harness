@@ -1,22 +1,49 @@
 {
   "name": "offline-skill-routing",
-  "description": "Prove one selected external skill and its referenced guidance enter only the intended harness stage.",
+  "description": "Prove producer and reviewer contexts receive only their selected skills.",
+  "controls": [
+    {
+      "path": ".policy/workflow-control.txt",
+      "sha256": "sha256:a42c67ec55b8fcec991d265ecd5f0f173465cbe5831f35954175db654b28debc"
+    }
+  ],
+  "agents": {
+    "producer": {
+      "provider": "fixture-producer",
+      "command": "node",
+      "args": ["--version"]
+    },
+    "reviewer": {
+      "provider": "fixture-reviewer",
+      "command": "node",
+      "args": ["--version"]
+    }
+  },
   "stages": [
     {
-      "id": "review-acceptance",
-      "kind": "harness",
-      "provider": "copilot",
-      "prompt": "Review the acceptance criteria and return an approval with verification evidence.",
-      "skills": ["acceptance-review"],
-      "output": "run/review.md",
+      "id": "solve",
+      "kind": "agent",
+      "agent": "producer",
+      "prompt": "Propose a solution and its verification.",
+      "skills": ["solution-design"],
+      "output": "run/solution.md",
       "models": {
         "fast": "fast-fixture-model",
         "strong": "strong-fixture-model"
       },
       "gate": {
         "kind": "contains",
-        "values": ["APPROVED", "Verification:"]
-      }
+        "values": ["SOLUTION", "Verification:"]
+      },
+      "reviewers": [
+        {
+          "id": "acceptance",
+          "agent": "reviewer",
+          "model": "review-fixture-model",
+          "prompt": "Check the candidate against observable acceptance evidence.",
+          "skills": ["acceptance-review"]
+        }
+      ]
     }
   ]
 }

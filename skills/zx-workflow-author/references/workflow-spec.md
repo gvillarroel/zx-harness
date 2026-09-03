@@ -1,115 +1,143 @@
 # Workflow Plan
 
-Use one JSON object:
+The generated program solves runtime problems through one JSON plan. Paths are repository-relative;
+commands never use a shell.
 
 ```json
 {
-  "name": "portable-doc-links",
-  "description": "Detect, repair, and verify non-portable Markdown links.",
+  "name": "repository-problem-solver",
+  "description": "Solve bounded repository issues and verify every accepted change.",
+  "budgets": {
+    "maxAgentCalls": 6,
+    "maxInputTokens": 250000,
+    "maxOutputTokens": 30000,
+    "maxWallTimeMs": 900000
+  },
+  "controls": [
+    {
+      "path": "scripts/verify-acceptance.mjs",
+      "sha256": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+    }
+  ],
+  "agents": {
+    "solver": {
+      "provider": "codex",
+      "command": "codex",
+      "args": [
+        "exec", "--ignore-user-config", "--ephemeral", "--model", "{model}", "--json",
+        "--output-last-message", "{lastMessage}", "-"
+      ],
+      "promptMode": "stdin",
+      "resultFormat": "codex-jsonl",
+      "timeoutMs": 900000
+    },
+    "reviewer": {
+      "provider": "opencode",
+      "command": "opencode",
+      "args": ["run", "--model", "{model}", "{prompt}"],
+      "promptMode": "argument"
+    }
+  },
   "stages": []
 }
 ```
 
-Paths are repository-relative. Commands never use a shell.
+Agent commands are examples, not universal CLI contracts. Inspect installed help before authoring.
+Supported placeholders are `{model}`, `{prompt}`, `{problem}`, `{root}`, `{runDir}`, `{lastMessage}`,
+and `{candidate}` where the relevant field documents them. Prefer stdin for prompts.
 
-## Command Stage
+`budgets` is one workflow-wide envelope. `maxAgentCalls` counts every producer and reviewer process,
+including retries. The wall-time limit caps command, gate, producer, and reviewer process time from
+runtime start. Token limits use cumulative structured Codex usage; therefore every selected agent
+must use `codex-jsonl` when either token limit is present. Exhaustion is terminal and is recorded as
+`budget_exhausted`; missing structured usage is terminal `budget_accounting_incomplete`. Neither
+condition grants another repair or review attempt. Offline fixture responses cannot satisfy a token
+budget because they have no provider usage receipt.
+
+`controls` is optional for compatibility; when declared it must be non-empty. Each entry names one
+normalized repository-relative regular file and its exact `sha256:` plus 64 lowercase hex digest.
+Entries are unique and cannot equal, contain, or be contained by any stage `mutates` path. Declare
+controls whenever executable gates or other repository files define workflow policy. The runtime
+verifies them at startup and before and after each agent, reviewer, command, and command-gate process.
+It restores drift from a private startup copy, records only path and status in
+`protected_control_changed`, and fails closed.
+
+## Static stages
+
+Command stages receive `{problem}` as one argv value. Add `mutates` and a gate to any mutating stage.
 
 ```json
 {
-  "id": "collect-jira",
+  "id": "collect",
   "kind": "command",
-  "command": "acli",
-  "args": ["jira", "workitem", "view", "PROJ-123", "--json"],
-  "stdout": "run/jira.json",
-  "attempts": 1,
-  "gate": {
-    "kind": "json",
-    "path": "run/jira.json",
-    "required": ["key", "summary"]
-  }
+  "command": "gh",
+  "args": ["issue", "view", "{problem}", "--json", "title,body"],
+  "stdout": "run/issue.json",
+  "gate": {"kind": "json", "path": "run/issue.json", "required": ["title", "body"]}
 }
 ```
 
-Add `cwd`, `env`, and `timeoutMs` only when needed. Add every repository path a command may change
-to `mutates`. A mutating command requires a gate.
-
-## TF-IDF Stage
+TF-IDF uses the runtime problem as its query unless `query` or `queryFile` is explicit.
 
 ```json
 {
-  "id": "rank-evidence",
+  "id": "rank-context",
   "kind": "tfidf",
-  "query": "coverage gaps retry crawl product documentation",
-  "roots": ["docs", "data/step-02/current"],
-  "extensions": [".md", ".json"],
+  "roots": ["src", "tests", "docs"],
+  "extensions": [".ts", ".md"],
   "output": "run/ranked.json",
   "limit": 20,
   "maxFiles": 1000,
   "maxBytesPerFile": 24000,
-  "gate": {
-    "kind": "json",
-    "path": "run/ranked.json",
-    "required": ["0.path", "0.score"]
-  }
+  "gate": {"kind": "json", "path": "run/ranked.json", "required": ["0.path", "0.score"]}
 }
 ```
 
-Use `queryFile` instead of `query` when the task text already exists locally.
+## Agent stage
 
-## Harness Stage
+Every attempt is a fresh process. The first uses `models.fast`; later attempts use `models.strong`
+and receive the previous deterministic or reviewer feedback.
 
 ```json
 {
-  "id": "design-fix",
-  "kind": "harness",
-  "provider": "copilot",
-  "prompt": "Propose the minimum patch. Cite evidence paths and verification commands.",
-  "inputs": [
-    {"path": "run/jira.json", "maxBytes": 12000},
-    {"path": "run/ranked.json", "maxBytes": 24000}
-  ],
-  "output": "run/proposal.md",
-  "attempts": 2,
-  "models": {
-    "fast": "gpt-5-mini",
-    "strong": "gpt-5.4"
-  },
-  "gate": {
-    "kind": "contains",
-    "values": ["Evidence:", "Verification:"]
-  }
+  "id": "solve",
+  "kind": "agent",
+  "agent": "solver",
+  "prompt": "Produce the smallest complete patch proposal and cite verification evidence.",
+  "inputs": [{"path": "run/ranked.json", "maxBytes": 24000}],
+  "skills": ["test-driven-development"],
+  "output": "run/solution.md",
+  "attempts": 3,
+  "models": {"fast": "gpt-5.6-luna", "strong": "gpt-5.6-sol"},
+  "gate": {"kind": "contains", "values": ["Verification:"]},
+  "reviewers": [
+    {
+      "id": "correctness",
+      "agent": "reviewer",
+      "model": "review-model",
+      "prompt": "Reject unsupported behavior and missing edge cases.",
+      "skills": ["code-review"]
+    }
+  ]
 }
 ```
 
-For pi, set `provider` to `pi` and use `provider/model` identifiers:
+A reviewer receives the problem, candidate, declared evidence, its own prompt, and only its selected
+skills. It must return raw JSON:
 
 ```json
-{"fast": "github-copilot/gpt-5-mini", "strong": "openai-codex/gpt-5.4"}
+{"passed": true, "feedback": "All claims have executable evidence.", "evidence": ["test command"]}
 ```
 
-## Gates
-
-- `contains`: every value must exist in `path` or the current harness candidate.
-- `json`: JSON must parse and contain every dotted `required` path.
-- `command`: exit code zero passes. Use `{candidate}`, `{root}`, and `{runDir}` placeholders in
-  argument arrays.
-
-Keep attempts between 1 and 4. Attempt one uses `models.fast`; later attempts use `models.strong`
-and receive the previous gate diagnostics.
-
-## Skill-Aware Scaffold
-
-`skills` is optional and valid only on harness stages. Select one to three names after scanning the
-provided library as described in [skill-libraries.md](skill-libraries.md), then pass its path:
-
-```json
-{"skills": ["code-review"]}
-```
+Use one to four attempts and at most three producer skills, three reviewer skills per context, and
+three reviewers. Scaffold with:
 
 ```bash
-node <skill-directory>/scripts/scaffold-workflow.mjs <plan.json> <target-directory> \
-  --skill-library <skill-library>
+node <skill-directory>/scripts/scaffold-workflow.mjs <plan.json> <empty-target> \
+  --skill-library <optional-library>
 ```
 
-The scaffold fails when a selected name is absent or ambiguous. It embeds only selected Markdown
-guidance; generated workflows never read the source library.
+Use `--state-root <path>` when run evidence must stay outside the target repository. Each run writes
+`events.jsonl`; live agent processes also append `model-calls.jsonl` with provenance, latency, exit
+state, content-free stream hashes and counts, and available usage. Raw agent JSONL is never persisted.
+Codex final messages are bounded to 1 MB and their per-call temporary files are removed after reading.

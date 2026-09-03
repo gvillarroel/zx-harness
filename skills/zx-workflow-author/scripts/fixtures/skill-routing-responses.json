@@ -1,13 +1,16 @@
 {
-  "review-acceptance": [
+  "solve": [
     {
-      "promptIncludes": [
-        "### Specialized skill: acceptance-review",
-        "ACCEPTANCE_SENTINEL",
-        "REFERENCE_SENTINEL",
-        "Binding workflow constraints:"
-      ],
-      "response": "APPROVED\nVerification: every criterion has an observable gate."
+      "promptIncludes": ["SOLUTION_SKILL_SENTINEL", "Runtime problem:"],
+      "promptExcludes": ["REVIEW_SKILL_SENTINEL", "UNSELECTED_SENTINEL"],
+      "response": "SOLUTION\nVerification: run the declared gate."
+    }
+  ],
+  "solve:acceptance": [
+    {
+      "promptIncludes": ["REVIEW_SKILL_SENTINEL", "Candidate to review:", "SOLUTION"],
+      "promptExcludes": ["SOLUTION_SKILL_SENTINEL", "UNSELECTED_SENTINEL"],
+      "response": "{\"passed\":true,\"feedback\":\"Acceptance is observable.\",\"evidence\":[\"declared gate\"]}"
     }
   ]
 }

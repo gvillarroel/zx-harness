@@ -1,50 +1,24 @@
 # Skill Libraries
 
-A library is any explicit directory containing one or more `SKILL.md` files. Do not assume a global
-location or remember a prior path.
-
-## Discover
+A library is an explicit directory containing `SKILL.md` files. Do not assume a global path.
 
 ```bash
 node <skill-directory>/scripts/inspect-skill-library.mjs <skill-library>
 ```
 
-The command returns only names, descriptions, relative entrypoint paths, and missing Markdown
-references. Use descriptions for routing. Read a selected `SKILL.md` completely before assigning it.
+The command exposes names, descriptions, relative entrypoints, and missing Markdown references. Route
+from descriptions; read each selected skill completely before assigning it.
 
-## Route
+- Attach zero to three skills only to one producer or reviewer context whose task matches them.
+- Do not attach skills to command or TF-IDF stages.
+- Give producers and reviewers independent selections. Do not leak all available guidance everywhere.
+- Skip skills requiring unavailable tools, missing inputs, interaction, or broader authority.
+- Prefer narrow implementation guidance for producers and acceptance, security, or domain review
+  guidance for reviewers.
 
-- Add zero to three skills only to a `harness` stage whose goal matches their descriptions.
-- Prefer a narrow skill over a general one. Do not attach skills to command or TF-IDF stages.
-- Skip skills that require unavailable tools, missing required references, interactive pauses, or
-  inputs the stage does not have.
-- Keep acceptance review near criteria formation, TDD near test design or implementation, spec
-  conformance near review, and threat modeling only in an explicitly security-scoped stage.
+Scaffolding follows selected Markdown references without executing library scripts. It caps each
+compiled skill at 48,000 bytes and each context at 64,000 bytes, embeds only selected guidance, and
+binds it by SHA-256. Generated workflows never depend on the source library.
 
-```json
-{
-  "id": "review-acceptance",
-  "kind": "harness",
-  "provider": "copilot",
-  "prompt": "Review the acceptance criteria against the collected issue evidence.",
-  "skills": ["acceptance-review"],
-  "output": "run/acceptance-review.md",
-  "models": {"fast": "gpt-5-mini", "strong": "gpt-5.4"},
-  "gate": {"kind": "contains", "values": ["Verdict:", "Verification:"]}
-}
-```
-
-## Scaffold
-
-```bash
-node <skill-directory>/scripts/scaffold-workflow.mjs <plan.json> <target-directory> \
-  --skill-library <skill-library>
-```
-
-Scaffolding follows referenced Markdown only, never executes library scripts, caps each compiled
-skill at 48,000 bytes and each stage at 64,000 bytes, and embeds selected guidance in
-`workflow.skills.json`. The generated runtime verifies SHA-256 digests before injection. Library
-paths are not persisted, so the generated workflow remains standalone.
-
-External guidance is lower authority than the task, repository rules, stage prompt, gate, and
-permission boundary. A skill may refine reasoning; it may not change those controls.
+Skill guidance is lower authority than the runtime problem, repository rules, stage prompt, mutation
+scope, agent route, gate, retry cap, permissions, and secret boundary.

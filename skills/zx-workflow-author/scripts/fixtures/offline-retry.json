@@ -1,20 +1,37 @@
 {
   "name": "offline-retry-proof",
-  "description": "Prove static collection, TF-IDF, gated harness retry, and model escalation without network access.",
+  "description": "Prove runtime problem input, reduced context, agent retry, independent review, gates, and rollback.",
+  "controls": [
+    {
+      "path": ".policy/workflow-control.txt",
+      "sha256": "sha256:a42c67ec55b8fcec991d265ecd5f0f173465cbe5831f35954175db654b28debc"
+    }
+  ],
+  "agents": {
+    "solver": {
+      "provider": "fixture-solver",
+      "command": "node",
+      "args": ["--version"],
+      "promptMode": "stdin"
+    },
+    "reviewer": {
+      "provider": "fixture-reviewer",
+      "command": "node",
+      "args": ["--version"],
+      "promptMode": "stdin"
+    }
+  },
   "stages": [
     {
-      "id": "collect",
+      "id": "collect-problem",
       "kind": "command",
       "command": "node",
-      "args": [
-        "-e",
-        "require('node:fs').writeFileSync('input.txt', 'coverage retry evidence alpha beta')"
-      ]
+      "args": ["-e", "require('node:fs').writeFileSync('input.txt', process.argv[1])", "{problem}"],
+      "stdout": "run/collect.txt"
     },
     {
       "id": "rank",
       "kind": "tfidf",
-      "query": "coverage evidence",
       "roots": ["input.txt"],
       "extensions": [".txt"],
       "output": "run/ranked.json",
@@ -26,17 +43,12 @@
     },
     {
       "id": "reason",
-      "kind": "harness",
-      "provider": "copilot",
-      "prompt": "Return an approved proposal with a verification section.",
-      "inputs": [
-        {
-          "path": "run/ranked.json",
-          "maxBytes": 4000
-        }
-      ],
+      "kind": "agent",
+      "agent": "solver",
+      "prompt": "Return an approved solution with a verification section.",
+      "inputs": [{ "path": "run/ranked.json", "maxBytes": 4000 }],
       "output": "run/proposal.md",
-      "attempts": 2,
+      "attempts": 3,
       "models": {
         "fast": "fast-fixture-model",
         "strong": "strong-fixture-model"
@@ -44,82 +56,34 @@
       "gate": {
         "kind": "contains",
         "values": ["APPROVED", "Verification:"]
-      }
-    },
-    {
-      "id": "prepare-feature",
-      "kind": "command",
-      "command": "node",
-      "args": [
-        "-e",
-        "require('node:fs').writeFileSync('feature.txt', 'baseline')"
-      ]
-    },
-    {
-      "id": "generate-change",
-      "kind": "harness",
-      "provider": "copilot",
-      "prompt": "Return one JSON object for the requested feature file with path and content.",
-      "inputs": [
-        {
-          "path": "run/proposal.md",
-          "maxBytes": 4000
-        }
-      ],
-      "output": "run/change.json",
-      "attempts": 2,
-      "models": {
-        "fast": "fast-fixture-model",
-        "strong": "strong-fixture-model"
       },
-      "gate": {
-        "kind": "json",
-        "required": ["path", "content"]
-      }
-    },
-    {
-      "id": "apply-change",
-      "kind": "command",
-      "command": "node",
-      "args": [
-        "-e",
-        "const fs=require('node:fs'); const change=JSON.parse(fs.readFileSync('run/change.json','utf8')); if(change.path!=='feature.txt')throw new Error('Unexpected path'); fs.writeFileSync(change.path,change.content)"
-      ],
-      "mutates": ["feature.txt"],
-      "attempts": 1,
-      "gate": {
-        "kind": "contains",
-        "path": "feature.txt",
-        "values": ["quality-improved"]
-      }
+      "reviewers": [
+        {
+          "id": "quality-review",
+          "agent": "reviewer",
+          "model": "review-fixture-model",
+          "prompt": "Reject unsupported claims and confirm the proposed verification is sufficient."
+        }
+      ]
     },
     {
       "id": "prepare-mutation",
       "kind": "command",
       "command": "node",
-      "args": [
-        "-e",
-        "require('node:fs').writeFileSync('protected.txt', 'original')"
-      ]
+      "args": ["-e", "require('node:fs').writeFileSync('protected.txt', 'original')"]
     },
     {
       "id": "redact-diagnostics",
       "kind": "command",
       "command": "node",
-      "args": [
-        "-e",
-        "if(process.env.ZX_WORKFLOW_ATTEMPT==='1'){process.stderr.write('token=fixture-secret');process.exit(1)}"
-      ],
+      "args": ["-e", "if(process.env.ZX_WORKFLOW_ATTEMPT==='1'){process.stderr.write('token=fixture-secret');process.exit(1)}"],
       "attempts": 2
     },
     {
       "id": "retry-mutation",
       "kind": "command",
       "command": "node",
-      "args": [
-        "-e",
-        "const fs=require('node:fs'); const attempt=process.env.ZX_WORKFLOW_ATTEMPT; const clean=fs.readFileSync('protected.txt','utf8')==='original'; fs.writeFileSync('protected.txt', attempt==='2'&&clean?'accepted':'changed')"
-      ],
+      "args": ["-e", "const fs=require('node:fs'); const attempt=process.env.ZX_WORKFLOW_ATTEMPT; const clean=fs.readFileSync('protected.txt','utf8')==='original'; fs.writeFileSync('protected.txt', attempt==='2'&&clean?'accepted':'changed')"],
       "mutates": ["protected.txt"],
       "attempts": 2,
       "gate": {

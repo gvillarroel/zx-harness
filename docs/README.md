@@ -1,13 +1,8 @@
-# ZX Harness: documentation
+# ZX Harness Documentation
 
-Self-contained skills for authoring and evolving ZX workflows that combine deterministic tools, TypeScript harness SDKs, model calls, and quality gates. Generated workflows are intended to remain standalone after scaffolding.
-
-## Start here
-
-- [Usage and setup](getting-started.md)
-- [Repository layout, maintenance, and validation](repository-guide.md)
-- [Harbor evaluation dataset authoring skill](../skills/harbor-author-evaluation-datasets/SKILL.md)
-- [DeepSWE repository-workflow evaluation](../skills/zx-repository-issue-workflow/references/deep-swe-evaluation.md)
-- [Agent instructions](../AGENTS.md)
-- [Global specification](../SPEC.md)
+- [Generate and run a problem-solving workflow](getting-started.md)
+- [Compose issue triage, issue resolution, and code review](../skills/zx-workflow-author/references/problem-types.md)
+- [Repository layout and validation](repository-guide.md)
+- [Product specification](../SPEC.md)
 - [Architecture decisions](../.specs/adr/)
+- [Agent instructions](../AGENTS.md)

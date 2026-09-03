@@ -1,15 +1,19 @@
 {
   "name": "offline-rollback-proof",
   "description": "Prove a terminal command-gate failure restores a declared file.",
+  "controls": [
+    {
+      "path": ".policy/workflow-control.txt",
+      "sha256": "sha256:a42c67ec55b8fcec991d265ecd5f0f173465cbe5831f35954175db654b28debc"
+    }
+  ],
+  "agents": {},
   "stages": [
     {
       "id": "mutate",
       "kind": "command",
       "command": "node",
-      "args": [
-        "-e",
-        "require('node:fs').writeFileSync('protected.txt', 'changed')"
-      ],
+      "args": ["-e", "require('node:fs').writeFileSync('protected.txt', 'changed')"],
       "mutates": ["protected.txt"],
       "attempts": 1,
       "gate": {
