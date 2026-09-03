@@ -117,6 +117,23 @@ In commands, `<skill-root>` means this installed skill directory.
     `harbor-organize-evaluations`. Let that skill create the authoritative
     SHA-256 dataset locks and govern release.
 
+12. After authorized Harbor runs have already been normalized by
+    `harbor-run-results`, optionally create a publication-safe comparison from
+    one or more native `final-report.json` files:
+
+    ~~~powershell
+    python <skill-root>/scripts/consolidate_harbor_reports.py `
+      <reports/run-a/final-report.json> `
+      <reports/run-b/final-report.json> `
+      --baseline <run-label-or-id> `
+      --output-dir <publication/comparison-id>
+    ~~~
+
+    This companion does not read raw jobs, recompute rewards, or establish
+    comparability. It emits aggregate-only Markdown and SVG views; use it only
+    after the native reporter's task, model, agent, attempt, lock, and hardware
+    checks have been preserved.
+
 ## Response and Verifier Routing
 
 - Normalize exact scalar or categorical responses only according to declared
@@ -136,6 +153,43 @@ The reference contract contains the complete response-profile and variation
 catalog. Do not choose one valid representation randomly and reject other
 semantically valid representations. Either accept the full equivalence class or
 make a different representation an explicit task requirement.
+
+## Aggregate Execution Comparison
+
+`scripts/consolidate_harbor_reports.py` consumes only schema-version-1
+`final-report.json` artifacts produced by `harbor-run-results`. It writes:
+
+~~~text
+<output>/
+├── comparison-report.json
+├── comparison-report.md
+├── quality-comparison.svg
+├── resource-comparison.svg
+└── efficiency-frontier.svg
+~~~
+
+The report compares pass rate, mean reward, verifier and execution failures,
+input, cached-input, output, optional reasoning, and total tokens, reported USD
+cost, summed agent time, wall time, throughput, per-trial efficiency, and
+baseline deltas. Cached input is already part of Harbor input tokens and is
+never added twice. Reasoning tokens are shown separately because provider
+accounting may overlap output tokens.
+
+The SVGs are static, self-contained, accessible, and dependency-free. The
+consolidator omits task names, prompts, answers, per-case diagnostics, raw
+paths, trajectories, and skill contents. It records input SHA-256 commitments
+and native fairness metadata, refuses invalid or inconsistent accounting, and
+does not claim cross-report fairness. Missing metrics remain visibly missing;
+observed partial totals are labeled with their coverage instead of being
+silently treated as complete. Incomplete token, cost, or agent-time coverage
+must not produce per-trial efficiency deltas or participate in Pareto/frontier
+calculations.
+
+Never expose sealed validation or holdout aggregates before their declared
+release. Never feed the resulting charts or gate outcomes back into candidate
+selection in the same study. A comparison across different hardware, task
+locks, agents, models, attempts, or cache policies is descriptive unless the
+study explicitly models and controls that difference.
 
 ## Boundaries
 
@@ -164,6 +218,7 @@ After changing this copied bundle, run:
 ~~~powershell
 python <skill-creator-root>/scripts/quick_validate.py <skill-root>
 python -m py_compile <skill-root>/scripts/plan_harbor_task_datasets.py
+python -m py_compile <skill-root>/scripts/consolidate_harbor_reports.py
 python <skill-root>/scripts/plan_harbor_task_datasets.py --help
+python <skill-root>/scripts/consolidate_harbor_reports.py --help
 ~~~
-

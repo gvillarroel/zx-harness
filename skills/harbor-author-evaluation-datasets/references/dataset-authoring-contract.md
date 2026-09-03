@@ -518,6 +518,53 @@ rehashes the actual task roots and produces the authoritative locks. Register
 all splits before execution, plan the downstream validation stage before
 evolution, and keep the detailed curator record private.
 
+## Aggregate Report Publication
+
+Use the bundled consolidator only on schema-version-1 `final-report.json`
+artifacts already produced by `harbor-run-results`. That native reporter owns
+raw Harbor parsing, reward interpretation, completeness checks, and within-run
+fairness validation. The consolidator is a sanitized presentation layer, not a
+replacement evaluation or normalization runtime.
+
+Every published comparison must surface, when available:
+
+- requested, completed, passed, verifier-failed, and execution-error counts
+- pass rate and mean primary reward with the reward coverage count
+- input tokens, cached input as a subset, output tokens, optional reasoning
+  tokens, and total tokens defined as input plus output
+- USD cost totals and observation coverage
+- summed agent-execution time, end-to-end wall time, per-trial latency, and
+  throughput
+- cost per trial, cost per pass, tokens per trial, and deltas from the declared
+  baseline
+- native fairness basis and warnings, source timestamps, and SHA-256
+  commitments for every input report
+- the hardware, cache, concurrency, network, model, agent, task, attempt, and
+  lock identities needed to interpret the comparison, either in the source
+  report or its bound study protocol
+
+Never add cached input to total input a second time. Keep reasoning tokens
+separate unless a frozen provider-specific accounting contract proves they are
+exclusive. Refuse NaN, infinity, negative resource usage, inconsistent pass
+counts, impossible timestamps, and totals that contradict their declared
+components. A missing metric remains `n/a`; a partial total must state its
+observed-trial numerator and denominator. Incomplete token, cost, or
+agent-time coverage may be displayed with that fraction, but it must be
+excluded from per-trial efficiency deltas and Pareto/frontier calculations.
+
+Static SVG output must include an accessible title and description, legible
+labels, units, a visible baseline, and textual tables carrying the same core
+metrics. Visual encoding may not hide errors or imply that a higher reward
+automatically compensates for correctness, cost, or latency regressions.
+Pareto highlighting is descriptive and must not become a new selection rule
+after the study protocol is frozen.
+
+Only aggregate information authorized for the current release may enter a
+consolidated report. Do not include task IDs, prompts, answers, fixture paths,
+per-case results, verifier diagnostics, trajectories, or raw local paths.
+Validation and holdout charts stay sealed until their one-way gate is released,
+and their outcomes never return to same-study evolution.
+
 ## Interpretation Limits
 
 - A private split does not correct pretraining contamination from public tasks.
@@ -560,4 +607,3 @@ The split-release semantics are intentionally stricter than workflows that use
 validation repeatedly to filter several finalists: this repository releases
 validation only after one candidate is frozen and requires fresh validation in
 a new study after any feedback-driven revision.
-

@@ -36,6 +36,13 @@ outside this repository and outside candidate-visible workspaces. The new skill
 does not run Harbor, score results, register datasets, or release sealed
 cohorts; those responsibilities remain with their owning tools.
 
+After the owning release boundary, the bundle may consume finalized
+schema-version-1 `harbor-run-results` reports and emit aggregate-only JSON,
+Markdown, and static SVG comparisons. Those views expose correctness, errors,
+tokens, reported cost, agent time, wall time, throughput, and source hashes;
+they do not reparse raw jobs, replace native evidence, or make unlike task
+locks, agents, models, cache policies, or hardware comparable.
+
 ## Consequences
 
 - Dataset construction becomes reproducible and independently auditable.
@@ -44,3 +51,4 @@ cohorts; those responsibilities remain with their owning tools.
 - Existing probes and historical evidence paths do not move.
 - The repository remains a collection of independently copyable skills rather
   than a second evaluation runtime.
+- Validation or holdout aggregates never feed the same study's evolution loop.
