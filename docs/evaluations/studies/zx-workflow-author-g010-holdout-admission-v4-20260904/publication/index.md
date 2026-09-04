@@ -14,10 +14,10 @@ Raw Harbor evaluations, datasets, task content, jobs, traces, candidates, diagno
 
 | Evidence | Kind | Role | SHA-256 | Files | Bytes |
 | --- | --- | --- | --- | ---: | ---: |
-| g010-v4-holdout-admission-public | final-report | publication | `3e29e41b95747def64ddd26fda7ecb7440b44fe257586976e6489d9675124b6e` | 1 | 1470 |
+| g010-v4-holdout-admission-public | final-report | publication | `1b427d50301dfd41b1f45cb2b30b9c12b5cd2dba14b3c6400bd2d1e2c54c596a` | 1 | 1482 |
 
 ## Reviewed aggregate result tables
 
 | Table | SHA-256 | Bytes |
 | --- | --- | ---: |
-| `tables/g010-v4-holdout-admission.table.csv` | `3e29e41b95747def64ddd26fda7ecb7440b44fe257586976e6489d9675124b6e` | 1470 |
+| `tables/g010-v4-holdout-admission.table.csv` | `1b427d50301dfd41b1f45cb2b30b9c12b5cd2dba14b3c6400bd2d1e2c54c596a` | 1482 |

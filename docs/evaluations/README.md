@@ -26,5 +26,5 @@ inherited holdout failed 0/2 without errors. Neither sealed split was released a
 promoted or retried.
 
 V4 also stopped before candidate execution. Its fresh holdout failed the one-shot Oracle admission
-0/2 without errors and was frozen without repair or retry. Because the cohort was not registered in
-the organizer before execution, V4 is additionally ineligible for selection or promotion.
+0/2 without errors and was frozen without repair or retry. Its terminal receipt binds no
+pre-execution organizer registration evidence, making V4 ineligible for selection or promotion.
