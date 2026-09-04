@@ -12,8 +12,8 @@ identical locks except for the injected skill. See
 [ADR 0036](../../.specs/adr/0036-publish-codex-only-reference-baselines.md).
 
 Codex-only rows measure direct problem solving. G010 rows measure deterministic skill-contract
-conformance and cannot be used to compute cross-study deltas. Its released validation is retained
-as unavailable because a pre-treatment fixture defect prevented either skill from running.
+conformance and cannot be used to compute cross-study deltas. The original G010 v1 validation is
+retained as unavailable because a pre-treatment fixture defect prevented either skill from running.
 
 Recovery v2 produced valid paired validation results (2/2 for both arms) but no promotion decision:
 development used adapter 1.0.0 while validation used the fail-closed adapter 1.1.0. The strict Pareto

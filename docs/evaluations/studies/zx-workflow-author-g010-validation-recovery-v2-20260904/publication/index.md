@@ -3,10 +3,9 @@
 - Study: `zx-workflow-author-g010-validation-recovery-v2-20260904`
 - Comparison profile: `zx-workflow-author-g010-recovery-v2`
 - Publication policy: `indexes-and-result-tables-only-v1`
-- Progress: 12/22 completed (54.55%; all other stages stopped)
+- Progress: 12/22 completed (54.55%)
 - Validation released: yes
 - Holdout released: no
-- Promotion: no; strict adapter-profile mismatch
 
 Raw Harbor evaluations, datasets, task content, jobs, traces, candidates, diagnostics, and local paths are intentionally excluded.
 
