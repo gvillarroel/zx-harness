@@ -114,6 +114,9 @@ ledger and checkpoint authority remains private. Add `mutates` and a gate to any
 ```
 
 TF-IDF uses the runtime problem as its query unless `query` or `queryFile` is explicit.
+Roots retain declared priority. The file cap and document frequencies count unique resolved paths;
+overlaps do not spend extra slots. Depth-first directory traversal and equal-score paths use ascending
+UTF-8 byte order, independent of filesystem enumeration and locale.
 
 ```json
 {

@@ -956,6 +956,57 @@ try {
       throw new Error(`TF-IDF cap failed shared pre-execution validation: ${id}`);
     }
   }
+  // Corpus identity must survive overlapping roots without changing scores or spending duplicate slots.
+  for (const [path, content] of Object.entries({
+    "evidence/éclair.txt": "queue retry\n",
+    "evidence/nested/child.txt": "audit trace\n",
+    "evidence/apple.txt": "queue retry\n",
+    "evidence/Z.txt": "queue retry\n",
+    "evidence/a.md": "queue audit\n",
+    "evidence/node_modules/ignored.txt": "queue audit\n",
+    "supplement/priority.txt": "audit trace\n",
+  })) {
+    await mkdir(resolve(tfidfTarget, path, ".."), { recursive: true });
+    await writeFile(resolve(tfidfTarget, path), content);
+  }
+  for (const [query, expected] of [
+    ["queue", ["evidence/Z.txt", "evidence/apple.txt", "evidence/éclair.txt"]],
+    ["audit", ["evidence/nested/child.txt"]],
+  ]) {
+    let referenceRanking;
+    for (const roots of [["evidence"], ["evidence", "evidence/nested", "evidence/Z.txt", "evidence"]]) {
+      const plan = structuredClone(tfidfDefinition);
+      delete plan.stages[0].query;
+      plan.stages[0].roots = roots;
+      await writeFile(resolve(tfidfTarget, "workflow.plan.json"), `${JSON.stringify(plan, null, 2)}\n`);
+      await runWorkflow(skillTarget, tfidfTarget, ["--problem", query]);
+      const ranking = JSON.parse(await readFile(resolve(tfidfTarget, "run/ranked.json"), "utf8"));
+      if (
+        JSON.stringify(ranking.map((row) => row.path)) !== JSON.stringify(expected) ||
+        ranking.some((row) => !Number.isFinite(row.score) || row.score <= 0) ||
+        (referenceRanking !== undefined && JSON.stringify(ranking) !== referenceRanking)
+      ) {
+        throw new Error(`TF-IDF changed corpus identity, filtering, scores, or tie order: ${query}`);
+      }
+      referenceRanking = JSON.stringify(ranking);
+    }
+  }
+  // Canonical traversal selects a stable capped subset while explicit roots retain their priority.
+  for (const [roots, maxFiles, query, expected] of [
+    [["evidence"], 2, "queue", ["evidence/Z.txt", "evidence/apple.txt"]],
+    [["supplement", "evidence"], 1, "audit", ["supplement/priority.txt"]],
+    [["supplement", "supplement", "evidence"], 3, "queue", ["evidence/Z.txt", "evidence/apple.txt"]],
+  ]) {
+    const plan = structuredClone(tfidfDefinition);
+    delete plan.stages[0].query;
+    Object.assign(plan.stages[0], { roots, maxFiles });
+    await writeFile(resolve(tfidfTarget, "workflow.plan.json"), `${JSON.stringify(plan, null, 2)}\n`);
+    await runWorkflow(skillTarget, tfidfTarget, ["--problem", query]);
+    const ranking = JSON.parse(await readFile(resolve(tfidfTarget, "run/ranked.json"), "utf8"));
+    if (JSON.stringify(ranking.map((row) => row.path)) !== JSON.stringify(expected)) {
+      throw new Error("TF-IDF lost root priority or unique deterministic file-cap accounting.");
+    }
+  }
   await writeFile(resolve(tfidfTarget, "workflow.plan.json"), `${JSON.stringify(tfidfDefinition, null, 2)}\n`);
 
   // Runtime schema rejection happens before state creation and before even the first configured subprocess.

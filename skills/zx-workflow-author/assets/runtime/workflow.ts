@@ -538,12 +538,17 @@ async function runTfidfStage(stage: TfidfStage): Promise<void> {
   const extensions = new Set((stage.extensions ?? []).map((value) => value.toLowerCase()));
   const ignored = new Set([".git", ".zx-workflow", "build", "dist", "node_modules", "target"]);
   const files: string[] = [];
+  const visited = new Set<string>();
 
-  // Walk roots sequentially and stop at the declared file cap to bound time and memory.
+  // Preserve root priority; overlaps must not spend file slots or inflate document frequency.
   for (const rootPath of stage.roots) {
-      const pending = [await resolveExistingSafe(rootPath, `tfidf-root:${stage.id}`)];
+    const pending = [await resolveExistingSafe(rootPath, `tfidf-root:${stage.id}`)];
     while (pending.length && files.length < (stage.maxFiles ?? 1000)) {
       const current = pending.pop()!;
+      if (visited.has(current)) {
+        continue;
+      }
+      visited.add(current);
       const currentStats = await lstat(current).catch(() => null);
       if (!currentStats) {
         continue;
@@ -558,6 +563,8 @@ async function runTfidfStage(stage: TfidfStage): Promise<void> {
         continue;
       }
       const entries = await readdir(current, { withFileTypes: true });
+      // Reverse push order makes the LIFO walk ascending and independent of filesystem enumeration.
+      entries.sort((left, right) => Buffer.compare(Buffer.from(right.name), Buffer.from(left.name)));
       for (const entry of entries) {
         if (!ignored.has(entry.name)) {
           pending.push(resolve(current, entry.name));
@@ -593,7 +600,7 @@ async function runTfidfStage(stage: TfidfStage): Promise<void> {
       return { path: document.path, score: Number(score.toFixed(8)) };
     })
     .filter((item) => item.score > 0)
-    .sort((left, right) => right.score - left.score || left.path.localeCompare(right.path))
+    .sort((left, right) => right.score - left.score || Buffer.compare(Buffer.from(left.path), Buffer.from(right.path)))
     .slice(0, stage.limit ?? 20);
 
   const output = await resolveWritableSafe(stage.output, `tfidf-output:${stage.id}`);

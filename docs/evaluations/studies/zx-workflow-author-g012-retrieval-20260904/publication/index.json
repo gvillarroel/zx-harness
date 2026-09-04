@@ -1,0 +1,41 @@
+{
+  "holdoutReleased": false,
+  "ledger": {
+    "eventCount": 66,
+    "headSha256": "97a956e5155f4512c5b7164b4b1d7ac26c1cd20e6afbbdd70eeb16a15df99bf7"
+  },
+  "progress": {
+    "completedCount": 8,
+    "completionPercent": 100.0,
+    "stageCount": 8
+  },
+  "publicationPolicy": "indexes-and-result-tables-only-v1",
+  "resultIndex": [
+    {
+      "artifactType": "file",
+      "byteCount": 2021,
+      "evidenceId": "g012-public-results",
+      "fileCount": 1,
+      "kind": "final-report",
+      "role": "publication",
+      "sha256": "682b6157e3f2af1ff692fd9e9eab47ba11302d320eaa9e91c50faa9df9f3880c",
+      "stageId": "publish",
+      "visibility": "public"
+    }
+  ],
+  "resultTables": [
+    {
+      "byteCount": 2021,
+      "path": "tables/g012-retrieval.table.csv",
+      "sha256": "682b6157e3f2af1ff692fd9e9eab47ba11302d320eaa9e91c50faa9df9f3880c"
+    }
+  ],
+  "schemaVersion": 1,
+  "study": {
+    "comparisonProfile": "g012-retrieval-adapter11",
+    "createdAt": "2026-09-04T19:47:25Z",
+    "studyId": "zx-workflow-author-g012-retrieval-20260904",
+    "title": "G012 unique deterministic context retrieval"
+  },
+  "validationReleased": true
+}

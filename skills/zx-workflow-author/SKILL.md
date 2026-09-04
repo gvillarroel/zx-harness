@@ -60,6 +60,8 @@ Generate the program that solves a class of problems. Do not solve one example a
 - Pass dynamic values as argv elements or closed stdin. Argument mode has exactly one `{prompt}`;
   stdin mode has none in argv. Never interpolate dynamic data into a shell command.
 - Prefer deterministic tools before agents and deterministic gates before reviewer agents.
+- For capped retrieval, order roots by evidence priority. Count each resolved path once and use
+  stable traversal and score ties so duplicate context cannot displace distinct evidence.
 - Keep acceptance routing inspectable: gate leaves and reviewers declare the criterion IDs they cover;
   optional unique leaf IDs override structural routes, every criterion has at least one route, and
   criteria-aware reviewers inherit no producer evidence implicitly.

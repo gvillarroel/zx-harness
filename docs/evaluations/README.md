@@ -14,6 +14,7 @@ tasks, prompts, verifiers, reports, trajectories, patches, locks, and ledgers re
 - [G011 adapter 1.1 evolution v8, 2026-09-04](studies/zx-workflow-author-g011-adapter11-evolution-v8-20260904/publication/index.md)
 - [G011 adapter 1.1 evolution v9, 2026-09-04](studies/zx-workflow-author-g011-adapter11-evolution-v9-20260904/publication/index.md)
 - [G011 producer-qualified evolution v10, 2026-09-04](studies/zx-workflow-author-g011-adapter11-evolution-v10-20260904/publication/index.md)
+- [G012 unique deterministic context retrieval, 2026-09-04](studies/zx-workflow-author-g012-retrieval-20260904/publication/index.md)
 
 All published rows are descriptive. Causal deltas require a contemporary paired control with
 identical locks except for the injected skill. See
@@ -71,3 +72,13 @@ errors, and zero retries. Strict paired gates found no regression and promoted t
 G011 bundle; see [ADR 0041](../../.specs/adr/0041-bind-closed-evaluated-bundles.md). Development remains
 adaptive evidence, producer separation is procedural, and no causal comparison to Codex-only rows is
 supported.
+
+G012 reran a contemporary 15-case development pair: G011 passed 12/15 and G012 passed 15/15,
+preserving all 12 historical cases. Fresh producer-qualified validation passed its live Oracle 4/4,
+then G011 passed 1/4 and G012 passed 4/4. Both strict gates found zero protected-metric regressions,
+execution errors, or semantic retries. The complete sealed G012 bundle was promoted after Windows
+and Linux suites and both public runtime input modes passed; see
+[ADR 0042](../../.specs/adr/0042-count-unique-context-paths-before-ranking.md). Four local Linux
+test-environment failures remain recorded. No additional holdout or model calls were declared.
+Custody is procedural; incidental image metadata exposure after candidate sealing is documented.
+These targeted deterministic results do not estimate end-to-end Codex efficacy or model cost.
