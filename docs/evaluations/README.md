@@ -6,6 +6,7 @@ tasks, prompts, verifiers, reports, trajectories, patches, locks, and ledgers re
 - [Codex-only reference, 2026-09-03](studies/codex-only-reference-20260903/publication/index.md)
 - [G010 deterministic contract study, 2026-09-04](studies/zx-workflow-author-g010-evolution-v1-20260904/publication/index.md)
 - [G010 validation recovery v2, 2026-09-04](studies/zx-workflow-author-g010-validation-recovery-v2-20260904/publication/index.md)
+- [G010 adapter 1.1 evolution v3, 2026-09-04](studies/zx-workflow-author-g010-adapter11-evolution-v3-20260904/publication/index.md)
 
 All published rows are descriptive. Causal deltas require a contemporary paired control with
 identical locks except for the injected skill. See
@@ -18,3 +19,7 @@ retained as unavailable because a pre-treatment fixture defect prevented either 
 Recovery v2 produced valid paired validation results (2/2 for both arms) but no promotion decision:
 development used adapter 1.0.0 while validation used the fail-closed adapter 1.1.0. The strict Pareto
 profile gate rejected that drift; holdout remained sealed and the baseline was retained.
+
+V3 stopped before candidate execution: fresh validation passed Oracle admission 2/2, but the
+inherited holdout failed 0/2 without errors. Neither sealed split was released and no candidate was
+promoted or retried.

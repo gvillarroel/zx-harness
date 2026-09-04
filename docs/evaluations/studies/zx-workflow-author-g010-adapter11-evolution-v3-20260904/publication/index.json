@@ -1,0 +1,41 @@
+{
+  "holdoutReleased": false,
+  "ledger": {
+    "eventCount": 76,
+    "headSha256": "38d697ae9c41c290e166ed4a8c3d6cd3cc067f517ce57c41c9c2059260134457"
+  },
+  "progress": {
+    "completedCount": 6,
+    "completionPercent": 26.09,
+    "stageCount": 23
+  },
+  "publicationPolicy": "indexes-and-result-tables-only-v1",
+  "resultIndex": [
+    {
+      "artifactType": "file",
+      "byteCount": 2231,
+      "evidenceId": "g010-v3-oracle-admission-public",
+      "fileCount": 1,
+      "kind": "final-report",
+      "role": "publication",
+      "sha256": "68a35d95c3b195e7803b1c0d372bb06b9ac78e66b15e959901b1fd1790b8daf7",
+      "stageId": "failure-publication-v3",
+      "visibility": "public"
+    }
+  ],
+  "resultTables": [
+    {
+      "byteCount": 2231,
+      "path": "tables/g010-v3-oracle-admission.table.csv",
+      "sha256": "68a35d95c3b195e7803b1c0d372bb06b9ac78e66b15e959901b1fd1790b8daf7"
+    }
+  ],
+  "schemaVersion": 1,
+  "study": {
+    "comparisonProfile": "zx-workflow-author-g010-adapter11-v3",
+    "createdAt": "2026-09-04T08:17:07Z",
+    "studyId": "zx-workflow-author-g010-adapter11-evolution-v3-20260904",
+    "title": "G010 adapter 1.1 Pareto evolution"
+  },
+  "validationReleased": false
+}
