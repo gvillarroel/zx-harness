@@ -1,0 +1,41 @@
+{
+  "holdoutReleased": false,
+  "ledger": {
+    "eventCount": 71,
+    "headSha256": "abd1bfc48b8ced8bb70ce794f70c6b36ac453cbe1974116bb0f66db61e8b8335"
+  },
+  "progress": {
+    "completedCount": 5,
+    "completionPercent": 20.83,
+    "stageCount": 24
+  },
+  "publicationPolicy": "indexes-and-result-tables-only-v1",
+  "resultIndex": [
+    {
+      "artifactType": "file",
+      "byteCount": 1324,
+      "evidenceId": "g010-v5-protocol-rejection-public",
+      "fileCount": 1,
+      "kind": "final-report",
+      "role": "publication",
+      "sha256": "6097d267f30c2fd0297f34d98d6aca9ac2e9ee807bc78a33db4e291456edbfac",
+      "stageId": "failure-publication-v5",
+      "visibility": "public"
+    }
+  ],
+  "resultTables": [
+    {
+      "byteCount": 1324,
+      "path": "tables/g010-v5-protocol-rejection.table.csv",
+      "sha256": "6097d267f30c2fd0297f34d98d6aca9ac2e9ee807bc78a33db4e291456edbfac"
+    }
+  ],
+  "schemaVersion": 1,
+  "study": {
+    "comparisonProfile": "zx-workflow-author-g010-adapter11-v5",
+    "createdAt": "2026-09-04T09:15:56Z",
+    "studyId": "zx-workflow-author-g010-adapter11-evolution-v5-20260904",
+    "title": "G010 adapter 1.1 Pareto evolution v5"
+  },
+  "validationReleased": false
+}
