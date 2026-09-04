@@ -7,6 +7,7 @@ tasks, prompts, verifiers, reports, trajectories, patches, locks, and ledgers re
 - [G010 deterministic contract study, 2026-09-04](studies/zx-workflow-author-g010-evolution-v1-20260904/publication/index.md)
 - [G010 validation recovery v2, 2026-09-04](studies/zx-workflow-author-g010-validation-recovery-v2-20260904/publication/index.md)
 - [G010 adapter 1.1 evolution v3, 2026-09-04](studies/zx-workflow-author-g010-adapter11-evolution-v3-20260904/publication/index.md)
+- [G010 holdout admission v4, 2026-09-04](studies/zx-workflow-author-g010-holdout-admission-v4-20260904/publication/index.md)
 
 All published rows are descriptive. Causal deltas require a contemporary paired control with
 identical locks except for the injected skill. See
@@ -23,3 +24,7 @@ profile gate rejected that drift; holdout remained sealed and the baseline was r
 V3 stopped before candidate execution: fresh validation passed Oracle admission 2/2, but the
 inherited holdout failed 0/2 without errors. Neither sealed split was released and no candidate was
 promoted or retried.
+
+V4 also stopped before candidate execution. Its fresh holdout failed the one-shot Oracle admission
+0/2 without errors and was frozen without repair or retry. Because the cohort was not registered in
+the organizer before execution, V4 is additionally ineligible for selection or promotion.

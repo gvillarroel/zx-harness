@@ -1,0 +1,34 @@
+{
+  "holdoutReleased": false,
+  "protocolEligible": false,
+  "candidateJobsRun": 0,
+  "publicationPolicy": "indexes-and-result-tables-only-v1",
+  "resultIndex": [
+    {
+      "artifactType": "file",
+      "byteCount": 1470,
+      "evidenceId": "g010-v4-holdout-admission-public",
+      "fileCount": 1,
+      "kind": "final-report",
+      "role": "publication",
+      "sha256": "3e29e41b95747def64ddd26fda7ecb7440b44fe257586976e6489d9675124b6e",
+      "stageId": "terminal-admission-v4",
+      "visibility": "public"
+    }
+  ],
+  "resultTables": [
+    {
+      "byteCount": 1470,
+      "path": "tables/g010-v4-holdout-admission.table.csv",
+      "sha256": "3e29e41b95747def64ddd26fda7ecb7440b44fe257586976e6489d9675124b6e"
+    }
+  ],
+  "schemaVersion": 1,
+  "study": {
+    "comparisonProfile": "zx-workflow-author-g010-adapter11-v4-admission",
+    "createdAt": "2026-09-04T09:05:50Z",
+    "studyId": "zx-workflow-author-g010-holdout-admission-v4-20260904",
+    "title": "G010 holdout admission v4"
+  },
+  "validationReleased": false
+}
