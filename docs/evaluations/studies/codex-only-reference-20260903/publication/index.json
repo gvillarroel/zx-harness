@@ -1,0 +1,57 @@
+{
+  "holdoutReleased": false,
+  "ledger": {
+    "eventCount": 26,
+    "headSha256": "238d425b8f9bf06797aa72b2bf052a8d7833985794255485c9feebf30c585b39"
+  },
+  "progress": {
+    "completedCount": 2,
+    "completionPercent": 100.0,
+    "stageCount": 2
+  },
+  "publicationPolicy": "indexes-and-result-tables-only-v1",
+  "resultIndex": [
+    {
+      "artifactType": "file",
+      "byteCount": 16468,
+      "evidenceId": "codex-reference-report-v1",
+      "fileCount": 1,
+      "kind": "final-report",
+      "role": "publication",
+      "sha256": "66430d0fc880e23ed97a6e52aa3338b63e820d2ab3911e0a38016c66291488dd",
+      "stageId": "deepswe-codex-reference",
+      "visibility": "public"
+    },
+    {
+      "artifactType": "file",
+      "byteCount": 8005,
+      "evidenceId": "codex-reference-supplemental-v1",
+      "fileCount": 1,
+      "kind": "final-report",
+      "role": "publication",
+      "sha256": "df35d4b2bcc5ee9f8584d49247991b886e2373c17895925b2d034f2746ecc110",
+      "stageId": "deepswe-codex-reference",
+      "visibility": "public"
+    }
+  ],
+  "resultTables": [
+    {
+      "byteCount": 1301,
+      "path": "tables/codex-execution-incidents-v1.table.csv",
+      "sha256": "55c1cffbfbb4bfcf8ffc775e3753ffa41afef0f9c3b0da534e7f033cf61610e4"
+    },
+    {
+      "byteCount": 6835,
+      "path": "tables/codex-reference-v1.table.csv",
+      "sha256": "55ad03143c986ea40141575f9b08ff119af47e58e152c290e14cbc6cd7558f9c"
+    }
+  ],
+  "schemaVersion": 1,
+  "study": {
+    "comparisonProfile": "sha256:ea71d1c686b68962c1a17c27f6111dada3cfbe5da06993076f9ea13cde435441",
+    "createdAt": "2026-09-03T23:29:45Z",
+    "studyId": "codex-only-reference-20260903",
+    "title": "Codex-only frozen reference"
+  },
+  "validationReleased": false
+}
