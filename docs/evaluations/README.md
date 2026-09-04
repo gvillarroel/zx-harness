@@ -13,6 +13,7 @@ tasks, prompts, verifiers, reports, trajectories, patches, locks, and ledgers re
 - [G010 adapter 1.1 evolution v7, 2026-09-04](studies/zx-workflow-author-g010-adapter11-evolution-v7-20260904/publication/index.md)
 - [G011 adapter 1.1 evolution v8, 2026-09-04](studies/zx-workflow-author-g011-adapter11-evolution-v8-20260904/publication/index.md)
 - [G011 adapter 1.1 evolution v9, 2026-09-04](studies/zx-workflow-author-g011-adapter11-evolution-v9-20260904/publication/index.md)
+- [G011 producer-qualified evolution v10, 2026-09-04](studies/zx-workflow-author-g011-adapter11-evolution-v10-20260904/publication/index.md)
 
 All published rows are descriptive. Causal deltas require a contemporary paired control with
 identical locks except for the injected skill. See
@@ -62,3 +63,11 @@ Oracle admission. The Oracle completed 6/6 without errors or retries but passed 
 trials were final semantic verifier outcomes. Candidate arms did not run, holdout stayed sealed, and
 G010 remained installed. Future cohorts require producer-side Oracle attestation before registration;
 see [ADR 0040](../../.specs/adr/0040-require-producer-oracle-attestation.md).
+
+V10 reused the immutable 12-case development pairing, where G011 passed 12/12 versus G010 at 10/12,
+then used independently producer-qualified fresh validation and holdout cohorts. Both live Oracles and
+all four candidate arms passed 6/6 with exact `reward` and `workflow_contract` scores of 1, zero
+errors, and zero retries. Strict paired gates found no regression and promoted the complete sealed
+G011 bundle; see [ADR 0041](../../.specs/adr/0041-bind-closed-evaluated-bundles.md). Development remains
+adaptive evidence, producer separation is procedural, and no causal comparison to Codex-only rows is
+supported.
