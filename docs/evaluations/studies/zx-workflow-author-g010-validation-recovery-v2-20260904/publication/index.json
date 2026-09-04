@@ -1,0 +1,52 @@
+{
+  "holdoutReleased": false,
+  "ledger": {
+    "eventCount": 108,
+    "headSha256": "866268a6283f720c2adc41b1d0a06d0cf1eaec7f731ecb5d4e69b67d4d76e669"
+  },
+  "progress": {
+    "completedCount": 12,
+    "completionPercent": 54.55,
+    "stageCount": 22
+  },
+  "publicationPolicy": "indexes-and-result-tables-only-v1",
+  "resultIndex": [
+    {
+      "artifactType": "file",
+      "byteCount": 6121,
+      "evidenceId": "v1-public-incident-table",
+      "fileCount": 1,
+      "kind": "final-report",
+      "role": "publication",
+      "sha256": "42c17f4a48c2436a8d0137cc096803092207b8595ac44204156d1e8cc7718d9b",
+      "stageId": "v1-unavailability-audit",
+      "visibility": "public"
+    },
+    {
+      "artifactType": "file",
+      "byteCount": 6688,
+      "evidenceId": "recovery-v2-public-results-table",
+      "fileCount": 1,
+      "kind": "final-report",
+      "role": "publication",
+      "sha256": "db0ae46f8ad4034b81caf859f7660792d7bfe003d7fe7c3a68906d7108316b4a",
+      "stageId": "v2-profile-mismatch-reference-publication",
+      "visibility": "public"
+    }
+  ],
+  "resultTables": [
+    {
+      "byteCount": 6688,
+      "path": "tables/g010-recovery-v2-results.table.csv",
+      "sha256": "db0ae46f8ad4034b81caf859f7660792d7bfe003d7fe7c3a68906d7108316b4a"
+    }
+  ],
+  "schemaVersion": 1,
+  "study": {
+    "comparisonProfile": "zx-workflow-author-g010-recovery-v2",
+    "createdAt": "2026-09-04T06:59:36Z",
+    "studyId": "zx-workflow-author-g010-validation-recovery-v2-20260904",
+    "title": "G010 pre-treatment validation recovery"
+  },
+  "validationReleased": true
+}
