@@ -1,0 +1,41 @@
+{
+  "holdoutReleased": false,
+  "ledger": {
+    "eventCount": 90,
+    "headSha256": "523020a1ea639945a39348dce12a52c7bdf8a9d2b737d5678e938e4e9959cead"
+  },
+  "progress": {
+    "completedCount": 7,
+    "completionPercent": 38.89,
+    "stageCount": 18
+  },
+  "publicationPolicy": "indexes-and-result-tables-only-v1",
+  "resultIndex": [
+    {
+      "artifactType": "file",
+      "byteCount": 3033,
+      "evidenceId": "g011-v9-validation-oracle-rejection-public",
+      "fileCount": 1,
+      "kind": "final-report",
+      "role": "publication",
+      "sha256": "733ada4dbf777b406c9387e10dd98efe2049a21f4c9f6d9d39c186d040fadefa",
+      "stageId": "failure-publication-v9",
+      "visibility": "public"
+    }
+  ],
+  "resultTables": [
+    {
+      "byteCount": 3033,
+      "path": "tables/g011-v9-validation-oracle-rejection.table.csv",
+      "sha256": "733ada4dbf777b406c9387e10dd98efe2049a21f4c9f6d9d39c186d040fadefa"
+    }
+  ],
+  "schemaVersion": 1,
+  "study": {
+    "comparisonProfile": "zx-workflow-author-g011-adapter11-v9",
+    "createdAt": "2026-09-04T13:00:33Z",
+    "studyId": "zx-workflow-author-g011-adapter11-evolution-v9-20260904",
+    "title": "G011 adapter 1.1 imported-development Pareto evolution v9"
+  },
+  "validationReleased": true
+}
