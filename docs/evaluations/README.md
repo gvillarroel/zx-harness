@@ -9,6 +9,7 @@ tasks, prompts, verifiers, reports, trajectories, patches, locks, and ledgers re
 - [G010 adapter 1.1 evolution v3, 2026-09-04](studies/zx-workflow-author-g010-adapter11-evolution-v3-20260904/publication/index.md)
 - [G010 holdout admission v4, 2026-09-04](studies/zx-workflow-author-g010-holdout-admission-v4-20260904/publication/index.md)
 - [G010 adapter 1.1 evolution v5, 2026-09-04](studies/zx-workflow-author-g010-adapter11-evolution-v5-20260904/publication/index.md)
+- [G010 adapter 1.1 evolution v6, 2026-09-04](studies/zx-workflow-author-g010-adapter11-evolution-v6-20260904/publication/index.md)
 
 All published rows are descriptive. Causal deltas require a contemporary paired control with
 identical locks except for the injected skill. See
@@ -33,3 +34,8 @@ pre-execution organizer registration evidence, making V4 ineligible for selectio
 V5 stopped before semantic execution. The organizer rejected a validation-bound admission stage
 before validation release, revealing a circular dependency with development selection. No Oracle or
 candidate job ran; the unchanged blind holdout remains eligible for a fresh preregistered study.
+
+V6 also stopped before semantic execution. Independent review rejected a pre-release holdout Oracle
+job modeled as development evidence. No Oracle or candidate job ran. Holdout IDs and high-level file
+names were observed after candidate sealing; V7 must defer Oracle admission until holdout release and
+must not permit mutation or reselection.
