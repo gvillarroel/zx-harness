@@ -1,0 +1,57 @@
+{
+  "holdoutReleased": false,
+  "ledger": {
+    "eventCount": 42,
+    "headSha256": "b65cc2a51b2f7fdea044b066953c95cecd1256150c6d1996a3042f05211e1e12"
+  },
+  "progress": {
+    "completedCount": 3,
+    "completionPercent": 100.0,
+    "stageCount": 3
+  },
+  "publicationPolicy": "indexes-and-result-tables-only-v1",
+  "resultIndex": [
+    {
+      "artifactType": "file",
+      "byteCount": 6394,
+      "evidenceId": "luna-g012-aggregate-csv",
+      "fileCount": 1,
+      "kind": "other",
+      "role": "publication",
+      "sha256": "7e8d2e71ac7683855019b927bc4c60682768ec8905c4d8bdb2353692016ff942",
+      "stageId": "report",
+      "visibility": "public"
+    },
+    {
+      "artifactType": "file",
+      "byteCount": 4801,
+      "evidenceId": "luna-g012-side-by-side",
+      "fileCount": 1,
+      "kind": "other",
+      "role": "publication",
+      "sha256": "5cd9c5206f261e40d468ba095c4171a3358950e7250abba1af8fbe9617faec00",
+      "stageId": "report",
+      "visibility": "public"
+    }
+  ],
+  "resultTables": [
+    {
+      "byteCount": 6394,
+      "path": "tables/luna-g012-v1.table.csv",
+      "sha256": "7e8d2e71ac7683855019b927bc4c60682768ec8905c4d8bdb2353692016ff942"
+    },
+    {
+      "byteCount": 4801,
+      "path": "tables/luna-g012-v1.table.md",
+      "sha256": "5cd9c5206f261e40d468ba095c4171a3358950e7250abba1af8fbe9617faec00"
+    }
+  ],
+  "schemaVersion": 1,
+  "study": {
+    "comparisonProfile": "luna-high-g012-real-paired-v1",
+    "createdAt": "2026-09-04T21:55:21Z",
+    "studyId": "luna-g012-real-paired-20260904",
+    "title": "Luna alone versus frozen G012"
+  },
+  "validationReleased": false
+}

@@ -15,6 +15,7 @@ tasks, prompts, verifiers, reports, trajectories, patches, locks, and ledgers re
 - [G011 adapter 1.1 evolution v9, 2026-09-04](studies/zx-workflow-author-g011-adapter11-evolution-v9-20260904/publication/index.md)
 - [G011 producer-qualified evolution v10, 2026-09-04](studies/zx-workflow-author-g011-adapter11-evolution-v10-20260904/publication/index.md)
 - [G012 unique deterministic context retrieval, 2026-09-04](studies/zx-workflow-author-g012-retrieval-20260904/publication/index.md)
+- [Luna alone versus G012, real paired observations, 2026-09-04](studies/luna-g012-real-paired-20260904/publication/index.md)
 
 All published rows are descriptive. Causal deltas require a contemporary paired control with
 identical locks except for the injected skill. See
@@ -82,3 +83,10 @@ and Linux suites and both public runtime input modes passed; see
 test-environment failures remain recorded. No additional holdout or model calls were declared.
 Custody is procedural; incidental image metadata exposure after candidate sealing is documented.
 These targeted deterministic results do not estimate end-to-end Codex efficacy or model cost.
+
+The contemporary Luna comparison used one existing real development problem per dataset and arm.
+Terminal-Bench passed 9/16 checks without the skill versus 0/16 after a treatment timeout; DeepSWE
+passed 80/82 new and 643/643 existing checks without the skill versus 0/82 and 643/643 with G012.
+Neither arm fully solved either task. Treatment authentication, timeout, protocol, and accounting
+failures remain recorded. These operational observations do not establish causal quality or efficiency
+deltas, replace the prior Sol references, or authorize promotion.
