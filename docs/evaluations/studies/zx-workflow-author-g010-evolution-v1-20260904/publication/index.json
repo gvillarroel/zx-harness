@@ -1,0 +1,29 @@
+{
+  "holdoutReleased": false,
+  "ledger": {
+    "eventCount": 79,
+    "headSha256": "e8cb92e4563a3a0e0553fd038ddd7d1078fa91a0e4e1141e4a8f4e99496a8991"
+  },
+  "progress": {
+    "completedCount": 10,
+    "completionPercent": 66.67,
+    "stageCount": 15
+  },
+  "publicationPolicy": "indexes-and-result-tables-only-v1",
+  "resultIndex": [],
+  "resultTables": [
+    {
+      "byteCount": 6121,
+      "path": "tables/g010-paired-contract-results-v1.table.csv",
+      "sha256": "42c17f4a48c2436a8d0137cc096803092207b8595ac44204156d1e8cc7718d9b"
+    }
+  ],
+  "schemaVersion": 1,
+  "study": {
+    "comparisonProfile": "zx-workflow-author-g010-evolution-v1",
+    "createdAt": "2026-09-04T06:04:14Z",
+    "studyId": "zx-workflow-author-g010-evolution-v1-20260904",
+    "title": "G010 timeout-terminal Pareto evolution"
+  },
+  "validationReleased": true
+}
