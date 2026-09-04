@@ -10,6 +10,7 @@ tasks, prompts, verifiers, reports, trajectories, patches, locks, and ledgers re
 - [G010 holdout admission v4, 2026-09-04](studies/zx-workflow-author-g010-holdout-admission-v4-20260904/publication/index.md)
 - [G010 adapter 1.1 evolution v5, 2026-09-04](studies/zx-workflow-author-g010-adapter11-evolution-v5-20260904/publication/index.md)
 - [G010 adapter 1.1 evolution v6, 2026-09-04](studies/zx-workflow-author-g010-adapter11-evolution-v6-20260904/publication/index.md)
+- [G010 adapter 1.1 evolution v7, 2026-09-04](studies/zx-workflow-author-g010-adapter11-evolution-v7-20260904/publication/index.md)
 
 All published rows are descriptive. Causal deltas require a contemporary paired control with
 identical locks except for the injected skill. See
@@ -39,3 +40,10 @@ V6 also stopped before semantic execution. Independent review rejected a pre-rel
 job modeled as development evidence. No Oracle or candidate job ran. Holdout IDs and high-level file
 names were observed after candidate sealing; V7 must defer Oracle admission until holdout release and
 must not permit mutation or reselection.
+
+V7 completed native paired development and validation. G010 reproduced a 9/10 to 10/10 development
+gain without regression, then tied G009 at 0/2 on fresh validation. Pareto retained the baseline. The
+validation verifier exposed only scalar reward, so the frozen strict gate also stopped as
+non-evaluable. No retry, mutation, holdout release, Oracle run, or promotion occurred. Future studies
+must freeze metric-schema compatibility before release; see
+[ADR 0038](../../.specs/adr/0038-freeze-metric-schema-before-split-release.md).
