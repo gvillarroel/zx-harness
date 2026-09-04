@@ -1,0 +1,41 @@
+{
+  "holdoutReleased": false,
+  "ledger": {
+    "eventCount": 84,
+    "headSha256": "bcf1ad4fbfabc103271002449c743ae05e65812de7b41259cd142f68d674dd85"
+  },
+  "progress": {
+    "completedCount": 8,
+    "completionPercent": 36.36,
+    "stageCount": 22
+  },
+  "publicationPolicy": "indexes-and-result-tables-only-v1",
+  "resultIndex": [
+    {
+      "artifactType": "file",
+      "byteCount": 2906,
+      "evidenceId": "g011-v8-development-contract-rejection-public",
+      "fileCount": 1,
+      "kind": "final-report",
+      "role": "publication",
+      "sha256": "c3efe5ba9ab1d3465f466bec58fdfb837cc82e4f9e6b96f0ffd6a713045f8ca8",
+      "stageId": "failure-publication-v8",
+      "visibility": "public"
+    }
+  ],
+  "resultTables": [
+    {
+      "byteCount": 2906,
+      "path": "tables/g011-v8-development-contract-rejection.table.csv",
+      "sha256": "c3efe5ba9ab1d3465f466bec58fdfb837cc82e4f9e6b96f0ffd6a713045f8ca8"
+    }
+  ],
+  "schemaVersion": 1,
+  "study": {
+    "comparisonProfile": "zx-workflow-author-g011-adapter11-v8",
+    "createdAt": "2026-09-04T12:17:48Z",
+    "studyId": "zx-workflow-author-g011-adapter11-evolution-v8-20260904",
+    "title": "G011 adapter 1.1 Pareto evolution v8"
+  },
+  "validationReleased": false
+}

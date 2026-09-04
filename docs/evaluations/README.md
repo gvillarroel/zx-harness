@@ -11,6 +11,7 @@ tasks, prompts, verifiers, reports, trajectories, patches, locks, and ledgers re
 - [G010 adapter 1.1 evolution v5, 2026-09-04](studies/zx-workflow-author-g010-adapter11-evolution-v5-20260904/publication/index.md)
 - [G010 adapter 1.1 evolution v6, 2026-09-04](studies/zx-workflow-author-g010-adapter11-evolution-v6-20260904/publication/index.md)
 - [G010 adapter 1.1 evolution v7, 2026-09-04](studies/zx-workflow-author-g010-adapter11-evolution-v7-20260904/publication/index.md)
+- [G011 adapter 1.1 evolution v8, 2026-09-04](studies/zx-workflow-author-g011-adapter11-evolution-v8-20260904/publication/index.md)
 
 All published rows are descriptive. Causal deltas require a contemporary paired control with
 identical locks except for the injected skill. See
@@ -47,3 +48,10 @@ validation verifier exposed only scalar reward, so the frozen strict gate also s
 non-evaluable. No retry, mutation, holdout release, Oracle run, or promotion occurred. Future studies
 must freeze metric-schema compatibility before release; see
 [ADR 0038](../../.specs/adr/0038-freeze-metric-schema-before-split-release.md).
+
+V8 improved paired development reward from 10/12 for G010 to 12/12 for G011 with no execution errors,
+and the Pareto archive retained only G011 without using holdout data. The frozen development
+allowlist omitted nine legitimate protected metrics emitted by seven historical cases, so the strict
+gate rejected before validation release. Neither fresh six-case cohort was released or run; G010
+remained installed. V9 must freeze exact case-level reward schemas before execution; see
+[ADR 0039](../../.specs/adr/0039-freeze-case-level-reward-schemas.md).
